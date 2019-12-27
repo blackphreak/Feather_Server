@@ -222,7 +222,12 @@ namespace Feather_Server.ServerRelated
                     fullInfo.hit = defs[6];
                     fullInfo.dodge = defs[7];
                     fullInfo.criticalHitRate = defs[8];
+
+                    fullInfo.rideList = new List<Ride>();
+                    fullInfo.petList = new List<Pet>();
+                    fullInfo.equips = new EquipmentSet();
                     fullInfo.bag = new Bag();
+                    // fullInfo.lifeMake = new __(); // TODO: lifeMake class init
 
                     if (!DB2.GetInstance().Insert(
                         "Hero",

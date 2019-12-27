@@ -1,6 +1,7 @@
 ﻿using Feather_Server.Database;
 using Feather_Server.Entity;
 using Feather_Server.Entity.NPC_Related;
+using Feather_Server.Entity.PlayerRelated.Items;
 using Feather_Server.Entity.PlayerRelated.Items.Activable;
 using Feather_Server.MobRelated;
 using Feather_Server.PlayerRelated;
@@ -11,6 +12,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Feather_Server.ServerRelated
 {
@@ -529,8 +531,8 @@ namespace Feather_Server.ServerRelated
             if (cmd[0].StartsWith("learn"))
             {
                 // learn skill
-                // learn !! 510000  // 普通技
-                // learn !!! 510000 // 進階技
+                // learn !! 510000  // role basic skill
+                // learn !!! 510000 // role advance skill
                 // reply:
                 /*
                  
@@ -553,8 +555,45 @@ namespace Feather_Server.ServerRelated
 
             if (cmd[0] == "ride")
             {
-                // ride show 1
+                if (cmd[1] == "list")
+                {
+                    for (byte i = 1; i <= hero.rideList.Count; i++)
+                        this.send(PacketEncoder.rideItem(hero, i));
+                }
+                else if (cmd[1] == "desc")
+                {
+                    var idx = byte.Parse(cmd[2]);
+                    this.send(PacketEncoder.rideItem(hero, idx));
+                }
+                else if (cmd[1] == "show")
+                {
+                    var idx = byte.Parse(cmd[2]);
 
+                    hero.ride = hero.rideList[idx - 1];
+
+                    // broadcast to nearbys
+                    Lib.sendToNearby(hero, PacketEncoder.rideOn(hero), true);
+
+                    Lib.spawnNearbys(this, hero);
+
+                    // update ride 
+                    //var source = new CancellationTokenSource();
+                    //Task.Run(async delegate
+                    //{
+                    //    // TODO: delay & progress bar for ride show
+                    //    //await Task.Delay(TimeSpan.FromSeconds(5), source.Token);
+
+                    //    //this.send(PacketEncoder.progressBarComplete(true));
+                    //    hero.ride = hero.rideList[idx];
+
+                    //    // broadcast to nearbys
+                    //    Lib.sendToNearby(hero, PacketEncoder.rideOn(hero), true);
+
+                    //    source.Dispose();
+                    //});
+                }
+
+                return true;
             }
 
             if (cmd[0].StartsWith("remove"))
@@ -579,6 +618,8 @@ namespace Feather_Server.ServerRelated
 
                     if (item is RideWing)
                         pkts = ((RideWing)item).use(this.hero);
+                    else if (item is RideContract)
+                        pkts = ((RideContract)item).use(this.hero);
                     else
                         pkts = item.use(this.hero);
 

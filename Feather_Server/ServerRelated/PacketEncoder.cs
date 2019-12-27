@@ -71,7 +71,7 @@ namespace Feather_Server.ServerRelated
             return pkts;
         }
 
-        public static byte[] progressBarComplete(bool isSuccess, ushort time, int msgID)
+        public static byte[] progressBarComplete(bool isSuccess)
         {
             // idx:5e01
             byte[] pkts = new byte[0];
@@ -1114,34 +1114,38 @@ namespace Feather_Server.ServerRelated
         {
             // idx:b3??
             var pkts = new byte[0];
-            var ride = p.rideList[rideIndex];
+
+            if (rideIndex > p.rideList.Count)
+                return pkts;
+
+            var ride = p.rideList[rideIndex - 1];
 
             concatPacket(Lib.hexToBytes(
                 "b300"
-                + Lib.toHex(rideIndex)
-                + ride.baseItemID
+                + Lib.toHex(rideIndex) + "000000"
+                + Lib.toHex(ride.baseItemID)
                 + "00"
             ), ref pkts);
 
             concatPacket(Lib.hexToBytes(
                 "b304"
-                + Lib.toHex(rideIndex)
+                + Lib.toHex(rideIndex) + "000000"
                 + "00"
-                + ride.buffItemID
+                + Lib.toHex(ride.descItemID)
                 + "00"
             ), ref pkts);
 
             concatPacket(Lib.hexToBytes(
                 "b301"
-                + Lib.toHex(rideIndex)
-                + ride.generation + "000000"
-                + ride.lv + "000000"
-                + ride.stat[1] + "0000"
-                + ride.stat[2] + "0000"
-                + ride.stat[3] + "0000"
-                + ride.stat[4] + "0000"
-                + ride.stat[5] + "0000"
-                + ride.stat[0] + "0000" // usable stat point
+                + Lib.toHex(rideIndex) + "000000"
+                + Lib.toHex(ride.generation) + "000000"
+                + Lib.toHex(ride.lv) + "000000"
+                + Lib.toHex(ride.stat[1]) + "0000"
+                + Lib.toHex(ride.stat[2]) + "0000"
+                + Lib.toHex(ride.stat[3]) + "0000"
+                + Lib.toHex(ride.stat[4]) + "0000"
+                + Lib.toHex(ride.stat[5]) + "0000"
+                + Lib.toHex(ride.stat[0]) + "0000" // usable stat point
                 + "00000000" // unk
                 + "00000000" // unk
                 + Lib.toHex(ride.exp)
@@ -1158,16 +1162,16 @@ namespace Feather_Server.ServerRelated
 
             concatPacket(Lib.hexToBytes(
                 "b304"
-                + Lib.toHex(rideIndex)
+                + Lib.toHex(rideIndex) + "000000"
                 + "00"
-                + ride.buffItemID
+                + Lib.toHex(ride.descItemID)
                 + "00"
             ), ref pkts);
 
             if (!ride.speak.Equals(string.Empty))
                 concatPacket(Lib.hexToBytes(
                     "b305"
-                    + Lib.toHex(rideIndex)
+                    + Lib.toHex(rideIndex) + "000000"
                     + Lib.toHex(Lib.gbkToBytes(ride.speak))
                     + "00"
                 ), ref pkts);
@@ -1175,7 +1179,7 @@ namespace Feather_Server.ServerRelated
             foreach (RideSkill skill in ride.cubSkills)
                 concatPacket(Lib.hexToBytes(
                     "b314"
-                    + Lib.toHex(rideIndex)
+                    + Lib.toHex(rideIndex) + "000000"
                     + Lib.toHex(skill.skillID)
                     + "0000"
                     + "64"
@@ -1186,7 +1190,7 @@ namespace Feather_Server.ServerRelated
             foreach (RideSkill skill in ride.cubSkills)
                 concatPacket(Lib.hexToBytes(
                     "b314"
-                    + Lib.toHex(rideIndex)
+                    + Lib.toHex(rideIndex) + "000000"
                     + Lib.toHex(skill.skillID)
                     + "0100"
                     + "64"
@@ -1197,7 +1201,7 @@ namespace Feather_Server.ServerRelated
             foreach (RideSkill skill in ride.cubSkills)
                 concatPacket(Lib.hexToBytes(
                     "b314"
-                    + Lib.toHex(rideIndex)
+                    + Lib.toHex(rideIndex) + "000000"
                     + Lib.toHex(skill.skillID)
                     + "0200"
                     + "64"
