@@ -621,9 +621,9 @@ namespace Feather_Server.ServerRelated
             (hero as ILivingEntity).addBuff(0x0893bf, 1);
 
             hero.effects ??= new List<Effect>();
-            hero.effects.Add(new Effect(0x70, 0x02, 0x01, 0x02));
-            hero.effects.Add(new Effect(0x6f, 0x04, 0x02, 0x02));
-            hero.effects.Add(new Effect(0x6e, 0x02, 0x01, 0x02));
+            //hero.effects.Add(new Effect(0x70, 0x02, 0x01, 0x02));
+            //hero.effects.Add(new Effect(0x6f, 0x04, 0x02, 0x02));
+            //hero.effects.Add(new Effect(0x6e, 0x02, 0x01, 0x02));
 
             client.send(PacketEncoder.playerJoin(hero));
 

@@ -1127,6 +1127,15 @@ namespace Feather_Server.ServerRelated
                 + "00"
             ), ref pkts);
 
+            // currently activated
+            if (p.ride?.descItemID == ride.descItemID)
+                concatPacket(Lib.hexToBytes(
+                    "b302"
+                    + Lib.toHex(rideIndex) + "000000"
+                    + "01000000"
+                    + "00"
+                ), ref pkts);
+
             concatPacket(Lib.hexToBytes(
                 "b304"
                 + Lib.toHex(rideIndex) + "000000"

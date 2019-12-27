@@ -28,8 +28,6 @@ namespace Feather_Server.ServerRelated
         /// </summary>
         public uint descItemID = 0x00000000;
 
-        public List<Effect> rideBottomEffect;
-
         // excluded from model packet
         public byte lv = 0; // 0 ~ 150
         public uint exp = 0;
@@ -63,7 +61,6 @@ namespace Feather_Server.ServerRelated
             this.baseItemID = baseItemID;
             this.descItemID = descItemID;
 
-            var effects = this.rideBottomEffect ?? new List<Effect>();
             switch (descItemID)
             {
                 #region Gen1

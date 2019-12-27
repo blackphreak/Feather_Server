@@ -569,6 +569,9 @@ namespace Feather_Server.ServerRelated
                 {
                     var idx = byte.Parse(cmd[2]);
 
+                    // active the ride
+                    this.send(PacketEncoder.rideItem(hero, idx));
+
                     hero.ride = hero.rideList[idx - 1];
 
                     // broadcast to nearbys
@@ -591,6 +594,16 @@ namespace Feather_Server.ServerRelated
 
                     //    source.Dispose();
                     //});
+                }
+                else if (cmd[1] == "hide")
+                {
+                    hero.ride = null;
+
+                    // respawn the player
+                    Lib.sendToNearby(hero, PacketEncoder.spawnHero(hero, false), true);
+
+                    // spawn nearby (again, since spawn ride will despawn all existing models) -- also sync the ride models
+                    Lib.spawnNearbys(this, hero);
                 }
 
                 return true;
