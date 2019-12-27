@@ -9,9 +9,9 @@ namespace Feather_Server.ServerRelated
     {
         // For ride list, please refer to the [@info.dat][Item] | search for [col:buffdec] nr0
         // for diviation (nr___ 變色):
-        // nr026: 0x
-        // nr027: 0x62b9
-        // nr033: 0x1ae8
+        // nr027: 0x62b9 // 
+        // nr031: 0x6222 // yellow elephant
+        // nr033: 0x1ae8 // 
         public ushort modelID = 0x0000;
         public ushort modelColor = 0x0000; // colored
         [JsonIgnore]
@@ -89,7 +89,7 @@ namespace Feather_Server.ServerRelated
                     break;
                 case 101287: // 翠鳞初代
                     this.modelID = 0x0004;
-                    this.modelColor = 0x1ae8; // TODO: find color
+                    this.modelColor = 0x1ae8;
                     break;
 
                 case 101225:
@@ -109,7 +109,7 @@ namespace Feather_Server.ServerRelated
                     break;
                 case 101286: // 金刚初代
                     this.modelID = 0x0007;
-                    this.modelColor = 0x1ae8; // TODO: find color
+                    this.modelColor = 0x6222;
                     break;
 
                 case 101231: // 骆马契约
@@ -176,7 +176,7 @@ namespace Feather_Server.ServerRelated
                 case 101291: // 金刚之魂
                     this.modelID = 0x001E;
                     this.generation = 2;
-                    this.modelColor = 0x1ae8; // TODO: find color
+                    this.modelColor = 0x6222;
                     break;
 
                 case 101211: // 地之契约
@@ -186,7 +186,7 @@ namespace Feather_Server.ServerRelated
                 case 101292: // 翠鳞之魂
                     this.modelID = 0x0020;
                     this.generation = 2;
-                    this.modelColor = 0x1ae8; // TODO: find color
+                    this.modelColor = 0x1ae8;
                     break;
 
                 case 101213:
@@ -252,7 +252,7 @@ namespace Feather_Server.ServerRelated
                 case 101296: // 金刚之魂
                     this.modelID = 0x001F;
                     this.generation = 3;
-                    this.modelColor = 0x1ae8; // TODO: find color
+                    this.modelColor = 0x6222;
                     break;
 
                 case 101212: // 地之契约
@@ -262,7 +262,7 @@ namespace Feather_Server.ServerRelated
                 case 101297: // 翠鳞之魂
                     this.modelID = 0x0021;
                     this.generation = 3;
-                    this.modelColor = 0x1ae8; // TODO: find color
+                    this.modelColor = 0x1ae8;
                     break;
 
                 case 101214:
