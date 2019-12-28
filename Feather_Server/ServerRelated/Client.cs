@@ -1,7 +1,6 @@
 ﻿using Feather_Server.Database;
 using Feather_Server.Entity;
 using Feather_Server.Entity.NPC_Related;
-using Feather_Server.Entity.PlayerRelated.Items;
 using Feather_Server.Entity.PlayerRelated.Items.Activable;
 using Feather_Server.MobRelated;
 using Feather_Server.PlayerRelated;
@@ -12,7 +11,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Feather_Server.ServerRelated
 {
@@ -285,7 +283,7 @@ namespace Feather_Server.ServerRelated
                 //go >2 -> facing
 
                 ((IEntity)hero).updateFacing(byte.Parse(cmd[1].Substring(1)));
-                Lib.sendToNearby(hero, PacketEncoder.updatePlayerFacing(hero), true);
+                Lib.sendToNearby(hero, PacketEncoder.updatePlayerState(hero));
                 return true;
             }
             if (cmd[0].StartsWith("act"))
@@ -314,10 +312,9 @@ namespace Feather_Server.ServerRelated
                 var pkt = PacketEncoder.playerAct(hero);
                 Lib.sendToNearby(hero, pkt);
 
-                // confirm act (only for sender)
-                PacketEncoder.concatPacket(Lib.hexToBytes(
-                    "04 3d0901"
-                ), ref pkt, false);
+                PacketEncoder.concatPacket(
+                    PacketEncoder.playerUpdateState(hero)
+                    , ref pkt, false);
                 this.send(pkt);
                 return true;
             }
@@ -532,8 +529,8 @@ namespace Feather_Server.ServerRelated
             if (cmd[0].StartsWith("learn"))
             {
                 // learn skill
-                // learn !! 510000  // role basic skill
-                // learn !!! 510000 // role advance skill
+                // learn !! 510000  // 普通技
+                // learn !!! 510000 // 進階技
                 // reply:
                 /*
                  
@@ -556,70 +553,8 @@ namespace Feather_Server.ServerRelated
 
             if (cmd[0] == "ride")
             {
-                if (cmd[1] == "list")
-                {
-                    for (byte i = 1; i <= hero.rideList.Count; i++)
-                        this.send(PacketEncoder.rideItem(hero, i));
-                }
-                else if (cmd[1] == "desc")
-                {
-                    var idx = byte.Parse(cmd[2]);
-                    this.send(PacketEncoder.rideItem(hero, idx));
-                }
-                else if (cmd[1] == "show")
-                {
-                    var idx = byte.Parse(cmd[2]);
+                // ride show 1
 
-                    hero.ride = hero.rideList[idx - 1];
-
-                    // broadcast to nearbys
-                    Lib.sendToNearby(hero, PacketEncoder.rideOn(hero), true);
-
-                    Lib.spawnNearbys(this, hero);
-
-                    // active the ride
-                    this.send(PacketEncoder.rideItem(hero, idx));
-
-                    // TODO: ride stat share calculation & update player stat (include attack, defense, dodge, etc.)
-
-                    // update ride 
-                    //var source = new CancellationTokenSource();
-                    //Task.Run(async delegate
-                    //{
-                    //    // TODO: delay & progress bar for ride show
-                    //    //await Task.Delay(TimeSpan.FromSeconds(5), source.Token);
-
-                    //    //this.send(PacketEncoder.progressBarComplete(true));
-                    //    hero.ride = hero.rideList[idx];
-
-                    //    // broadcast to nearbys
-                    //    Lib.sendToNearby(hero, PacketEncoder.rideOn(hero), true);
-
-                    //    source.Dispose();
-                    //});
-                }
-                else if (cmd[1] == "hide")
-                {
-                    if (hero.ride == null)
-                        return true;
-
-                    byte idx = (byte)(hero.rideList.FindIndex(ride => ride.descItemID == hero.ride.descItemID) + 1);
-
-                    hero.ride = null;
-
-                    // respawn the player
-                    Lib.sendToNearby(hero, PacketEncoder.spawnHero(hero, false), true);
-
-                    // also send de-activate ride item (must after spawn player)
-                    this.send(PacketEncoder.rideItem(hero,
-                        idx
-                    ));
-
-                    // spawn nearby (again, since spawn ride will despawn all existing models) -- also sync the ride models
-                    Lib.spawnNearbys(this, hero);
-                }
-
-                return true;
             }
 
             if (cmd[0].StartsWith("remove"))
@@ -644,8 +579,6 @@ namespace Feather_Server.ServerRelated
 
                     if (item is RideWing)
                         pkts = ((RideWing)item).use(this.hero);
-                    else if (item is RideContract)
-                        pkts = ((RideContract)item).use(this.hero);
                     else
                         pkts = item.use(this.hero);
 
