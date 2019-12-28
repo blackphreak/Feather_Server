@@ -290,16 +290,16 @@ namespace Feather_Server.ServerRelated
             // 69 0b dc7b0b00 f200 6000 02                                      body_color
             // readyState (0100: joining (green named), >0200: ready (blue named))
             //      icon               hair color                  hat       body      wing      mask      tail      wp-- wpCode--
-            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 321a5c0c 0001 0200 09370000 d0fd312020202020202020202020202000
+            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 32 1a 5c0c0001 0200 09370000 d0fd312020202020202020202020202000
             // 69 0b 47ac0400 90 00 5A 00 01
 
             // 69 0b dc7b0b00 f2 00 60 00 02
-            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 321a5c0c 0001 0200 09370000 d0fd312020202020202020202020202000
+            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 32 1a 5c0c0001 0200 09370000 d0fd312020202020202020202020202000
             // 69 0a b6a60600 94 00 5e 00 04
-            // 0201 0100 1127 00000000 0100 e780 07002cd3 07002cd3 e903 9b42 0b00 0000 0000 0000 0800 0000 0100 0000 3d08 00000000 0000 0e00f70b 0000 c0cfcde6bcd23920202020202020202000
-            // 0201 0400 1127 00000000 0800 0c63 26000000 26000000 0c00 0000 2800 1552 0000 0000 0400 0000 0700 0000 3e0f 00001ff8 0505 1900e43f 0000 a4b8bbd2ccabc0c7d8bc20202020202000
+            // 0201 0100 1127 00000000 0100 e780 07002cd3 07002cd3 e903 9b42 0b00 0000 0000 0000 0800 0000 0100 0000 3d08 00000000 0000 0e 00 f70b0000 c0cfcde6bcd23920202020202020202000
+            // 0201 0400 1127 00000000 0800 0c63 26000000 26000000 0c00 0000 2800 1552 0000 0000 0400 0000 0700 0000 3e0f 00001ff8 0505 19 00 e43f0000 a4b8bbd2ccabc0c7d8bc20202020202000
             // 69 0b e3060000 E3 00 6F 00 01
-            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 311a5c0c 0001 0200 e3060000 bcd3d0fd30352020202020202020202000
+            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 31 1a 5c0c0001 0200 e3060000 bcd3d0fd30352020202020202020202000
 
             // ref: pkt_model_00.jpg
             // 69 0a dedf0d00 ee 00 6e 00 02
@@ -351,13 +351,15 @@ namespace Feather_Server.ServerRelated
                 + "00000000" // ?
                 + "00000000" // ?
                 + p.model.toModelHex()
-                //wp   wpColor-      HP ?? ?? ??
-                //3d01 00000000 0000 32 1a 5c 0c 0001 0200 <uid > <name> [0b]
-                //3e0c 0000bffc 0404 2f 00 9a 3a 0000 <name>        [0a]
+                //wp   wpColor-      HP ?? heroID--
+                //3d01 00000000 0000 32 1a 5c0c0001 0200 <uid-> <name> [0b]
+                //3e0c 0000bffc 0404 2f 00 9a3a0000 <name>             [0a]
                 + "0000"
                 + Lib.toHex((byte)(p.hp / p.maxHP * 0x32))
-                + "1a5c0c"
-                + ((newlyAppear) ? "00010200" + Lib.toHex(p.heroID) : "0000")
+                + "1A" // unk
+                //+ "5c0c0000" // player ID (shown in "W" GUI)
+                + Lib.toHex(p.heroID)
+                + ((newlyAppear) ? "0200" + Lib.toHex(p.heroID) : "")
                 + Lib.padWithString(Lib.toHex(Lib.gbkToBytes(p.heroName)), "20", 16 * 2)
                 + "00"
             ), ref pkts);
@@ -496,7 +498,7 @@ namespace Feather_Server.ServerRelated
             return pkts;
         }
         
-        public static byte[] setHeroMeleeAttack(Hero p)
+        public static byte[] setHeroPhysicalAttack(Hero p)
         {
             // idx:3d18
             byte[] pkts = new byte[0];
@@ -510,7 +512,7 @@ namespace Feather_Server.ServerRelated
             return pkts;
         }
         
-        public static byte[] setHeroMeleeDefense(Hero p)
+        public static byte[] setHeroPhysicalDefense(Hero p)
         {
             // idx:3d19
             byte[] pkts = new byte[0];
@@ -526,7 +528,7 @@ namespace Feather_Server.ServerRelated
         
         public static byte[] setHeroMagicAttack(Hero p)
         {
-            // idx:3d1a | TODO: confirm pkt
+            // idx:3d1a
             byte[] pkts = new byte[0];
             // __ 3d 1a 11000000 34000000 00 // 17 | 52 | set Magic Attack  (min 17, max 52)
             concatPacket(Lib.hexToBytes(
@@ -540,7 +542,7 @@ namespace Feather_Server.ServerRelated
 
         public static byte[] setHeroMagicDefense(Hero p)
         {
-            // idx:3d1b | TODO: confirm pkt
+            // idx:3d1b
             byte[] pkts = new byte[0];
             // __ 3d 1b 11000000 34000000 00 // 17 | 52 | set Magic Defense (min 17, max 52)
             concatPacket(Lib.hexToBytes(
@@ -641,20 +643,19 @@ namespace Feather_Server.ServerRelated
         }
 
         /// <summary>
-        /// Update player model for both Acting and Facing
+        /// Update player model for Facing
         /// </summary>
         /// <param name="p">Hero</param>
         /// <returns>Packets based on Hero(p) </returns>
-        public static byte[] updatePlayerState(Hero p)
+        public static byte[] updatePlayerFacing(Hero p)
         {
             // idx:5e??
             byte[] pkts = new byte[0];
-            // 07 5e 34271600 02 00 00
+            // 07 5e 34271600 02 00
             concatPacket(Lib.hexToBytes(
                 "07" // sz
                 + "5e"
                 + Lib.toHex(p.heroID)
-                + Lib.toHex(p.act)
                 + Lib.toHex(p.facing)
                 + "00"
             ), ref pkts, false);
@@ -663,19 +664,20 @@ namespace Feather_Server.ServerRelated
 
         public static byte[] playerAct(Hero p)
         {
-            // TODO: confirm pkt | wtf is this?
             // idx:40??
             byte[] pkts = new byte[0];
             // act: 01~06: walk animate
             //      08
             //       heroID-- rnd----- act
-            // __ 40 <uid>
-            byte[] rnd = new byte[4];
+            // __ 40 644b4600 18143013 0b 00 // fight
+            // __ 40 644b4600 37163013 01 00 // stand
+            // __ 40 644b4600 8c163013 04 00 // sit
+            byte[] rnd = new byte[2]; // should be time?
             new Random().NextBytes(rnd);
             concatPacket(Lib.hexToBytes(
                 "40"
                 + Lib.toHex(p.heroID)
-                + Lib.toHex(rnd)
+                + Lib.toHex(rnd) + "0000"
                 + Lib.toHex(p.act)
                 + "00"
             ), ref pkts);
@@ -1127,14 +1129,13 @@ namespace Feather_Server.ServerRelated
                 + "00"
             ), ref pkts);
 
-            // currently activated
-            if (p.ride?.descItemID == ride.descItemID)
-                concatPacket(Lib.hexToBytes(
-                    "b302"
-                    + Lib.toHex(rideIndex) + "000000"
-                    + "01000000"
-                    + "00"
-                ), ref pkts);
+            // currently activated ride (active ride item)
+            concatPacket(Lib.hexToBytes(
+                "b302"
+                + Lib.toHex(rideIndex) + "000000"
+                + (p.ride?.descItemID == ride.descItemID ? "01" : "00") + "000000"
+                + "00"
+            ), ref pkts);
 
             concatPacket(Lib.hexToBytes(
                 "b304"
