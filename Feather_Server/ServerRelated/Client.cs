@@ -312,7 +312,7 @@ namespace Feather_Server.ServerRelated
                 }
 
                 var pkt = PacketEncoder.playerAct(hero);
-                Lib.sendToNearby(hero, pkt);
+                Lib.sendToNearby(hero, pkt, true);
 
                 // confirm act (only for sender)
                 PacketEncoder.concatPacket(Lib.hexToBytes(
