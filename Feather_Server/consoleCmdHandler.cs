@@ -15,6 +15,7 @@ namespace Feather_Server
         {
             var inp = cmd.Split(" ");
             int heroID;
+            Client cli;
 
             switch (inp[0].ToLower())
             {
@@ -46,7 +47,7 @@ namespace Feather_Server
                         Console.WriteLine("\t[!] Exited Give Test Item Mode.");
                         return;
                     }
-                    Client cli = Lib.clientList[heroID];
+                    cli = Lib.clientList[heroID];
 
                     Console.WriteLine("\t[.] Please enter the item with format: <itemID> [baseID]. (baseID is optional)");
                     do
@@ -305,7 +306,7 @@ namespace Feather_Server
                         if (inp.Length == 5)
                             baseID = uint.Parse(inp[4]);
 
-                        var cli = Lib.clientList.GetValueOrDefault(targetID, null);
+                        cli = Lib.clientList.GetValueOrDefault(targetID, null);
 
                         if (cli == null)
                         {
