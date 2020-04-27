@@ -116,7 +116,7 @@ namespace Feather_Server.ServerRelated
 
             byte[] pkts = new byte[0];
 
-            // $1: item UniqueID
+            // $1: item description ID
             // $2: item position in bag (start counting from 1)
             // $3: baseID
             // $4: stack (ushort)
@@ -138,6 +138,7 @@ namespace Feather_Server.ServerRelated
                 + Lib.toHex(newlyAdded.quality)
                 + Lib.toHex(newlyAdded.lvRequirement)
                 + (newlyAdded is EquippableItem ? Lib.toHex((byte)(newlyAdded as EquippableItem).slotIndex) : "00")
+                + "00"
                 + Lib.toHex(newlyAdded.itemID)
                 + "00"
             ), ref pkts);
@@ -171,7 +172,7 @@ namespace Feather_Server.ServerRelated
             // $7: color?
             // $8: color?
             // $9: if appears, use format string, otherwise, name only.
-            // $10: string format ID
+            // $10: 
             // $11: mobNameID
 
             //          eid----- X--- Y--- $1 $2 $3 $4------ $5 $6 $7-- $8-- $9 $10----- __ $11----- __ mobLv---
@@ -350,10 +351,10 @@ namespace Feather_Server.ServerRelated
                 + "00000000" // ?
                 + "00000000" // ?
                 + p.model.toModelHex()
-                //wp   wpColor- XX   HP ?? heroID--
-                //3d01 00000000 0000 32 1a 5c0c0001 0200 <uid-> <name> [0b]
-                //3e0c 0000bffc 0404 2f 00 9a3a0000 <name>             [0a]
-                + "0000" // XX
+                //wp   wpColor-      HP ?? ?? ??
+                //3d01 00000000 0000 32 1a 5c 0c 0001 0200 <uid > <name> [0b]
+                //3e0c 0000bffc 0404 2f 00 9a 3a 0000 <name>        [0a]
+                + "0000"
                 + Lib.toHex((byte)(p.hp / p.maxHP * 0x32))
                 + "1a5c0c"
                 + ((newlyAppear) ? "00010200" + Lib.toHex(p.heroID) : "0000")
@@ -626,7 +627,7 @@ namespace Feather_Server.ServerRelated
 
         public static byte[] heroLevelUpAnimate(Hero p)
         {
-            // idx:3d2c
+            // idx:3d28
             byte[] pkts = new byte[0];
             //         newLv newLvExp
             // __ 3d2c 0300  c3000000 00 // lv up head-msg-animate
@@ -767,7 +768,7 @@ namespace Feather_Server.ServerRelated
             ), ref pkts);
 
             lastLoginRecord(p.heroID, ref pkts);
-            //getGameNotice(ref pkts); // TODO: uncomment
+            getGameNotice(ref pkts);
 
             // @ Server.cs : JoinGame-Mark1
             concatPacket(Lib.hexToBytes(
@@ -785,7 +786,7 @@ namespace Feather_Server.ServerRelated
 
             // @ Server.cs : JoinGame-Mark3
             concatPacket(Lib.hexToBytes(
-                "490a0000000000"
+                "490a00000000"
             ), ref pkts);
 
             // @ Server.cs - Player Location
@@ -853,7 +854,6 @@ namespace Feather_Server.ServerRelated
                 + "00" // null-term
             ), ref pkts);
 
-            var a = Lib.toHex(pkts);
             return pkts;
         }
 
@@ -865,20 +865,20 @@ namespace Feather_Server.ServerRelated
             // 3e 01 250f00007313000000323031392d31322d31322031303a30353a3237730e000000 3132342e3234342e31342e313137 00
             concatPacket(Lib.hexToBytes(
                 "3e01"
-                + "250f0000"
-                + "73 13000000"
+                + "25" // 25: last 26: current
+                + "0f00007313000000"
                 + "323031392d31322d31322031303a30353a3237" // date time [2019-12-12 10:05:27]
-                + "73 0e000000"
+                + "730e000000"
                 + "3131312e3131312e3131312e313131" // IP
                 + "00"
             ), ref pkts);
 
             concatPacket(Lib.hexToBytes(
                 "3e01"
-                + "260f0000"
-                + "73 13000000"
+                + "26" // 25: last 26: current
+                + "0f00007313000000"
                 + "323031392d31322d31322031303a30353a3238" // date time [2019-12-12 10:05:28]
-                + "73 0e000000"
+                + "730e000000"
                 + "3131312e3131312e3131312e313131" // IP
                 + "00"
             ), ref pkts);
@@ -902,14 +902,14 @@ namespace Feather_Server.ServerRelated
             ), ref pkts);
 
             // title list
-            //__ a2 0100 74270000 73 04000000 42303032 73 04000000 c0b4d0c5 00
-            //__ a2 0100 7b270000 73 04000000 44303033 64 2b270000 00
-            //__ a2 0100 7b270000 73 04000000 47303035 64 42270000 00
-            //__ a2 0100 7b270000 73 04000000 44303031 64 29270000 00
-            //__ a2 0100 75270000 73 04000000 42303031 73 0e000000 602b433078323766353263602d43 64 11270000 00 // GBK colorCode & titleID
-            //__ a2 0100 77270000 73 04000000 43303036 73 06000000 天青色 64 28270000 00
-            //__ a2 0100 75270000 73 04000000 56303032 73 0e000000602b433078666666663030602d43 64 69270000 00
-            //__ a2 0100 76270000 73 04000000 43303033 73 06000000 天青色 64 fe1100006425270000 00
+            //__ a2 0100 74270000 73040000 00423030327304000000c0b4d0c5 00
+            //__ a2 0100 7b270000 73040000 004430303364 2b270000 00
+            //__ a2 0100 7b270000 73040000 004730303564 42270000 00
+            //__ a2 0100 7b270000 73040000 004430303164 29270000 00
+            //__ a2 0100 75270000 73040000 0042303031730e000000602b433078323766353263602d43 64 11270000 00 // GBK colorCode & titleID
+            //__ a2 0100 77270000 73040000 00433030367306000000 天青色 64 28270000 00
+            //__ a2 0100 75270000 73040000 0056303032730e000000602b433078666666663030602d43 64 69270000 00
+            //__ a2 0100 76270000 73040000 00433030337306000000 天青色 64 fe1100006425270000 00
             //concatPacket(Lib.hexToBytes(
             //    "a214" // currently using's user title
             //    + Lib.toHex(p.uid)
@@ -951,7 +951,7 @@ namespace Feather_Server.ServerRelated
                 + Lib.toHex(p.magicDamage )
                 + Lib.toHex(p.magicDefense - 35 <= 10 ? 10 : p.magicDefense - 35)
                 + Lib.toHex(p.magicDefense) 
-                + "0000 0000 0000" // unk
+                + "000000000000" // unk
                 + "00"
             ), ref pkts);
 
@@ -970,7 +970,7 @@ namespace Feather_Server.ServerRelated
                 + Lib.toHex(p.exp)
                 + Lib.toHex(Lib.lvUpExp[p.lv])
                 + Lib.toHex(p.silver)
-                + "0000 0000" // unk
+                + "00000000" // unk
                 + "00"
             ), ref pkts);
 
@@ -1081,7 +1081,8 @@ namespace Feather_Server.ServerRelated
 
             // skill tree
             // TODO: build skill tree
-            getHeroSkillTreeFull(p, ref pkts);
+            // __ 55 858b080005000000000000858b0800 00 // 攻擊提升 (部落技)
+            // __ 55 be93080003000000000000be930800 00 // 偵查術
 
             // item bar
             // TODO: build item bar
@@ -1207,68 +1208,14 @@ namespace Feather_Server.ServerRelated
         }
         #endregion
 
-        #region Skill
-        public static void getHeroSkillTreeFull(Hero p, ref byte[] pkts)
-        {
-            concatPacket(Lib.hexToBytes(
-                "06 53 00000000 00"
-                //                lv--
-                + "13 53 30c80700 EE00 0000 00000000 00 30c80700 00"
-                // $A: tree level?
-                //       skID     skLv      $A
-                + "21 50 3ac80700 0300 0000 EE00 0000 00 00000000 91b00a00 64 3ac80700 64 01000000 00" // 91b00a00 ("^1($2级)"): formatStringID, $1, $2
-
-                + "0e 64 3ac80700 0600 0002 010a0500 00"
-                
-                + "1c 50 44c80700 0000 0000 EE00 0000 00 00000000 6acb1000 64 44c80700 00"
-                //+ "1c 50 4ec80700000000000100000000000000006acb1000644ec80700 00"
-                //+ "1c 50 58c80700000000000100000000000000006acb10006458c80700 00"
-                //+ "1c 50 62c80700000000000100000000000000006acb10006462c80700 00"
-                //+ "1c 50 6cc80700000000000100000000000000006acb1000646cc80700 00"
-                //+ "1c 50 76c80700000000000100000000000000006acb10006476c80700 00"
-                //+ "13 53 94c8070001000000000000000094c80700 00"
-                //+ "1c 50 9ec80700000000000100000000000000006acb1000649ec80700 00"
-                //+ "1c 50 a8c80700000000000100000000000000006acb100064a8c80700 00"
-                //+ "1c 50 b2c80700000000000100000000000000006acb100064b2c80700 00"
-                //+ "1c 50 bcc80700000000000100000000000000006acb100064bcc80700 00"
-                //+ "13 53 f8c80700070000000000000000f8c80700 00"
-                //+ "1c 50 02c90700030000000200000000000000006acb10006402c90700 00"
-                //+ "0e 64 02c907000a00000a5e000700 00"
-                //+ "1c 50 0cc90700000000000100000000000000006acb1000640cc90700 00"
-                //+ "1c 50 16c90700000000000100000000000000006acb10006416c90700 00"
-                //+ "13 53 5cc907000100000000000000005cc90700 00"
-                //+ "13 53 c0c90700010000000000000000c0c90700 00"
-                //+ "13 53 24ca070001000000000000000024ca0700 00"
-                //+ "13 53 88ca070001000000000000000088ca0700 00"
-                //+ "11 55 96930800 0100 000000000096930800 00"
-                //+ "11 55 18940800 0100 000000000018940800 00"
-                //+ "1c 50 19940800000000001e00000000000000006acb10006419940800 00"
-                //+ "0e 64 199408000000010d00000500 00"
-                //+ "1c 50 1a940800000000001e00000000000000006acb1000641a940800 00"
-                //+ "0e 64 1a9408000000010d00000500 00"
-                //+ "1c 50 9ab208000b0000000100000000000000006acb1000649ab20800 00"
-                //+ "1c 50 a4b208000b0000000100000000000000006acb100064a4b20800 00"
-                //+ "1c 50 e0b208000b0000000100000000000000006acb100064e0b20800 00"
-                //+ "1c 50 1cb30800030000000100000000000000006acb1000641cb30800 00"
-                //+ "0e 64 1cb30800000000085e000500 00"
-                //+ "1c 50 eab208000b0000000100000000000000006acb100064eab20800 00"
-                //+ "1c 50 30b308000b0000000100000000000000006acb10006430b30800 00"
-                //+ "1c 50 3ab308000d0000000100000000000000006acb1000643ab30800 00"
-                //+ "1c 50 44b308000b0000000100000000000000006acb10006444b30800 00"
-                //+ "1c 50 26b308000b0000000100000000000000006acb10006426b30800 00"
-            ), ref pkts, false);
-        }
-        #endregion
-
         #region Broadcast / Notice / System / GM
         public static byte[] scrollingNoticeWithFormat(int msgID, params int[] argv)
         {
             // idx:a301
             // sep: 64
             // TypeA: 64 as sep
-            //          msgID--- __ param $1 __ param $2 __ param $3 __
-            // __ a3 01 56750000 64 68000000 64 f0000000 64 9d000000 00
-            // __ a3 01 4c320000 64 6d000000 64 ca000000 64 6c000000 64 66000000 64 2e010000 00
+            //           msgID        __ param $1     __ param $2    __ param $3
+            // __ a3_01_ 56_75_00_00_ 64_68_00_00_00_ 64_f0_00_00_00_64_9d_00_00_00_ 00_
             // TypeB: 7306 as sep
             // __ a3_01_ 64_75_00_00_ 73_06_00_00_00_ bb_b9_cb_c0_b9_ed_ 73_06_ 00_00_00_d1_e0_b3_e0_cf_bc_00_
             var pkts = new byte[0];
@@ -1287,7 +1234,6 @@ namespace Feather_Server.ServerRelated
         }
         #endregion
 
-
         public static List<string> parse(byte[] packet)
         {
             // TODO: parser (i dont think client will send packets to me lo = =.., it uses commands only..)
@@ -1302,17 +1248,17 @@ namespace Feather_Server.ServerRelated
         /// <returns>Packet total size (newly added size byte included)</returns>
         public static void concatPacket(in byte[] src, ref byte[] concatTo, bool prependSize = true)
         {
-            var szSrc = src.Length;
+            var sz = (byte)(src.Length & 0x000000FF); // read the lowest bits only.
             int szPkts = concatTo.Length;
 
-            if (prependSize)
-                szSrc &= 0xFF; // use the lowest 8 bits only.
+            if (!prependSize)
+                szPkts -= 1;
 
-            Array.Resize(ref concatTo, szPkts + szSrc + 1);
-            Buffer.BlockCopy(src, 0, concatTo, szPkts + 1, szSrc);
+            Array.Resize(ref concatTo, szPkts + sz + 1);
+            Buffer.BlockCopy(src, 0, concatTo, szPkts + 1, sz);
 
             if (prependSize)
-                concatTo[szPkts] = (byte)szSrc;
+                concatTo[szPkts] = sz;
         }
     }
 }
