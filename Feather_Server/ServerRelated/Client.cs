@@ -310,7 +310,7 @@ namespace Feather_Server.ServerRelated
                 }
 
                 var pkt = PacketEncoder.playerAct(hero);
-                Lib.sendToNearby(hero, pkt, true);
+                Lib.sendToNearby(hero, pkt);
 
                 PacketEncoder.concatPacket(
                     PacketEncoder.playerUpdateState(hero)

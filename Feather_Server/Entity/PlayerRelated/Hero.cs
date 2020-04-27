@@ -74,19 +74,7 @@ namespace Feather_Server.ServerRelated
         public string aiming; // selected target
 
         // 屬性
-        
-        public ushort[] gifts = {
-            // strength // 體質
-            23,
-            // spirit // 精神
-            23,
-            // intelligence // 智力
-            23,
-            // power // 力量
-            23,
-            // stamina // 耐力
-            23,
-        };
+        public ushort[] gifts = { 23, 23, 23, 23, 23 };
         public ushort giftPoint = 0;
 
         public uint exp = 0;
