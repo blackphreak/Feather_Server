@@ -1321,6 +1321,8 @@ namespace Feather_Server.ServerRelated
 
             if (prependSize)
                 szSrc &= 0xFF; // use the lowest 8 bits only.
+            else
+                szSrc -= 1;
 
             Array.Resize(ref concatTo, szPkts + szSrc + 1);
             Buffer.BlockCopy(src, 0, concatTo, szPkts + 1, szSrc);
