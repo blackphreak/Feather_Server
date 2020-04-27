@@ -27,7 +27,7 @@ So, if you are really interested and want to own a private server yourself, plea
 # Tools
 For the game exe reverse engineering function addresses (some are missing): [Here](https://hackmd.io/@blackphreak/r1MHKHqrS)\
 For the latest function address, you may download the CheatEngine Table (.ct) [Here](https://dl.hkwtc.org/feather_201908282145.CT)\
-For filter out known packets in the captured packets: [FeatherParser](https://hkwtc.org/FeatherParser/pktParser.php)
+For filter out known packets in the captured packets: [FeatherParser](https://wi.hkwtc.org/FeatherParser/pktParser.php)
 
 # Licensing
 I don't really care the license problem, if you really want, just copy it or do whatever you want,\
