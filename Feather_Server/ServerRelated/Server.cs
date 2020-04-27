@@ -222,12 +222,7 @@ namespace Feather_Server.ServerRelated
                     fullInfo.hit = defs[6];
                     fullInfo.dodge = defs[7];
                     fullInfo.criticalHitRate = defs[8];
-
-                    fullInfo.rideList = new List<Ride>();
-                    fullInfo.petList = new List<Pet>();
-                    fullInfo.equips = new EquipmentSet();
                     fullInfo.bag = new Bag();
-                    // fullInfo.lifeMake = new __(); // TODO: lifeMake class init
 
                     if (!DB2.GetInstance().Insert(
                         "Hero",
@@ -621,9 +616,9 @@ namespace Feather_Server.ServerRelated
             (hero as ILivingEntity).addBuff(0x0893bf, 1);
 
             hero.effects ??= new List<Effect>();
-            //hero.effects.Add(new Effect(0x70, 0x02, 0x01, 0x02));
-            //hero.effects.Add(new Effect(0x6f, 0x04, 0x02, 0x02));
-            //hero.effects.Add(new Effect(0x6e, 0x02, 0x01, 0x02));
+            hero.effects.Add(new Effect(0x70, 0x02, 0x01, 0x02));
+            hero.effects.Add(new Effect(0x6f, 0x04, 0x02, 0x02));
+            hero.effects.Add(new Effect(0x6e, 0x02, 0x01, 0x02));
 
             client.send(PacketEncoder.playerJoin(hero));
 

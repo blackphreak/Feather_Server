@@ -322,10 +322,6 @@ namespace Feather_Server
                             ((RideWing)item).wingsID = 0x0841;
                             ((RideWing)item).wingsLv = 0x000b;
                         }
-                        else if (baseID >= 101035 && baseID <= 101039 || baseID == 101057)
-                        {
-                            item = new RideContract();
-                        }
 
                         item ??= new Item();
                         item.itemUID = Lib.lastItemUID++;
