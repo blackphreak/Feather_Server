@@ -8,6 +8,7 @@ using Feather_Server.Entity;
 using Feather_Server.PlayerRelated.Skills.Rides;
 using Feather_Server.PlayerRelated;
 using Feather_Server.PlayerRelated.Items;
+using System.Runtime.InteropServices;
 
 namespace Feather_Server.ServerRelated
 {
@@ -16,6 +17,9 @@ namespace Feather_Server.ServerRelated
     /// </summary>
     public static class PacketEncoder
     {
+        [DllImport("winmm.dll", EntryPoint = "timeGetTime")]
+        public static extern uint timeGetTime();
+
         public static byte[] alertBox(uint msgID)
         {
             // idx:2102
@@ -126,8 +130,8 @@ namespace Feather_Server.ServerRelated
             // $8: description ID
             // $9: itemID
 
-            //       $1------ $2 $3------ $4-- $5 $6 $7 $8 __ $9------ __
-            // __ 2b ea152c00 02 BC2E0200 0100 00 00 00 00 00 BC2E0200 00
+            //       $1------ $2 $3------ $4-- $5 $6 $7 $8-- $9------ __
+            // __ 2b ea152c00 02 BC2E0200 0100 00 00 00 0000 BC2E0200 00
             concatPacket(Lib.hexToBytes(
                 "2b"
                 + Lib.toHex(newlyAdded.itemUID)
@@ -137,7 +141,7 @@ namespace Feather_Server.ServerRelated
                 + Lib.toHex(newlyAdded.itemType)
                 + Lib.toHex(newlyAdded.quality)
                 + Lib.toHex(newlyAdded.lvRequirement)
-                + (newlyAdded is EquippableItem ? Lib.toHex((byte)(newlyAdded as EquippableItem).slotIndex) : "00")
+                + (newlyAdded is EquippableItem ? Lib.toHex((ushort)(newlyAdded as EquippableItem).slotIndex) : "0000")
                 + Lib.toHex(newlyAdded.itemID)
                 + "00"
             ), ref pkts);
@@ -667,18 +671,18 @@ namespace Feather_Server.ServerRelated
             byte[] pkts = new byte[0];
             // act: 01~06: walk animate
             //      08
-            //       heroID-- rnd----- act
+            //       heroID-- time---- act
             // __ 40 644b4600 18143013 0b 00 // fight
             // __ 40 644b4600 37163013 01 00 // stand
             // __ 40 644b4600 8c163013 04 00 // sit
-            byte[] rnd = new byte[2]; // should be time?
-            new Random().NextBytes(rnd);
-            concatPacket(Lib.hexToBytes(
-                "40"
+
+            var pkt = "40"
                 + Lib.toHex(p.heroID)
-                + Lib.toHex(rnd) + "0000"
+                + Lib.toHex(timeGetTime())
                 + Lib.toHex(p.act)
-                + "00"
+                + "00";
+            concatPacket(Lib.hexToBytes(
+                pkt
             ), ref pkts);
             return pkts;
         }
@@ -769,7 +773,7 @@ namespace Feather_Server.ServerRelated
             ), ref pkts);
 
             lastLoginRecord(p.heroID, ref pkts);
-            //getGameNotice(ref pkts); // TODO: uncomment
+            getGameNotice(ref pkts);
 
             // @ Server.cs : JoinGame-Mark1
             concatPacket(Lib.hexToBytes(
@@ -1322,7 +1326,7 @@ namespace Feather_Server.ServerRelated
             if (prependSize)
                 szSrc &= 0xFF; // use the lowest 8 bits only.
             else
-                szSrc -= 1;
+                szPkts -= 1;
 
             Array.Resize(ref concatTo, szPkts + szSrc + 1);
             Buffer.BlockCopy(src, 0, concatTo, szPkts + 1, szSrc);

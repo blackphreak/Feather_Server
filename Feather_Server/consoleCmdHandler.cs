@@ -188,7 +188,10 @@ namespace Feather_Server
                             try
                             {
                                 PacketEncoder.concatPacket(Lib.hexToBytes(
-                                    pkt.Replace("{hid}", Lib.toHex(heroID == -1 ? 0x78563412 : heroID)).Replace("_", "")
+                                    pkt
+                                        .Replace("{hid}", Lib.toHex(heroID == -1 ? 0x78563412 : heroID))
+                                        .Replace("{time}", Lib.toHex(PacketEncoder.timeGetTime()))
+                                        .Replace("_", "")
                                 ), ref tmpPkt);
                                 fullPkt.Insert(idx, tmpPkt);
                             }
@@ -218,6 +221,7 @@ namespace Feather_Server
                                     .Replace("{ai:1}", Lib.toHex(numByte++)) // auto increment: 1 byte
                                     .Replace("{ai:2}", Lib.toHex(numShort++)) // auto increment: 2 byte
                                     .Replace("{ai:4}", Lib.toHex(numInt++)) // auto increment: 4 byte
+                                    .Replace("{time}", Lib.toHex(PacketEncoder.timeGetTime()))
                                     .Replace("_", "")
                                 ), ref tmpPkt);
                                 fullPkt[idx] = tmpPkt;
@@ -282,7 +286,10 @@ namespace Feather_Server
                             try
                             {
                                 PacketEncoder.concatPacket(Lib.hexToBytes(
-                                    pkt.Replace("{hid}", Lib.toHex(heroID == -1 ? 0x78563412 : heroID)).Replace("_", "")
+                                    pkt
+                                    .Replace("{hid}", Lib.toHex(heroID == -1 ? 0x78563412 : heroID))
+                                    .Replace("{time}", Lib.toHex(PacketEncoder.timeGetTime()))
+                                    .Replace("_", "")
                                 ), ref tmpPkt);
                                 fullPkt.Add(tmpPkt);
                             }
