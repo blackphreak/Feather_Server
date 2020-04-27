@@ -769,7 +769,7 @@ namespace Feather_Server.ServerRelated
             ), ref pkts);
 
             lastLoginRecord(p.heroID, ref pkts);
-            getGameNotice(ref pkts);
+            //getGameNotice(ref pkts); // TODO: uncomment
 
             // @ Server.cs : JoinGame-Mark1
             concatPacket(Lib.hexToBytes(
@@ -787,7 +787,7 @@ namespace Feather_Server.ServerRelated
 
             // @ Server.cs : JoinGame-Mark3
             concatPacket(Lib.hexToBytes(
-                "490a00000000"
+                "490a0000000000"
             ), ref pkts);
 
             // @ Server.cs - Player Location
@@ -855,6 +855,7 @@ namespace Feather_Server.ServerRelated
                 + "00" // null-term
             ), ref pkts);
 
+            var a = Lib.toHex(pkts);
             return pkts;
         }
 
@@ -1315,17 +1316,17 @@ namespace Feather_Server.ServerRelated
         /// <returns>Packet total size (newly added size byte included)</returns>
         public static void concatPacket(in byte[] src, ref byte[] concatTo, bool prependSize = true)
         {
-            var sz = (byte)(src.Length & 0x000000FF); // read the lowest bits only.
+            var szSrc = src.Length;
             int szPkts = concatTo.Length;
 
-            if (!prependSize)
-                szPkts -= 1;
+            if (prependSize)
+                szSrc &= 0xFF; // use the lowest 8 bits only.
 
-            Array.Resize(ref concatTo, szPkts + sz + 1);
-            Buffer.BlockCopy(src, 0, concatTo, szPkts + 1, sz);
+            Array.Resize(ref concatTo, szPkts + szSrc + 1);
+            Buffer.BlockCopy(src, 0, concatTo, szPkts + 1, szSrc);
 
             if (prependSize)
-                concatTo[szPkts] = sz;
+                concatTo[szPkts] = (byte)szSrc;
         }
     }
 }
