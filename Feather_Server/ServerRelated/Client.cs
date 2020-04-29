@@ -292,26 +292,28 @@ namespace Feather_Server.ServerRelated
             {
                 // act 11 -> triggered by SHIFT + LeftClick
                 // TODO: fix bug, idk why the fuck this is not working :(
-                // cmd:       6 = stand | 2 = sit <--not work| 9 = freeFight | 11 = fight
-                // real code: 1 = stand | 4 = sit <--not work| 9 = freeFight | _B = fight
+                // cmd:       6 = stand | 2 = sit | 9 = freeFight | 11 = fight
+                // real code: 1 = stand | 4 = sit | 9 = freeFight | _B = fight
                 var realAct = byte.Parse(cmd[1]);
 
                 switch (realAct)
                 {
-                    //case 6:
-                    //    hero.act = 1;
-                    //    break;
-                    //case 2:
-                    //    hero.act = 4;
-                    //    break;
-                    case 0xB:
-                        hero.act = 0x9;
+                    case 6:
+                        hero.act = 1;
+                        break;
+                    case 2:
+                        hero.act = 4;
+                        break;
+                    case 11:
+                        hero.act = 0xB;
                         break;
                     default:
                         hero.act = realAct;
                         break;
                 }
 
+                // must add a delay before setting act -- since local server is too quick LOL
+                Thread.Sleep(100);
                 var pkt = PacketEncoder.playerAct(hero);
                 Lib.sendToNearby(hero, pkt, false);
 

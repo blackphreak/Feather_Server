@@ -449,6 +449,38 @@ namespace Feather_Server.ServerRelated
             return pkts;
         }
 
+        public static byte[] updateHeroHealthInfo(Hero p)
+        {
+            // idx:5403
+            byte[] pkts = new byte[0];
+            //         entityID currHP-- maxHP--- __
+            // __ 5403 a7200000 f8620000 05630000 00
+            concatPacket(Lib.hexToBytes(
+                "0f" // sz
+                + "5403"
+                + Lib.toHex(p.heroID)
+                + Lib.toHex(p.hp)
+                + Lib.toHex(p.maxHP)
+                + "00"), ref pkts, false);
+            return pkts;
+        }
+
+        public static byte[] updateHeroMPInfo(Hero p)
+        {
+            // idx:5404
+            byte[] pkts = new byte[0];
+            //         entityID currMP-- maxMP--- __
+            // __ 5404 a7200000 f8620000 05630000 00
+            concatPacket(Lib.hexToBytes(
+                "0f" // sz
+                + "5404"
+                + Lib.toHex(p.heroID)
+                + Lib.toHex(p.mp)
+                + Lib.toHex(p.maxMP)
+                + "00"), ref pkts, false);
+            return pkts;
+        }
+
         public static byte[] setHeroCurrentHealth(Hero p)
         {
             // idx:3d14
@@ -672,9 +704,9 @@ namespace Feather_Server.ServerRelated
             // act: 01~06: walk animate
             //      08
             //       heroID-- time---- act
-            // __ 40 644b4600 18143013 0b 00 // fight
-            // __ 40 644b4600 37163013 01 00 // stand
-            // __ 40 644b4600 8c163013 04 00 // sit
+            // __ 40 644b4600 18143013 0b 00 // fight (client: act 11)
+            // __ 40 644b4600 37163013 01 00 // stand (client: act 6)
+            // __ 40 644b4600 8c163013 04 00 // sit   (client: act 2)
 
             var pkt = "40"
                 + Lib.toHex(p.heroID)
