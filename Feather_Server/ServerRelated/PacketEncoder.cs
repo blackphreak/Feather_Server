@@ -32,7 +32,7 @@ namespace Feather_Server.ServerRelated
             return pkts;
         }
 
-        public static byte[] loginSuccess(HeroBasicInfo[] players, bool isInHeroCreation = false)
+        /*public static byte[] loginSuccess(HeroBasicInfo[] players, bool isInHeroCreation = false)
         {
             // idx:490e
             // idx:3d2f
@@ -54,7 +54,7 @@ namespace Feather_Server.ServerRelated
             }
 
             return pkts;
-        }
+        }*/
 
         public static byte[] showProgressBar(ushort time, int msgID)
         {
@@ -286,98 +286,98 @@ namespace Feather_Server.ServerRelated
             return pkts;
         }
 
-        public static byte[] spawnHero(Hero p, bool newlyAppear)
-        {
-            // working:
-            //                X--- Y--- facing
-            // 69 0b dc7b0b00 f200 6000 02                                      body_color
-            // readyState (0100: joining (green named), >0200: ready (blue named))
-            //      icon               hair color                  hat       body      wing      mask      tail      wp-- wpCode--
-            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 32 1a 5c0c0001 0200 09370000 d0fd312020202020202020202020202000
-            // 69 0b 47ac0400 90 00 5A 00 01
+        //public static byte[] spawnHero(Hero p, bool newlyAppear)
+        //{
+        //    // working:
+        //    //                X--- Y--- facing
+        //    // 69 0b dc7b0b00 f200 6000 02                                      body_color
+        //    // readyState (0100: joining (green named), >0200: ready (blue named))
+        //    //      icon               hair color                  hat       body      wing      mask      tail      wp-- wpCode--
+        //    // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 32 1a 5c0c0001 0200 09370000 d0fd312020202020202020202020202000
+        //    // 69 0b 47ac0400 90 00 5A 00 01
 
-            // 69 0b dc7b0b00 f2 00 60 00 02
-            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 32 1a 5c0c0001 0200 09370000 d0fd312020202020202020202020202000
-            // 69 0a b6a60600 94 00 5e 00 04
-            // 0201 0100 1127 00000000 0100 e780 07002cd3 07002cd3 e903 9b42 0b00 0000 0000 0000 0800 0000 0100 0000 3d08 00000000 0000 0e 00 f70b0000 c0cfcde6bcd23920202020202020202000
-            // 0201 0400 1127 00000000 0800 0c63 26000000 26000000 0c00 0000 2800 1552 0000 0000 0400 0000 0700 0000 3e0f 00001ff8 0505 19 00 e43f0000 a4b8bbd2ccabc0c7d8bc20202020202000
-            // 69 0b e3060000 E3 00 6F 00 01
-            // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 31 1a 5c0c0001 0200 e3060000 bcd3d0fd30352020202020202020202000
+        //    // 69 0b dc7b0b00 f2 00 60 00 02
+        //    // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 32 1a 5c0c0001 0200 09370000 d0fd312020202020202020202020202000
+        //    // 69 0a b6a60600 94 00 5e 00 04
+        //    // 0201 0100 1127 00000000 0100 e780 07002cd3 07002cd3 e903 9b42 0b00 0000 0000 0000 0800 0000 0100 0000 3d08 00000000 0000 0e 00 f70b0000 c0cfcde6bcd23920202020202020202000
+        //    // 0201 0400 1127 00000000 0800 0c63 26000000 26000000 0c00 0000 2800 1552 0000 0000 0400 0000 0700 0000 3e0f 00001ff8 0505 19 00 e43f0000 a4b8bbd2ccabc0c7d8bc20202020202000
+        //    // 69 0b e3060000 E3 00 6F 00 01
+        //    // 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 00000000 0000 31 1a 5c0c0001 0200 e3060000 bcd3d0fd30352020202020202020202000
 
-            // ref: pkt_model_00.jpg
-            // 69 0a dedf0d00 ee 00 6e 00 02
-            // 0201 0100 1127 00000000 0200 a4aa 00000000 00000000 1400 0000 1600 0000 0000 0000 0000 0000 0200 0000 3e08 0000df7b 0000 30009d36 0000 c0adcbb9c0d7b6c8202020202020202000
+        //    // ref: pkt_model_00.jpg
+        //    // 69 0a dedf0d00 ee 00 6e 00 02
+        //    // 0201 0100 1127 00000000 0200 a4aa 00000000 00000000 1400 0000 1600 0000 0000 0000 0000 0000 0200 0000 3e08 0000df7b 0000 30009d36 0000 c0adcbb9c0d7b6c8202020202020202000
 
-            // ref: pkt_model_02.jpg [wp: 6p 10*]
-            // 69 0a d2bf0d00 ef 00 84 00 03
-            // 0201 0400 1127 00000000 0800 c982 24000000 24000000 e903 9b42 2800 c9a1 0000 0000 0c00 0000 0700 0000 3d0c 0000bffc 0303 2f00fb07 0000 a6af6fcdedb7e76fa6af20202020202000
+        //    // ref: pkt_model_02.jpg [wp: 6p 10*]
+        //    // 69 0a d2bf0d00 ef 00 84 00 03
+        //    // 0201 0400 1127 00000000 0800 c982 24000000 24000000 e903 9b42 2800 c9a1 0000 0000 0c00 0000 0700 0000 3d0c 0000bffc 0303 2f00fb07 0000 a6af6fcdedb7e76fa6af20202020202000
 
-            // ref: pkt_model_01.jpg [girl mask: 0x0002] [wp: 6p 10*] [body: color No.1 (0x1DE7)]
-            // 69 0a 94d10d00 e7 00 86 00 02
-            // 0201 ea03 f92a 00000000 0a00 c982 0304089a 0304c84b 1d04 6a46 1500 e7d1 0000 0000 0700 0000 0700 0000 3e0a 00001ff8 0303 3100b96f 0000 d1ccd3eac4dec9d1202020202020202000
+        //    // ref: pkt_model_01.jpg [girl mask: 0x0002] [wp: 6p 10*] [body: color No.1 (0x1DE7)]
+        //    // 69 0a 94d10d00 e7 00 86 00 02
+        //    // 0201 ea03 f92a 00000000 0a00 c982 0304089a 0304c84b 1d04 6a46 1500 e7d1 0000 0000 0700 0000 0700 0000 3e0a 00001ff8 0303 3100b96f 0000 d1ccd3eac4dec9d1202020202020202000
 
-            // ref: pkt_model_03.jpg [boy]
-            // 69 0a 6ed70d00 a7 00 63 00 08
-            // 0201 0100 1127 00000000 0800 0c63 00000000 00000000 4000 0000 2800 3232 0000 0000 0000 0000 0700 0000 4007 0000bffc 0303 2e00bc71 0000 bfaad0c4b6b9d8bc202020202020202000
+        //    // ref: pkt_model_03.jpg [boy]
+        //    // 69 0a 6ed70d00 a7 00 63 00 08
+        //    // 0201 0100 1127 00000000 0800 0c63 00000000 00000000 4000 0000 2800 3232 0000 0000 0000 0000 0700 0000 4007 0000bffc 0303 2e00bc71 0000 bfaad0c4b6b9d8bc202020202020202000
 
-            // ref: pkt_model_04.jpg [boy] [sit]
-            // 69 0a 60010e00 b0 00 59 00 04
-            // 0204 0100 1127 00000000 0800 0c63 24000000 24000000 e903 9b42 2800 e7d1 0000 0000 0600 0000 1400 0000 3e07 0000bffc 0505 3200da29 0000 c0b6ccec20202020202020202020202000
+        //    // ref: pkt_model_04.jpg [boy] [sit]
+        //    // 69 0a 60010e00 b0 00 59 00 04
+        //    // 0204 0100 1127 00000000 0800 0c63 24000000 24000000 e903 9b42 2800 e7d1 0000 0000 0600 0000 1400 0000 3e07 0000bffc 0505 3200da29 0000 c0b6ccec20202020202020202020202000
 
-            // ref: pkt_model_06.jpg [girl]
-            // 69 0a dac30d00 d2 00 57 00 01
-            // 0204 e903 f92a 00000000 0b00 895a ea030000 ea030000 1d04 6a46 ef03 1552 0000 0000 1100 0000 0700 0000 3e0c 0000bffc 0404 2f009a3a 0000 a6f3a6f3c2b7a4c5c2b720202020202000
+        //    // ref: pkt_model_06.jpg [girl]
+        //    // 69 0a dac30d00 d2 00 57 00 01
+        //    // 0204 e903 f92a 00000000 0b00 895a ea030000 ea030000 1d04 6a46 ef03 1552 0000 0000 1100 0000 0700 0000 3e0c 0000bffc 0404 2f009a3a 0000 a6f3a6f3c2b7a4c5c2b720202020202000
 
-            // ref: pkt_model_05.jpg [boy] [body: color No.10 (0xe269)]
-            // 69 0a e1ca0d00 d5 00 59 00 03
-            // 0201 0100 1127 00000000 0100 e780 24000000 24000000 e903 9b42 0700 e269 0000 0000 0400 0000 0700 0000 3e0c 00001ff8 0303 32003466 0000 c1e8ece120202020202020202020202000
+        //    // ref: pkt_model_05.jpg [boy] [body: color No.10 (0xe269)]
+        //    // 69 0a e1ca0d00 d5 00 59 00 03
+        //    // 0201 0100 1127 00000000 0100 e780 24000000 24000000 e903 9b42 0700 e269 0000 0000 0400 0000 0700 0000 3e0c 00001ff8 0303 32003466 0000 c1e8ece120202020202020202020202000
 
-            // ref: pkt_model_07.jpg [boy] [body: color No.6 (0e548x) [sit]
-            // 69 0a 07e30d00 ec 00 93 00 08
-            // 0204 0300 1127 00000000 0200 e780 00000000 00000000 e903 9b42 1500 e548 0000 0000 0000 0000 0700 0000 3e0f 00001ff8 0404 3200bd31 0000 c4eac9d9b2bbcdf7202020202020202000
+        //    // ref: pkt_model_07.jpg [boy] [body: color No.6 (0e548x) [sit]
+        //    // 69 0a 07e30d00 ec 00 93 00 08
+        //    // 0204 0300 1127 00000000 0200 e780 00000000 00000000 e903 9b42 1500 e548 0000 0000 0000 0000 0700 0000 3e0f 00001ff8 0404 3200bd31 0000 c4eac9d9b2bbcdf7202020202020202000
 
-            byte[] pkts = new byte[0];
-            concatPacket(Lib.hexToBytes(
-                "69"
-                + (newlyAppear ? /*withAni*/"0b" : /*showOnly*/"0a")
-                + Lib.toHex(p.heroID)
-                + Lib.toHex(p.locX)
-                + Lib.toHex(p.locY)
-                + Lib.toHex(p.facing)
-                + Lib.toHex(p.state)
-                + Lib.toHex(p.act)
-                + Lib.toHex(p.hair.icon)
-                + Lib.toHex((short)p.gender)
-                + "00000000" // unk
-                + Lib.toHex(p.hair.model)
-                + Lib.toHex(p.hair.color)
-                + "00000000" // ?
-                + "00000000" // ?
-                + p.model.toModelHex()
-                //wp   wpColor- XX   HP ?? heroID--
-                //3d01 00000000 0000 32 1a 5c0c0001 0200 <uid-> <name> [0b]
-                //3e0c 0000bffc 0404 2f 00 9a3a0000 <name>             [0a]
-                + "0000" // XX
-                + Lib.toHex((byte)(p.hp / p.maxHP * 0x32))
-                + "1A" // unk
-                //+ "5c0c0000" // player ID (shown in "W" GUI)
-                + Lib.toHex(p.heroID)
-                + ((newlyAppear) ? "0200" + Lib.toHex(p.heroID) : "")
-                + Lib.padWithString(Lib.toHex(Lib.gbkToBytes(p.heroName)), "20", 16 * 2)
-                + "00"
-            ), ref pkts);
+        //    byte[] pkts = new byte[0];
+        //    concatPacket(Lib.hexToBytes(
+        //        "69"
+        //        + (newlyAppear ? /*withAni*/"0b" : /*showOnly*/"0a")
+        //        + Lib.toHex(p.heroID)
+        //        + Lib.toHex(p.locX)
+        //        + Lib.toHex(p.locY)
+        //        + Lib.toHex(p.facing)
+        //        + Lib.toHex(p.state)
+        //        + Lib.toHex(p.act)
+        //        + Lib.toHex(p.hair.icon)
+        //        + Lib.toHex((short)p.gender)
+        //        + "00000000" // unk
+        //        + Lib.toHex(p.hair.model)
+        //        + Lib.toHex(p.hair.color)
+        //        + "00000000" // ?
+        //        + "00000000" // ?
+        //        + p.model.toModelHex()
+        //        //wp   wpColor- XX   HP ?? heroID--
+        //        //3d01 00000000 0000 32 1a 5c0c0001 0200 <uid-> <name> [0b]
+        //        //3e0c 0000bffc 0404 2f 00 9a3a0000 <name>             [0a]
+        //        + "0000" // XX
+        //        + Lib.toHex((byte)(p.hp / p.maxHP * 0x32))
+        //        + "1A" // unk
+        //        //+ "5c0c0000" // player ID (shown in "W" GUI)
+        //        + Lib.toHex(p.heroID)
+        //        + ((newlyAppear) ? "0200" + Lib.toHex(p.heroID) : "")
+        //        + Lib.padWithString(Lib.toHex(Lib.gbkToBytes(p.heroName)), "20", 16 * 2)
+        //        + "00"
+        //    ), ref pkts);
 
-            //if (p.selectedTitleIndex != 0)
-            //    concatPacket(PacketEncoder.rideOn(p), ref pkts, false);
+        //    //if (p.selectedTitleIndex != 0)
+        //    //    concatPacket(PacketEncoder.rideOn(p), ref pkts, false);
 
-            if (p.ride != null)
-                concatPacket(PacketEncoder.rideOn(p), ref pkts, false);
+        //    if (p.ride != null)
+        //        concatPacket(PacketEncoder.rideOn(p), ref pkts, false);
 
-            concatPacket(PacketEncoder.playerEffectList(p), ref pkts, false);
+        //    concatPacket(PacketEncoder.playerEffectList(p), ref pkts, false);
 
-            concatPacket(PacketEncoder.entityBuffList(p), ref pkts, false);
-            return pkts;
-        }
+        //    concatPacket(PacketEncoder.entityBuffList(p), ref pkts, false);
+        //    return pkts;
+        //}
 
         public static byte[] playerEffectList(Hero p)
         {
@@ -774,126 +774,116 @@ namespace Feather_Server.ServerRelated
             return pkts;
         }
 
-        public static byte[] playerHPUpdate(int newHP)
-        {
-            return Lib.hexToBytes($"073d14{Lib.toHex(newHP)}00");
-        }
-
-        public static byte[] playerMPUpdate(int newMP)
-        {
-            return Lib.hexToBytes($"073d16{Lib.toHex(newMP)}00");
-        }
-
         #region player join server
-        public static byte[] playerJoin(Hero p)
-        {
-            byte[] pkts = new byte[0];
-            concatPacket(Lib.hexToBytes(
-                "490e0000000000"
-            ), ref pkts);
+        //public static byte[] playerJoin(Hero p)
+        //{
+        //    byte[] pkts = new byte[0];
+        //    concatPacket(Lib.hexToBytes(
+        //        "490e0000000000"
+        //    ), ref pkts);
 
-            concatPacket(Lib.hexToBytes(
-                "3d2fcee4cabf00"
-            ), ref pkts);
+        //    concatPacket(Lib.hexToBytes(
+        //        "3d2fcee4cabf00"
+        //    ), ref pkts);
 
-            concatPacket(Lib.hexToBytes(
-                "490200"
-            ), ref pkts);
+        //    concatPacket(Lib.hexToBytes(
+        //        "490200"
+        //    ), ref pkts);
 
-            concatPacket(Lib.hexToBytes(
-                "5a010000"
-            ), ref pkts);
+        //    concatPacket(Lib.hexToBytes(
+        //        "5a010000"
+        //    ), ref pkts);
 
-            lastLoginRecord(p.heroID, ref pkts);
-            getGameNotice(ref pkts);
+        //    lastLoginRecord(p.heroID, ref pkts);
+        //    getGameNotice(ref pkts);
 
-            // @ Server.cs : JoinGame-Mark1
-            concatPacket(Lib.hexToBytes(
-                "3d2fcee4cabf00"
-            ), ref pkts);
-            concatPacket(Lib.hexToBytes(
-                "3d910000"
-            ), ref pkts);
+        //    // @ Server.cs : JoinGame-Mark1
+        //    concatPacket(Lib.hexToBytes(
+        //        "3d2fcee4cabf00"
+        //    ), ref pkts);
+        //    concatPacket(Lib.hexToBytes(
+        //        "3d910000"
+        //    ), ref pkts);
 
-            // @ Server.cs : JoinGame-Mark2 - BackPack
-            if (p.bag != null)
-                concatPacket(Lib.hexToBytes(
-                    p.bag.fullBagToHex()
-                ), ref pkts, false);
+        //    // @ Server.cs : JoinGame-Mark2 - BackPack
+        //    if (p.bag != null)
+        //        concatPacket(Lib.hexToBytes(
+        //            p.bag.fullBagToHex()
+        //        ), ref pkts, false);
 
-            // @ Server.cs : JoinGame-Mark3
-            concatPacket(Lib.hexToBytes(
-                "490a0000000000"
-            ), ref pkts);
+        //    // @ Server.cs : JoinGame-Mark3
+        //    concatPacket(Lib.hexToBytes(
+        //        "490a0000000000"
+        //    ), ref pkts);
 
-            // @ Server.cs - Player Location
-            // idx:3c1127
-            concatPacket(Lib.hexToBytes(
-                "3c1127"
-                + Lib.toHex(p.map)
-                + Lib.toHex(p.map)
-                + Lib.toHex(p.locX)
-                + Lib.toHex(p.locY)
-                + "00"
-                + Lib.toHex(p.map)
-                + "0000"
-                + "00" // null-term
-            ), ref pkts);
+        //    // @ Server.cs - Player Location
+        //    // idx:3c1127
+        //    concatPacket(Lib.hexToBytes(
+        //        "3c1127"
+        //        + Lib.toHex(p.map)
+        //        + Lib.toHex(p.map)
+        //        + Lib.toHex(p.locX)
+        //        + Lib.toHex(p.locY)
+        //        + "00"
+        //        + Lib.toHex(p.map)
+        //        + "0000"
+        //        + "00" // null-term
+        //    ), ref pkts);
 
-            // spawn this player
-            concatPacket(spawnHero(p, true), ref pkts, false);
+        //    // spawn this player
+        //    concatPacket(spawnHero(p, true), ref pkts, false);
 
-            concatPacket(Lib.hexToBytes(
-                "7f016a"
-                + Lib.toHex(p.heroID)
-                + "a500a500"
-                + "00"
-            ), ref pkts);
+        //    concatPacket(Lib.hexToBytes(
+        //        "7f016a"
+        //        + Lib.toHex(p.heroID)
+        //        + "a500a500"
+        //        + "00"
+        //    ), ref pkts);
 
-            concatPacket(Lib.hexToBytes(
-                "7f016b"
-                + Lib.toHex(p.heroID)
-                + "54005400"
-                + "00"
-            ), ref pkts);
+        //    concatPacket(Lib.hexToBytes(
+        //        "7f016b"
+        //        + Lib.toHex(p.heroID)
+        //        + "54005400"
+        //        + "00"
+        //    ), ref pkts);
 
-            concatPacket(Lib.hexToBytes(
-                "7f016c"
-                + Lib.toHex(p.heroID)
-                + "54005400"
-                + "00"
-            ), ref pkts);
+        //    concatPacket(Lib.hexToBytes(
+        //        "7f016c"
+        //        + Lib.toHex(p.heroID)
+        //        + "54005400"
+        //        + "00"
+        //    ), ref pkts);
 
-            concatPacket(Lib.hexToBytes(
-                "7f0170"
-                + Lib.toHex(p.heroID)
-                + "3b003c00"
-                + "00"
-            ), ref pkts);
+        //    concatPacket(Lib.hexToBytes(
+        //        "7f0170"
+        //        + Lib.toHex(p.heroID)
+        //        + "3b003c00"
+        //        + "00"
+        //    ), ref pkts);
 
-            // start from window title to itembar
-            getHeroFullInfo(p, ref pkts);
+        //    // start from window title to itembar
+        //    getHeroFullInfo(p, ref pkts);
 
-            //// @ Server.cs - JoinGame-MarkZ
-            //concatPacket(Lib.hexToBytes(
-            //    "81245c"
-            //    + "0c000000"
-            //    + "01"
-            //    + "00" // null-term
-            //), ref pkts);
+        //    //// @ Server.cs - JoinGame-MarkZ
+        //    //concatPacket(Lib.hexToBytes(
+        //    //    "81245c"
+        //    //    + "0c000000"
+        //    //    + "01"
+        //    //    + "00" // null-term
+        //    //), ref pkts);
 
-            // player ready
-            // idx:3d01
-            concatPacket(Lib.hexToBytes(
-                "3d01"
-                + Lib.toHex(p.heroID)
-                + "02"
-                + "00" // null-term
-            ), ref pkts);
+        //    // player ready
+        //    // idx:3d01
+        //    concatPacket(Lib.hexToBytes(
+        //        "3d01"
+        //        + Lib.toHex(p.heroID)
+        //        + "02"
+        //        + "00" // null-term
+        //    ), ref pkts);
 
-            var a = Lib.toHex(pkts);
-            return pkts;
-        }
+        //    var a = Lib.toHex(pkts);
+        //    return pkts;
+        //}
 
         private static void lastLoginRecord(int playerUID, ref byte[] pkts)
         {

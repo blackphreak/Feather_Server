@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Feather_Server.Packets
 {
-    public abstract class ActionPacket
+    public interface IPacketStreamFragment
     {
-
+        void toFragment(ref PacketStream stream);
     }
 }

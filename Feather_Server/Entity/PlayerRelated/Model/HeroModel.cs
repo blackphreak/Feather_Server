@@ -1,4 +1,5 @@
-﻿using Feather_Server.PlayerRelated.Items;
+﻿using Feather_Server.Packets;
+using Feather_Server.PlayerRelated.Items;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace Feather_Server.PlayerRelated
 {
-    public class HeroModel
+    public class HeroModel : IPacketStreamFragment
     {
         // style
         private ushort mask = 0x0000;
@@ -114,31 +115,72 @@ namespace Feather_Server.PlayerRelated
             }
         }
 
-        public string toModelHex()
+        //public string toModelHex()
+        //{
+        //    return
+        //        // hat
+        //        Lib.toHex(hat)
+        //        + Lib.toHex(hat_color)
+        //        // body
+        //        + Lib.toHex(body)
+        //        + Lib.toHex(body_color)
+        //        // wings
+        //        + Lib.toHex(wings)
+        //        + Lib.toHex(wings_color)
+        //        // mask
+        //        + Lib.toHex(mask)
+        //        + Lib.toHex(mask_color)
+        //        // tail
+        //        + Lib.toHex(tail)
+        //        + Lib.toHex(tail_color)
+        //        // wp
+        //        + Lib.toHex(weapon)
+        //        + Lib.toHex(weapon_color.R)
+        //        + Lib.toHex(weapon_color.G)
+        //        + Lib.toHex(weapon_color.B)
+        //        + Lib.toHex(weapon_color.A)
+        //        ;
+        //}
+
+        public void toFragment(ref PacketStream stream)
         {
-            return
-                // hat
-                Lib.toHex(hat)
-                + Lib.toHex(hat_color)
-                // body
-                + Lib.toHex(body)
-                + Lib.toHex(body_color)
-                // wings
-                + Lib.toHex(wings)
-                + Lib.toHex(wings_color)
-                // mask
-                + Lib.toHex(mask)
-                + Lib.toHex(mask_color)
-                // tail
-                + Lib.toHex(tail)
-                + Lib.toHex(tail_color)
-                // wp
-                + Lib.toHex(weapon)
-                + Lib.toHex(weapon_color.R)
-                + Lib.toHex(weapon_color.G)
-                + Lib.toHex(weapon_color.B)
-                + Lib.toHex(weapon_color.A)
-                ;
+            /* JS_F: Here[HeroModel.cs,Hero_Model] */
+            stream
+                /* JS: Desc[Hat ModelID] */
+                .writeWord(hat)
+                /* JS: Desc[Hat Color] */
+                .writeWord(hat_color)
+
+                /* JS: Desc[Body ModelID] */
+                .writeWord(body)
+                /* JS: Desc[Body Color] */
+                .writeWord(body_color)
+
+                /* JS: Desc[Wings ModelID] */
+                .writeWord(wings)
+                /* JS: Desc[Wings Color] */
+                .writeWord(wings_color)
+
+                /* JS: Desc[Mask ModelID] */
+                .writeWord(mask)
+                /* JS: Desc[Mask Color] */
+                .writeWord(mask_color)
+
+                /* JS: Desc[Tail ModelID] */
+                .writeWord(tail)
+                /* JS: Desc[Tail Color] */
+                .writeWord(tail_color)
+
+                /* JS: Desc[Weapon ModelID] */
+                .writeWord(weapon)
+                /* JS: Desc[Weapon Color R] */
+                .writeByte(weapon_color.R)
+                /* JS: Desc[Weapon Color G] */
+                .writeByte(weapon_color.G)
+                /* JS: Desc[Weapon Color B] */
+                .writeByte(weapon_color.B)
+                /* JS: Desc[Weapon Color Alpha] */
+                .writeByte(weapon_color.A);
         }
     }
 }

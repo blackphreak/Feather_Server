@@ -4,6 +4,7 @@ using Feather_Server.Entity.NPC_Related;
 using Feather_Server.Entity.PlayerRelated.Items;
 using Feather_Server.Entity.PlayerRelated.Items.Activable;
 using Feather_Server.MobRelated;
+using Feather_Server.Packets;
 using Feather_Server.PlayerRelated;
 using Feather_Server.ServerRelated;
 using System;
@@ -701,6 +702,11 @@ namespace Feather_Server.ServerRelated
                     { "heroID", (int)this.hero.heroID }
                 }
             );
+        }
+
+        public void send(PacketStreamData packets)
+        {
+            send(packets.ToArray());
         }
 
         public void send(byte[] packets)
