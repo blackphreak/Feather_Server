@@ -175,19 +175,23 @@ namespace Feather_Server.ServerRelated
 
         #region Basic Stats
 
-        public int hp { get; set; }
+        public int HP { get; set; }
         public int maxHP { get; set; }
 
-        public int mp { get; set; }
+        public int MP { get; set; }
         public int maxMP { get; set; }
-        public int meleeDamage { get; set; }
-        public int meleeDefense { get; set; }
+        public int PA { get; set; }
+        public int PD { get; set; }
 
-        public int magicDamage { get; set; }
-        public int magicDefense { get; set; }
+        public int MA { get; set; }
+        public int MD { get; set; }
 
         public int hit { get; set; }
         public int dodge { get; set; }
+
+        /// <summary>
+        /// CH [爆擊 (率)]
+        /// </summary>
         public int criticalHitRate { get; set; }
 
         public byte state { get; set; } = 0x02;
@@ -234,7 +238,7 @@ namespace Feather_Server.ServerRelated
             //int meleeDamage = damagedBy.meleeDamage;
             //if (damagedBy is Hero)
             
-            this.hp -= damagedBy.meleeDamage;
+            this.HP -= damagedBy.PA;
         }
     }
 }

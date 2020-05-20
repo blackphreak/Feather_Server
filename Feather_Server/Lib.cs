@@ -1,21 +1,19 @@
-﻿using Feather_Server.ServerRelated;
+﻿using Feather_Server.Database;
+using Feather_Server.Entity;
+using Feather_Server.Entity.NPC_Related;
+using Feather_Server.ServerRelated;
+using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Linq;
-using System.Text;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using Feather_Server.Database;
-using System.Data.SQLite;
-using Newtonsoft.Json;
-using Feather_Server.MobRelated;
-using Feather_Server.Entity.NPC_Related;
-using Feather_Server.Entity;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Feather_Server
 {
@@ -80,27 +78,27 @@ namespace Feather_Server
         public static readonly Dictionary<Role, int[]> roleDefault = new Dictionary<Role, int[]>(){
             {
                 // order: hp, mp, meleeAtk, meleeDef, magicAtk, magicDef, hit, dodge, CHR (100 = 1.00%)
-                Role.WS, new int[]{
+                Role.Warrior, new int[]{
                     306, 98, 36, 53, 5, 40, 10, 4, 100
                 }
             },
             {
-                Role.SS, new int[]{
+                Role.Mage, new int[]{
                     172, 211, 11, 27, 28, 59, 10, 4, 100
                 }
             },
             {
-                Role.JK, new int[]{
+                Role.Swordman, new int[]{
                     208, 135, 27, 53, 16, 64, 10, 4, 100
                 }
             },
             {
-                Role.TS, new int[]{
+                Role.Taoist, new int[]{
                     263, 200, 11, 27, 26, 80, 10, 4, 100
                 }
             },
             {
-                Role.JS, new int[]{
+                Role.Priest, new int[]{
                     181, 249, 11, 28, 41, 66, 10, 4, 100
                 }
             }

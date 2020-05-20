@@ -181,10 +181,9 @@ namespace Feather_Server.ServerRelated
             //          eid----- X--- Y--- $1 $2 $3 $4------ $5 $6 $7-- $8-- $9 $10----- __ $11----- __ mobLv---
             // __ 69 80 a1530000 b300 3300 04 82 01 c3410600 32 06 0000 0000 00 91b00a00 64 c3410600 64 07000000 00
             // __ 69 80 4a2b1200 2c00 7e00 05 82 01 f6410600 32 06 0000 0000 00 91b00a00 64 f6410600 64 0a000000 00
-            // __ 69 80 6fd22b00 9700 5800 00 83 01 b1570700 32 04 0000 0000 00 91b00a00 64 52650600 64 46000000 00 // 火鳳凰
-            // __ 69 80 bb021700 ac00 d300 05 82 01 f6410600 32 06 0000 0000 00 6c420f00 64 f6410600 64 35150000 00 // 雨天寶寶 [white name]
-            // __ 69 80 91690000 d400 8100 03 80 01 69690600 00 00 0000 0000 00 6acb1000 64 a5bf0400             00 // 小鴨
             // __ 69 80 e21b0a00 ad00 7f00 04 82 01 9b410600 16 06 0000 0000 00 91b00a00 64 9b410600 64 03000000 00 // 半血小鴨
+            // __ 69 80 91690000 d400 8100 03 80 01 69690600 00 00 0000 0000 00 6acb1000 64 a5bf0400             00 // 小鴨 (0x0x10CB6A)1100650: ^1, (0x04BFA5)311205: (摇滚小鸡使者?!)
+            // __ 69 80 6fd22b00 9700 5800 00 83 01 b1570700 32 04 0000 0000 00 91b00a00 64 52650600 64 46000000 00 // 火鳳凰
             // __ 69 80 95690000 ae00 5800 02 80 01 c7240000 00 00 0000 0000 00 66420f00 64 12340500             00 // 天师导师
             // __ 69 80 43690000 a800 6500 04 80 01 ee130000 00 00 0000 0000 00 66420f00 64 30340500             00 // 术士导师
             // __ 69 80 42690000 9900 6000 04 80 01 e7260000 00 00 0000 0000 00 66420f00 64 1c340500             00 // 武士导师
@@ -193,13 +192,18 @@ namespace Feather_Server.ServerRelated
             // __ 69 80 99690000 a600 5f00 06 80 01 7d150000 00 00 0000 0000 00 66420f00 64 62340500             00 // 术士导师助手
             // __ 69 80 98690000 9200 6100 01 80 01 7d150000 00 00 0000 0000 00 66420f00 64 4e340500             00 // 武士导师助手
             // __ 69 80 44690000 a900 5500 01 80 01 7d150000 00 00 0000 0000 00 66420f00 64 44340500             00 // 天师导师助手
+
+            //          eid----- X--- Y--- $1 $2 $3 $4------ $5 $6 $7-- $8-- GBK Name----------------
             // __ 69 80 06a91600 6600 8700 00 80 01 9d070700 00 00 0000 0000 c9bdd2b0d1fdb9d6                    00 // 山野
             // __ 69 80 38a91600 b500 5600 00 80 01 9d070700 00 00 0000 0000 b1a9c5adc9bdd2b0d1fdb9d6            00 // 暴怒山野
+
+            //          eid----- X--- Y--- $1 $2 $3 $4------ $5 $6 $7-- $8-- $9 $10----- __ $11----- __ FSID----
+            // __ 69 80 bb021700 ac00 d300 05 82 01 f6410600 32 06 0000 0000 00 6c420f00 64 f6410600 64 35150000 00 // 雨天寶寶 [white name] (0x0641F6): 雨天幽灵, (0x1535): 宝宝
             //                                                                                       __ nameLen- GBK PlyName-
             // __ 69 80 3a433000 a100 7f00 00 81 01 cdbf0400 29 02 0000 0000 00 b5ae0a00 64 f8bf0400 73 06000000 caaed7d6befc 00 // 寵物 - using default name
             // __ 69 80 17513300 d500 5400 02 81 0f 4e650600 2b 02 0000 0000 00 b5ae0a00 64 5a650600 73 08000000 c2e4c0e1cedebadb 00 // 寵物 - using default name
             //                                                                                       __ nameLen- GBK Pet name--------    nameLen- GBK PlyName-
-            // __ 69 80 c8843300 d300 5500 04 81 0f 9c690600 19 02 0000 0000 00 b6ae0a00             73 0a000000 d0a1d0a1c0b6beabc1e9 73 06000000 d1ccd3eaa4a3 00 // 寵物
+            // __ 69 80 c8843300 d300 5500 04 81 0f 9c690600 19 02 0000 0000 00 b6ae0a00             73 0a000000 d0a1d0a1c0b6beabc1e9 73 06000000 d1ccd3eaa4a3 00 // 寵物 [0x0AAEB6]700086: $1($2)
 
             // __ 69 80 97690000 c100 4500 05 80 01 901a0000 00 00 0000 0000 00 66420f00 64 3a340500 00 // 劍客導師
             // __ 69 80 97700000 B900 4700 03 80 01 901a0000 00 00 0000 0000 00 66420f00 64 6c340500 00 // 劍客導師助手
@@ -235,7 +239,7 @@ namespace Feather_Server.ServerRelated
                 + "82" // $2
                 + Lib.toHex(npc.animationTime) // $3
                 + Lib.toHex(npc.modelID) // $4
-                + Lib.toHex((byte)(npc.hp / npc.maxHP * 0x32)) // $5
+                + Lib.toHex((byte)(npc.HP / npc.maxHP * 0x32)) // $5
                 + ((npc is MobNPC) ? Lib.toHex(npc.elementToProduce) : "00") // $6
                 + Lib.toHex(npc.param7) // $7
                 + Lib.toHex(npc.param8) // $8
@@ -247,7 +251,7 @@ namespace Feather_Server.ServerRelated
             {
                 pre += (
                     "00"
-                    + "91b00a00" // or 66420f00 // TODO: analysis
+                    + "91b00a00" // or 66420f00 // formatstring ID, [0x0AB091]700561: "^1($2级)", [0x0F4266]1000038: "@1||||^1", [0x0F426C]1000044: "^1|2"
                     + "64"
                     + Lib.toHex((npc as IIDNamedNPC).nameID)
                 );
@@ -459,7 +463,7 @@ namespace Feather_Server.ServerRelated
                 "0f" // sz
                 + "5403"
                 + Lib.toHex(p.heroID)
-                + Lib.toHex(p.hp)
+                + Lib.toHex(p.HP)
                 + Lib.toHex(p.maxHP)
                 + "00"), ref pkts, false);
             return pkts;
@@ -475,7 +479,7 @@ namespace Feather_Server.ServerRelated
                 "0f" // sz
                 + "5404"
                 + Lib.toHex(p.heroID)
-                + Lib.toHex(p.mp)
+                + Lib.toHex(p.MP)
                 + Lib.toHex(p.maxMP)
                 + "00"), ref pkts, false);
             return pkts;
@@ -489,7 +493,7 @@ namespace Feather_Server.ServerRelated
             concatPacket(Lib.hexToBytes(
                 "07" // sz
                 + "3d14"
-                + Lib.toHex(p.hp)
+                + Lib.toHex(p.HP)
                 + "00"), ref pkts, false);
             return pkts;
         }
@@ -515,7 +519,7 @@ namespace Feather_Server.ServerRelated
             concatPacket(Lib.hexToBytes(
                 "07" // sz
                 + "3d16"
-                + Lib.toHex(p.mp)
+                + Lib.toHex(p.MP)
                 + "00"), ref pkts, false);
             return pkts;
         }
@@ -541,8 +545,8 @@ namespace Feather_Server.ServerRelated
             concatPacket(Lib.hexToBytes(
                 "0b" // sz
                 + "3d18"
-                + Lib.toHex(p.meleeDamage - 35 <= 10 ? 10 : p.meleeDamage - 35)
-                + Lib.toHex(p.meleeDamage)
+                + Lib.toHex(p.PA - 35 <= 10 ? 10 : p.PA - 35)
+                + Lib.toHex(p.PA)
                 + "00"), ref pkts, false);
             return pkts;
         }
@@ -555,8 +559,8 @@ namespace Feather_Server.ServerRelated
             concatPacket(Lib.hexToBytes(
                 "0b" // sz
                 + "3d19"
-                + Lib.toHex(p.meleeDefense - 35 <= 10 ? 10 : p.meleeDefense - 35)
-                + Lib.toHex(p.meleeDefense)
+                + Lib.toHex(p.PD - 35 <= 10 ? 10 : p.PD - 35)
+                + Lib.toHex(p.PD)
                 + "00"), ref pkts, false);
             return pkts;
         }
@@ -569,8 +573,8 @@ namespace Feather_Server.ServerRelated
             concatPacket(Lib.hexToBytes(
                 "0b" // sz
                 + "3d1a"
-                + Lib.toHex(p.magicDamage - 35 <= 10 ? 10 : p.magicDamage - 35)
-                + Lib.toHex(p.magicDamage)
+                + Lib.toHex(p.MA - 35 <= 10 ? 10 : p.MA - 35)
+                + Lib.toHex(p.MA)
                 + "00"), ref pkts, false);
             return pkts;
         }
@@ -583,8 +587,8 @@ namespace Feather_Server.ServerRelated
             concatPacket(Lib.hexToBytes(
                 "0b" // sz
                 + "3d1b"
-                + Lib.toHex(p.magicDefense - 35 <= 10 ? 10 : p.magicDefense - 35)
-                + Lib.toHex(p.magicDefense)
+                + Lib.toHex(p.MD - 35 <= 10 ? 10 : p.MD - 35)
+                + Lib.toHex(p.MD)
                 + "00"), ref pkts, false);
             return pkts;
         }
@@ -631,7 +635,7 @@ namespace Feather_Server.ServerRelated
         public static byte[] setEntityHealthBar(ILivingEntity e)
         {
             // idx:2a??
-            byte hpBar = (byte)(e.hp / e.maxHP * 0x32);
+            byte hpBar = (byte)(e.HP / e.maxHP * 0x32);
             
             byte[] pkts = new byte[0];
             // __ 2a 25842100 30 00
@@ -931,7 +935,7 @@ namespace Feather_Server.ServerRelated
 
             // title list
             //__ a2 0100 74270000 73 04000000 42303032 73 04000000 c0b4d0c5 00
-            //__ a2 0100 7b270000 73 04000000 44303033 64 2b270000 00
+            //__ a2 0100 7b270000 73 04000000 44303033 64 2b270000 00 // 长腿小灰鸡
             //__ a2 0100 7b270000 73 04000000 47303035 64 42270000 00
             //__ a2 0100 7b270000 73 04000000 44303031 64 29270000 00
             //__ a2 0100 75270000 73 04000000 42303031 73 0e000000 602b433078323766353263602d43 64 11270000 00 // GBK colorCode & titleID
@@ -967,18 +971,18 @@ namespace Feather_Server.ServerRelated
             // idx:3da3
             concatPacket(Lib.hexToBytes(
                 "3da3"
-                + Lib.toHex(p.hp           )
+                + Lib.toHex(p.HP           )
                 + Lib.toHex(p.maxHP        )
-                + Lib.toHex(p.mp           )
+                + Lib.toHex(p.MP           )
                 + Lib.toHex(p.maxMP        )
-                + Lib.toHex(p.meleeDamage  - 35 <= 10 ? 10 : p.meleeDamage  - 35)
-                + Lib.toHex(p.meleeDamage)
-                + Lib.toHex(p.meleeDefense - 35 <= 10 ? 10 : p.meleeDefense - 35)
-                + Lib.toHex(p.meleeDefense)
-                + Lib.toHex(p.magicDamage  - 35 <= 10 ? 10 : p.magicDamage  - 35)
-                + Lib.toHex(p.magicDamage )
-                + Lib.toHex(p.magicDefense - 35 <= 10 ? 10 : p.magicDefense - 35)
-                + Lib.toHex(p.magicDefense) 
+                + Lib.toHex(p.PA  - 35 <= 10 ? 10 : p.PA  - 35)
+                + Lib.toHex(p.PA)
+                + Lib.toHex(p.PD - 35 <= 10 ? 10 : p.PD - 35)
+                + Lib.toHex(p.PD)
+                + Lib.toHex(p.MA  - 35 <= 10 ? 10 : p.MA  - 35)
+                + Lib.toHex(p.MA )
+                + Lib.toHex(p.MD - 35 <= 10 ? 10 : p.MD - 35)
+                + Lib.toHex(p.MD) 
                 + "0000 0000 0000" // unk
                 + "00"
             ), ref pkts);

@@ -85,5 +85,9 @@ namespace Feather_Server.Packets
         public static readonly byte[] HERO_LOCATION_SYNC = { 0x67 };
 
         // TODO: player join delimeter list
+        // @782
+
+        public static readonly byte[] SELF_LAST_LOGIN_RECORD = { 0x3e, 0x01 };
+
     }
 }

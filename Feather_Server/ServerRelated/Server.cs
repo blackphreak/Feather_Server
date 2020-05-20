@@ -124,7 +124,7 @@ namespace Feather_Server.ServerRelated
                 {
                     Console.WriteLine($"[!] Incorrect Password. [{loginInfo.Split('\r')[0]}]");
                     // login fail
-                    client.send(PacketEncoder.alertBox(7002230));
+                    client.send(PacketFactory.alertBox(Packets.PacketLibs.EFormatString.INCORRECT_USERNAME_PASSWORD));
                     client.Dispose();
                     return;
                 }
@@ -153,6 +153,12 @@ namespace Feather_Server.ServerRelated
 
                     // TODO: same name check
                     // error: 07_21_02_2b_0f_00_00_00_
+                    //if (!isNameExist)
+                    //{
+                    //    client.send(PacketFactory.alertBox(Packets.PacketLibs.EFormatString.EXACT_NAME_EXISTS));
+                    //    client.Dispose();
+                    //    return;
+                    //}
 
                     var gender = byte.Parse(info[3]);
                     var icon = ushort.Parse(info[4]);
@@ -162,28 +168,28 @@ namespace Feather_Server.ServerRelated
                     var role = byte.Parse(info[8]);
                     Role roleID;
 
-                    //武士 # 01
-                    //劍客 # 02
-                    //術士 # 03
-                    //天師 # 04
-                    //祭師 # 05
+                    // Warrior   (武士) # 01
+                    // Swordman  (劍客) # 02
+                    // Mage      (術士) # 03
+                    // Taoist    (天師) # 04
+                    // Priest    (祭師) # 05
 
                     switch (role)
                     {
                         case 2:
-                            roleID = Role.JK;
+                            roleID = Role.Swordman;
                             break;
                         case 3:
-                            roleID = Role.SS;
+                            roleID = Role.Mage;
                             break;
                         case 4:
-                            roleID = Role.TS;
+                            roleID = Role.Taoist;
                             break;
                         case 5:
-                            roleID = Role.JS;
+                            roleID = Role.Priest;
                             break;
                         default:
-                            roleID = Role.WS;
+                            roleID = Role.Warrior;
                             break;
                     }
 
@@ -212,14 +218,14 @@ namespace Feather_Server.ServerRelated
                     // assign role default values
                     int[] defs = Lib.roleDefault[roleID];
 
-                    fullInfo.hp = defs[0];
+                    fullInfo.HP = defs[0];
                     fullInfo.maxHP = defs[0];
-                    fullInfo.mp = defs[1];
+                    fullInfo.MP = defs[1];
                     fullInfo.maxMP = defs[1];
-                    fullInfo.meleeDamage = defs[2];
-                    fullInfo.meleeDefense = defs[3];
-                    fullInfo.magicDamage = defs[4];
-                    fullInfo.magicDefense = defs[5];
+                    fullInfo.PA = defs[2];
+                    fullInfo.PD = defs[3];
+                    fullInfo.MA = defs[4];
+                    fullInfo.MD = defs[5];
                     fullInfo.hit = defs[6];
                     fullInfo.dodge = defs[7];
                     fullInfo.criticalHitRate = defs[8];
@@ -277,7 +283,7 @@ namespace Feather_Server.ServerRelated
                 Console.WriteLine($"[+] Login. Username[{info[0]}] Pw[{pw}] Heros[{string.Join(", ", heroIDs)}]");
 
                 // login success
-                client.send(PacketEncoder.loginSuccess(Lib.getBasicInfos(heroIDs), isInHeroCreation));
+                client.send(PacketFactory.loginSuccess(Lib.getBasicInfos(heroIDs), isInHeroCreation));
 
                 //client.send(new byte[] {
                 //    0x07, 0x49, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -626,13 +632,13 @@ namespace Feather_Server.ServerRelated
             //hero.effects.Add(new Effect(0x6f, 0x04, 0x02, 0x02));
             //hero.effects.Add(new Effect(0x6e, 0x02, 0x01, 0x02));
 
-            client.send(PacketEncoder.playerJoin(hero));
+            client.send(PacketFactory.playerJoin(hero));
 
             // update player ready
             ((ILivingEntity)hero).state = 0x02;
 
             // sync to all nearby players
-            Lib.sendToNearby(hero, PacketEncoder.spawnHero(hero, true));
+            Lib.sendToNearby(hero, PacketFactory.spawnHero(hero, true));
 
             // spawn nearbys
             Lib.spawnNearbys(client, hero, 16, false);
