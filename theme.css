@@ -1,0 +1,181 @@
+body {
+    font-family: "Consolas", "Courier New", Courier, monospace;
+    background: #171717;
+    color: #e3e3e3;
+    padding: 10px 10px 120px 10px;
+}
+#io {
+    border: 1px solid #333333;
+    margin: 10px 0;
+    max-width: 1366px;
+    width: 100%;
+    min-height: 640px;
+    height: 60vh;
+    overflow-y: unset;
+    outline: none;
+    margin-bottom: 400px;
+}
+#io > div {
+    background: #222222;
+    padding: 5px 0;
+    border-top: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+}
+.tooltip {
+    position: absolute;
+    z-index: 1070;
+    display: block;
+    margin: 0;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: left;
+    text-align: start;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+    word-break: normal;
+    word-spacing: normal;
+    white-space: pre;
+    line-break: auto;
+    font-size: 0.875rem;
+    word-wrap: break-word;
+    opacity: 0;
+}
+.tooltip.show {
+    opacity: 1;
+}
+.tooltip .arrow {
+    position: absolute;
+    display: block;
+    width: 0.8rem;
+    height: 0.4rem;
+}
+.tooltip .arrow::before {
+    position: absolute;
+    content: "";
+    border-color: transparent;
+    border-style: solid;
+}
+.bs-tooltip-auto[x-placement^="top"],
+.bs-tooltip-top {
+    padding: 0.4rem 0;
+}
+.bs-tooltip-auto[x-placement^="top"] .arrow,
+.bs-tooltip-top .arrow {
+    bottom: 0;
+}
+.bs-tooltip-auto[x-placement^="top"] .arrow::before,
+.bs-tooltip-top .arrow::before {
+    top: 0;
+    border-width: 0.4rem 0.4rem 0;
+    border-top-color: #ebebeb;
+}
+.bs-tooltip-auto[x-placement^="right"],
+.bs-tooltip-right {
+    padding: 0 0.4rem;
+}
+.bs-tooltip-auto[x-placement^="right"] .arrow,
+.bs-tooltip-right .arrow {
+    left: 0;
+    width: 0.4rem;
+    height: 0.8rem;
+}
+.bs-tooltip-auto[x-placement^="right"] .arrow::before,
+.bs-tooltip-right .arrow::before {
+    right: 0;
+    border-width: 0.4rem 0.4rem 0.4rem 0;
+    border-right-color: #ebebeb;
+}
+.bs-tooltip-auto[x-placement^="bottom"],
+.bs-tooltip-bottom {
+    padding: 0.4rem 0;
+}
+.bs-tooltip-auto[x-placement^="bottom"] .arrow,
+.bs-tooltip-bottom .arrow {
+    top: 0;
+}
+.bs-tooltip-auto[x-placement^="bottom"] .arrow::before,
+.bs-tooltip-bottom .arrow::before {
+    bottom: 0;
+    border-width: 0 0.4rem 0.4rem;
+    border-bottom-color: #ebebeb;
+}
+.bs-tooltip-auto[x-placement^="left"],
+.bs-tooltip-left {
+    padding: 0 0.4rem;
+}
+.bs-tooltip-auto[x-placement^="left"] .arrow,
+.bs-tooltip-left .arrow {
+    right: 0;
+    width: 0.4rem;
+    height: 0.8rem;
+}
+.bs-tooltip-auto[x-placement^="left"] .arrow::before,
+.bs-tooltip-left .arrow::before {
+    left: 0;
+    border-width: 0.4rem 0 0.4rem 0.4rem;
+    border-left-color: #ebebeb;
+}
+.tooltip-inner {
+    min-width: 400px;
+    max-width: 800px;
+    padding: 0.25rem 0.5rem;
+    color: #e3e3e3;
+    text-align: left;
+    background-color: #3a3a3a;
+    border: 1px solid #72abff;
+    border-radius: 0.25rem;
+}
+
+.bg-nor {
+    background: #0c421f !important;
+}
+.bg-err {
+    background: #520606 !important;
+}
+.bg-warn {
+    background: #756e0a !important;
+}
+.cli {
+    background: #482f6f !important;
+}
+.fg-err {
+    background: #cf6868 !important;
+}
+[data-toggle="tooltip"].active {
+    background: #0d5575 !important;
+}
+div#io:empty::before {
+    white-space: pre;
+    color: #737373;
+    cursor: text;
+    user-select: none;
+    content: attr(placeholder);
+}
+div#io:not(:empty)::before {
+    content: "";
+}
+.tooltip div > span {
+    word-wrap: break-word;
+}
+#tooltip_killer {
+    cursor: pointer;
+    background: #792626;
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    font-size: 20px;
+    text-align: center;
+    line-height: 42px;
+    transition: 0.25s ease-in-out;
+    transform: rotate(0deg);
+}
+#tooltip_killer:hover {
+    background: #da5454;
+    transform: rotate(90deg);
+}

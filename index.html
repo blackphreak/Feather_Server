@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Feather Project Github Site</title>
+        <link
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="theme.css">
+    </head>
+    <body>
+        <button id="btn_do_parse" class="btn btn-success" disabled="disabled">Do Parse</button>
+        <button id="btn_reset" class="btn btn-warning">
+            Reset
+        </button>
+        <label id="pkt_ver"></label>
+        <br />
+        <!-- Parser Body -->
+        <div
+            id="io"
+            contenteditable="plaintext-only"
+            spellcheck="false"
+            placeholder="Any of the following formats are valid for parsing:&#xa;-- &lt;pktBody (without size prefix)&gt;&#xa;__ &lt;pktBody (without size prefix)&gt;&#xa;&lt;timeCode&gt; &lt;pktSize&gt;_&lt;pktBody...&gt; (Official Packet Record)&#xa;&lt;pkt (with size prefix)&gt;&#xa;{...} (JSON KVP format, by pkt_dump.py)&#xa;[...] (JSON Array format)"
+        >__ 210276d86a0000</div>
+        <!-- others -->
+        <div id="tooltip_killer" title="Click to kill all tooltip!">❌</div>
+        <!-- Javascripts -->
+        <script
+            src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"
+        ></script>
+        <!-- GBK en/decoder | src: https://github.com/cnwhy/GBK.js -->
+        <script src="https://blog.whyoop.com/GBK.js/dist/gbk.js"></script>
+        <script src="./js/functions.js"></script>
+        <script src="./js/parser.v2.js"></script>
+    </body>
+</html>
