@@ -179,3 +179,34 @@ div#io:not(:empty)::before {
     background: #da5454;
     transform: rotate(90deg);
 }
+td:first-child {
+    text-align: right;
+    width: 22%;
+    min-width: 140px;
+    padding-left: 15px;
+}
+td:first-child::after {
+    content: ' :';
+}
+td:nth-child(2) {
+    width: 27%;
+    min-width: 90px;
+}
+table {
+    color: #fff;
+    background-color: #3a3a3a;
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+table tr:first-child > td {
+    border-top: none;
+}
+table td {
+    padding: .3rem;
+    vertical-align: top;
+    border-top: 1px solid #454d55;
+}
+table tr:hover {
+    background-color: #4d5052;
+}

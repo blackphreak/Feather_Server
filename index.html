@@ -10,13 +10,14 @@
             integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
             crossorigin="anonymous"
         />
-        <link rel="stylesheet" href="theme.css">
+        <link rel="stylesheet" href="theme.css" />
     </head>
     <body>
         <button id="btn_do_parse" class="btn btn-success" disabled="disabled">Do Parse</button>
         <button id="btn_reset" class="btn btn-warning">
             Reset
         </button>
+        <br />
         <label id="pkt_ver"></label>
         <br />
         <!-- Parser Body -->
@@ -24,8 +25,13 @@
             id="io"
             contenteditable="plaintext-only"
             spellcheck="false"
-            placeholder="Any of the following formats are valid for parsing:&#xa;-- &lt;pktBody (without size prefix)&gt;&#xa;__ &lt;pktBody (without size prefix)&gt;&#xa;&lt;timeCode&gt; &lt;pktSize&gt;_&lt;pktBody...&gt; (Official Packet Record)&#xa;&lt;pkt (with size prefix)&gt;&#xa;{...} (JSON KVP format, by pkt_dump.py)&#xa;[...] (JSON Array format)"
-        >__ 210276d86a0000</div>
+            placeholder="Any of the following formats are valid for parsing:&#xa;-- &lt;pktBody (without size prefix)&gt;&#xa;__ &lt;pktBody (without size prefix)&gt;&#xa;&lt;timeCode&gt; &lt;pktSize&gt;_&lt;pktBody...&gt;_ (Official Packet Record)&#xa;&lt;pkt (with size prefix, no underscore, no space)&gt;&#xa;{...} (JSON KVP format, dump with pkt_dump.py)"
+        ></div>
+        <!--
+            __ 210276d86a0000
+            07490e0000000000
+            --3D2FAABBCCDD00
+        -->
         <!-- others -->
         <div id="tooltip_killer" title="Click to kill all tooltip!">❌</div>
         <!-- Javascripts -->
@@ -35,8 +41,13 @@
             crossorigin="anonymous"
         ></script>
         <script
-            src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
-            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
             crossorigin="anonymous"
         ></script>
         <!-- GBK en/decoder | src: https://github.com/cnwhy/GBK.js -->

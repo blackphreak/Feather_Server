@@ -1,4 +1,4 @@
-// region: Enums
+//#region Enum
 var eQualityColor = (q) => {
     if (q == 1) return "#00FFFF";
     if (q == 2) return "#FFFF00";
@@ -47,6 +47,14 @@ var ePlayerAct = (actCodeInPureHex) => {
     // TODO: find, confirm & fill all
 };
 
+var ePlayerRole = (hex) => {
+    if (hex == 0x11fe) return "Warrior";
+    if (hex == 0x11fd) return "Swordman";
+    if (hex == 0x1200) return "Mage";
+    if (hex == 0x11ff) return "Taoist";
+    if (hex == 0x1201) return "Priest";
+};
+
 var eChatChannel = (hex) => {
     //return "Marquee (Top)";
     if (hex == "02") return "Rumor";
@@ -86,15 +94,65 @@ var eAnimationDuration = (inp) => parseInt(inp, 16) + " seconds";
 var eAnimationLayer = (inp) => (inp <= "01" ? "Front" : "Back");
 var eAnimationLoop = (inp) => (inp <= "01" ? "Once" : "Repeated");
 
-var db_FormatString = (inp) => (formatstringDB[inp] || "-- FSDB Fail --");
-var db_Item = (inp) => (itemDB[inp] || "-- ItemDB Fail --");
-var db_NPC = (inp) => (npcDB[inp] || "-- NPCDB Fail --");
-var db_Map = (inp) => (mapDB[inp] || "-- MapDB Fail --");
-var db_Skill = (inp) => (skillDB[inp] || "-- SkillDB Fail --");
+var db_FormatString = (inp, cols = ["title"]) => {
+    let db = formatstringDB[inp] || false;
+    if (!db)
+        return "-- FSDB Fail --";
+    
+    let data = [];
+    cols.forEach(col => {
+        data.push(db[col] || "ERR-COL");
+    })
+    return data;
+}
+var db_Item = (inp, cols = ["name"]) => {
+    let db = itemDB[inp] || false;
+    if (!db)
+        return "-- ItemDB Fail --";
+    
+    let data = [];
+    cols.forEach(col => {
+        data.push(db[col] || "ERR-COL");
+    })
+    return data;
+}
+var db_NPC = (inp, cols = ["name", "name2"]) => {
+    let db = npcDB[inp] || false;
+    if (!db)
+        return "-- NPCDB Fail --";
+    
+    let data = [];
+    cols.forEach(col => {
+        data.push(db[col] || "ERR-COL");
+    })
+    return data;
+}
+var db_Map = (inp, cols = ["name"]) => {
+    let db = mapDB[inp] || false;
+    if (!db)
+        return "-- MapDB Fail --";
+    
+    let data = [];
+    cols.forEach(col => {
+        data.push(db[col] || "ERR-COL");
+    })
+    return data;
+}
+
+var db_Skill = (inp, cols = ["name"]) => {
+    let db = skillDB[inp] || false;
+    if (!db)
+        return "-- SkillDB Fail --";
+    
+    let data = [];
+    cols.forEach(col => {
+        data.push(db[col] || "ERR-COL");
+    })
+    return data;
+}
 
 //#endregion Enums
 
-//#region Common Functions
 //#region Extension Functions
 String.prototype.cPadStart = function(sz = 20) {
     return this.padStart(sz).replace(/\s/g, " ");
@@ -109,10 +167,9 @@ String.prototype.cPadEnd = function(sz = 14) {
 var LOG = 1 << 0,
     WARN = 1 << 1,
     ERR = 1 << 2,
-    DEBUG = 1 << 3
-;
-
+    DEBUG = 1 << 3;
 var logMode = LOG | WARN | ERR | DEBUG;
+var terminateFlag = false;
 
 var hasFlag = (myLv, targetLv) => (myLv & targetLv) == targetLv;
 var _logSign = (logLevel) => {
@@ -130,10 +187,12 @@ var log = (messages, logLevel) => {
         whole = [];
     if (hasFlag(logLevel, DEBUG)) fn = console.trace;
     else if (hasFlag(logLevel, WARN)) fn = console.warn;
-    else if (hasFlag(logLevel, ERR)) fn = console.error;
-    else fn = console.log;
+    else if (hasFlag(logLevel, ERR)) {
+        fn = console.error;
+        terminateFlag = true;
+    } else fn = console.log;
 
-    if (typeof messages == "object") messages.forEach(msg => whole.push(`[${logSign}] ${msg}`));
+    if (typeof messages == "object") messages.forEach((msg) => whole.push(`[${logSign}] ${msg}`));
     else whole.push(`[${logSign}] ${messages}`);
 
     fn(...whole);
@@ -154,8 +213,10 @@ var lib = {
         return new Uint8Array(a);
     },
 
+    /**
+     * Convert Little-Endianess to Big-Endianess
+     */
     le2be: (endian) => {
-        // Convert Little-Endianess to Big-Endianess
         // src: https://stackoverflow.com/a/44288059
         if (endian == undefined) {
             log("Empty input.", ERR | DEBUG);
@@ -197,29 +258,314 @@ var lib = {
     }
 };
 //#endregion
-//#endregion
 
-// sorting function
+//#region sorting function
 var sortFn = (a, b) => (a.length > b.length ? +1 : a.length < b.length ? -1 : a - b);
-var sortFnReverse = (a, b) => (a.length > b.length ? -1 : a.length < b.length ? +1 : b - a);
-
-//#region Trace Function
-window.backTrace = []
-var initBT = (_name, _data) => {
-    window.backTrace.push({
-        fn: _name, data: _data
-    })
-}
-var rmBT = window.backTrace.pop();
+var sortFnLongerFirst = (a, b) => (a.length > b.length ? -1 : a.length < b.length ? +1 : b - a);
 //#endregion
 
 //#region Parser
+/**
+ * Warning Flag: expected more bytes, but already reached the end.
+ */
+const WFLAG_MORE_EXPECTED = 1 << 0;
+var $io = $(`#io`);
 
-var singleParser = (bytes) => {
-    if (bytes == "")
-        return "";
+var buildOutput = (info) => {
+    let title = info.title || "default title",
+        packet = info.packet || "default packet";
+
+    if (info.log) log([title, `Packet: ${packet}`], info.log);
+
+    let tooltipInfo = "";
+    if (info.tooltip) {
+        // parsed packet
+        /* example of info.tooltip:
+        [
+            { "LHS": ["packet bytes", "" ] },
+            ...
+        ]
+        */
+        info.tooltip.forEach((ele) => {
+            if (typeof ele == "number") {
+                // is flag
+                let flag = parseInt(ele);
+                if (hasFlag(flag, WFLAG_MORE_EXPECTED))
+                    tooltipInfo += `<tr><td colspan=100></td></tr>`;
+            } else {
+                $.each(ele, (desc, actual) => {
+                    tooltipInfo += `<tr><td>${desc}</td>`;
+                    let last = actual.pop();
+                    actual.forEach(e => {
+                        tooltipInfo += `<td>${e}</td>`;
+                    });
+                    tooltipInfo += `<td colspan=100>${last}</td>`;
+                    tooltipInfo += "</tr>";
+                });
+            }
+        });
+        tooltipInfo = `<table><tbody>` + tooltipInfo + `</tbody></table>`;
+        tooltipInfo = tooltipInfo.replace(/\"/gm, "&quot;"); // replace double-qoute (") to HTML charCode
+        tooltipInfo = ` data-toggle="tooltip" data-original-title="${tooltipInfo}"`;
+    }
+
+    $io.append(`<div class="${info.class || ""}"${tooltipInfo}>// ${title}<br />${packet}</div>`);
+};
+
+var matchHeader = (pkt) => {
+    let typeA = pkt.substr(0, 4) + "",
+        typeB = pkt.substr(0, 2) + "";
+
+    if (pktList.hasOwnProperty(typeA)) return typeA;
+    if (pktList.hasOwnProperty(typeB)) return typeB;
+
+    return false;
+};
+
+/**
+ * To validate the size of the packet,
+ *   only applicable for packet starting with size and end with 00.
+ * @param {string} pkt packet that without underscore(_), spaces, and time header
+ */
+var sizeCheck = (pkt) => {
+    let sz = parseInt(pkt.substr(0, 2), 16),
+        body = pkt.slice(2).length; // exclude size
+
+    // skip size check for 0xFE and 0xFF packet
+    if (sz >= 0xfe) return true;
+
+    return sz * 2 == body;
+};
+
+var _info;
+// TODO: add support to REPS, REPE
+var isMatchSign = (signature, signInfo, original_pkt) => {
+    // clone pkt, this variable will be used to store the unprocessed bytes.
+    var pkt = original_pkt;
+    var allParamInfo = signInfo["params"];
     
-    // identify packet format
+    var i = -1;
+    signature.split(" ").every(function (param) {
+        i++;
+        var LHS, byte = "", endIndex = 0, paramInfo = [];
+        if (param == "[REPS]") {
+            
+        }
+        else if (param == "[REPE]") {
+            
+        }
+        else if (param == "73$4$gbk") {
+            if (pkt.slice(0, 2) != "73" || pkt.length < 12)
+                return false; // signature not match
+            
+            LHS = allParamInfo[i].name;
+            let gbkByteLength = parseInt(lib.le2be(pkt.slice(2, 10)), 16) * 2;
+            endIndex = 10 + gbkByteLength;
+            byte = pkt.slice(0, endIndex)
+            let value = pkt.slice(10, endIndex);
+            paramInfo.push(lib.parseGBK(value)); // push value
+            
+            pkt = pkt.slice(endIndex);
+        }
+        else if (param == "64$4") {
+            if (pkt.slice(0, 2) != "64" || pkt.length < 10)
+                return false; // signature not match
+            
+            endIndex = 10;
+            LHS = allParamInfo[i].name;
+            byte = pkt.slice(0, endIndex);
 
-}
+            let value = parseInt(lib.le2be(pkt.slice(2, endIndex)), 16);
+            paramInfo.push(`${value} [0x${value.toString(16).toUpperCase()}]`); // push value
+            
+            if (allParamInfo[i].func || false)
+            {
+                let fn = [...allParamInfo[i].func]; // duplicate array
+                if (fn.length == 1)
+                    paramInfo.push(window[fn[0]](value)); // push formatted value
+                else
+                    paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
+            }
+            
+            pkt = pkt.slice(endIndex);
+        }
+        else if (param.startsWith("$")) {
+            let sz = parseInt(param.substr(1)) * 2;
+            if (pkt.length < sz)
+                return false; // signature not match
+            
+            endIndex = sz;
+            LHS = allParamInfo[i].name;
+            byte = pkt.slice(0, endIndex);
+            let value = parseInt(lib.le2be(byte), 16);
+
+            paramInfo.push(`${value} [0x${value.toString(16).toUpperCase()}]`); // push value
+            
+            if (allParamInfo[i].func || false)
+            {
+                let fn = [...allParamInfo[i].func]; // duplicate array
+                if (fn.length == 1)
+                    paramInfo.push(window[fn[0]](value)); // push formatted value
+                else
+                    paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
+            }
+            
+            pkt = pkt.slice(endIndex);
+        }
+        else {
+            // direct byte matching
+            if (pkt.slice(0, param.length) != param)
+                return false; // signature not match
+
+            endIndex = param.length;
+            pkt = pkt.slice(param.length);
+            byte = param;
+
+            if (param.match(/^(00)+$/))
+            {
+                // this is padding
+                LHS = allParamInfo[i].name;
+                paramInfo.push(param);
+            }
+            else
+            {
+                // this is subcate byte
+                LHS = allParamInfo[i].name;
+                paramInfo.push(signInfo["desc"]);
+            }
+        }
+        let map = {};
+        map[LHS] = paramInfo;
+        _info.tooltip.push(map);
+        _info.packet += " " + byte;
+        return true;
+    });
+    return true;
+};
+
+var parseWorker = (header, pkt) => {
+    _info = {
+        title: "", // title with subcate (if any), extra mark (if applicable)
+        packet: "", // space seperated
+        tooltip: [], // parsed data
+        class: false // css class name (string). "false" only if using default css class
+    };
+
+    let target = pktList[header];
+    _info.title = `[${target.delimeter}] ${target.desc}`;
+
+    var signature = undefined;
+    $.each(target.signature, (_sign, v) => {
+        if (isMatchSign(_sign, v, pkt)) {
+            signature = _sign;
+            return false;
+        }
+    });
+
+    if (!signature)
+    {
+        return buildOutput({
+            class: "bg-warn",
+            title: _info.title + ` -- Failed to match any signature`,
+            packet: `__ ${header} ${pkt} 00`,
+            log: WARN
+        });
+    }
+
+    _info.packet = `__ ${header}${_info.packet} 00`;
+    buildOutput(_info);
+};
+
+var singleParser = (pkt) => {
+    if (pkt == "") {
+        log("Empty Packet Byte.", WARN);
+        return;
+    }
+
+    // try to parse with JSON
+    var json = undefined;
+    try {
+        json = JSON.parse(pkt);
+    } catch (e) {}
+
+    if (json != undefined) {
+        // packet is using JSON format
+        // TODO: ...
+    }
+
+    // remove all spaces
+    pkt = pkt.replace(" ", "").toLowerCase();
+    if (pkt.match(/([a-f0-9]{8})([a-f0-9]{2}_)+/i)) {
+        // official record format
+        // format: <time (4-bytes)><size (2-bytes)>_<data ... (split by _)>_00_
+        // raw   : 2d217c01 03_ff_02_00_
+        // trimmed: 2d217c0103_ff_02_00_
+        // output: ff02
+
+        pkt = pkt.replace(/_/g, "");
+
+        if (!sizeCheck(pkt.slice(8))) {
+            return buildOutput({
+                class: "bg-warn",
+                title: "Mismatch Packet Size. [Packet Size Check Failed - F1]",
+                packet: `${pkt}`,
+                log: WARN
+            });
+        }
+        pkt = pkt.slice(10, -2);
+    } else if (pkt.match(/([_-]{2})([a-f0-9]{2})+00/)) {
+        // replaced packet size with underscore(__) or dash(--), and without time.
+        // formatA: __ <data ...>
+        // raw    : __ ff0200
+        // trimmed: __ff0200
+        // output : ff02
+
+        // formatB: -- <data ...>
+        // raw    : -- ff0200
+        // trimmed: --ff0200
+        // output : ff02
+
+        pkt = pkt.slice(2, -2);
+    } else if (pkt.match(/([a-f0-9]{2})+/)) {
+        // sized raw packet
+        // format : <whole packet>
+        // raw    : 03ff0200
+        // trimmed: 03ff0200
+        // output : ff02
+
+        if (!sizeCheck(pkt)) {
+            return buildOutput({
+                class: "bg-warn",
+                title: "Mismatch Packet Size. [Packet Size Check Failed - F2]",
+                packet: `${pkt}`,
+                log: WARN
+            });
+        }
+        pkt = pkt.slice(2, -2);
+    } else {
+        // failed to match any
+        return buildOutput({
+            class: "bg-err",
+            title: "Invalid Format",
+            packet: `${pkt}`,
+            log: ERR
+        });
+    }
+
+    let header = matchHeader(pkt);
+    if (!header) {
+        // not in known-packet database
+        return buildOutput({
+            class: "",
+            title: "-- Not Known Yet --",
+            packet: `__ ${pkt} 00`,
+            log: ERR
+        });
+    }
+
+    parseWorker(header, pkt.substr(header.length));
+};
+
 //#endregion
+
+const parserVersion = 3;

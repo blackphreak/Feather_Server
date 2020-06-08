@@ -13,13 +13,13 @@ _log_indent = -1
 delimeters = {}
 backTrace = []
 pkt_outputs = {}
+longestHeader = -1
 """
 format: pkt_outputs
 {
     <pkt_header>: {
         "delimeter": <pkt_delimeter>, # for pkt_header collision checking
         "desc": <desc>,
-        "src": <path to .cs>,
         "signature": {
             <signature>: {
                 "desc": <desc for this signature>,
@@ -106,7 +106,7 @@ def doesKeywordAppear(line, keywordList):
 def readFragment(path, tag):
     initBT("readFragment")
     codeList = []
-    with open(path, "r") as f:
+    with open(basePath + path, "r") as f:
         lines = f.readlines()
 
     i = 0
@@ -162,7 +162,6 @@ def readFragment(path, tag):
 
 def buildSignature(codes):
     global _log_indent
-    _log_indent -= 1
     initBT("buildSignature")
 
     global pkt_outputs
@@ -185,7 +184,7 @@ def buildSignature(codes):
         if pl:
             print(line, ": ", code)
 
-        if "JS_D" in code:
+        if "/* JS_D:" in code:
             m = re.search("setDelimeter\(Delimeters\.(\S+)\)", codes[i + 1]["code"])
             if not m:
                 log("Failed to get Delimeter (Regex Failed).", ERR)
@@ -200,7 +199,7 @@ def buildSignature(codes):
                     log(f"de mo ar {header}", ERR)
 
                 if pkt_outputs[header]["delimeter"] != deli:
-                    log(f"Collision Detected for Delimeter[{deli}] 0x{header}", ERR, indentOffset=1)
+                    log(f"Collision Detected for Delimeter[{deli}] 0x{header}", ERR)
                 
                 # init empty dict or append previous
                 info["signature"] = pkt_outputs[header]["signature"] if "signature" in pkt_outputs[header] else {}
@@ -211,6 +210,7 @@ def buildSignature(codes):
                     "signature": {}
                 }
 
+            # for debug the specific packet only:
             # if header == "A91A":
             #     log([f"{line}: {code}"], DEBUG, indentOffset=-2)
             #     pl = True
@@ -243,14 +243,16 @@ def buildSignature(codes):
 
             i += 1 # skip "setDelimeter(...)" line
 
-        elif "JS_SC" in code:
+        elif "/* JS_SC:" in code:
             # read info
             subcate = re.match(".*JS_SC: ([A-Fa-f0-9PT]{2}).*", code)
             if not subcate:
                 log(["Invalid Subcate. [E-BS-SC]", f"Line: {line}", f"Code: {code}"], ERR)
 
             subcate = subcate[1].upper()
-            sign.append(subcate)
+            if "PT" not in subcate:
+                sign.append(subcate)
+                sign_info["params"].append({"name": f"SubCate[{subcate}]"})
 
             matches = re.findall("((Desc|Mark)\[(.+?)\])", code)
             if not matches:
@@ -272,8 +274,9 @@ def buildSignature(codes):
 
         elif "/* JS:" in code:
             paramInfo = {}
+            deferMark = None
 
-            matches = re.findall("([TR]|Fn|Desc)\[(.*?)\]", code)
+            matches = re.findall("([TR]|Fn|Desc|Mark)\[(.*?)\]", code)
             for m in matches:
                 _type = m[0]
                 v = m[1]
@@ -283,19 +286,33 @@ def buildSignature(codes):
                 elif (_type == "T"):
                     paramInfo["type"] = v
                 elif (_type == "R"):
-                    if (v == "MAP"):
-                        v = "db_MAP"
-                    elif (v == "NPC"):
-                        v = "db_NPC"
-                    elif (v == "ITEM"):
-                        v = "db_Item"
-                    elif (v == "SKILL"):
-                        v = "db_Skill"
-                    elif (v == "FS"):
-                        v = "db_FormatString"
+                    cols = []
+                    v = v.split(",")
+                    db = v.pop(0)
+
+                    if (db == "MAP"):
+                        cols.append("db_MAP")
+                    elif (db == "NPC"):
+                        cols.append("db_NPC")
+                    elif (db == "ITEM"):
+                        cols.append("db_Item")
+                    elif (db == "SKILL"):
+                        cols.append("db_Skill")
+                    elif (db == "FS"):
+                        cols.append("db_FormatString")
                     else:
-                        log([f"Unknown Reference Type[{v}].", f"Line: {line}", f"Code: {code}"], WARN, indentOffset=1)
-                    paramInfo["func"] = v
+                        log([f"Unknown Reference Type[{v}].", f"Line: {line}", f"Code: {code}"], WARN)
+                    
+                    paramInfo["func"] = cols + v
+                elif (_type == "Fn"):
+                    paramInfo["func"] = v.split(",")
+                elif (_type == "Mark"):
+                    if (v == "REPEAT_START" or v == "REPS"):
+                        sign.append("[REPS]")
+                    elif (v == "REPEAT_END" or v == "REPE"):
+                        deferMark = "[REPE]" # let this mark to be appended later
+                    else:
+                        log([f"Invalid Mark Value[{v}].", f"Line: {line}", f"Code: {code}"], ERR)
 
             # read next line, the actual code
             nextI = i + 1
@@ -312,7 +329,7 @@ def buildSignature(codes):
             elif ".writePadding" in next_code:
                 var = re.search("\(([A-Fa-f0-9x]+)\)", next_code)
                 if not var:
-                    log([f"Failed to capture value enclosed.", f"Line: {next_line}", f"Code: {next_code}"], ERR, indentOffset=1)
+                    log([f"Failed to capture the value enclosed.", f"Line: {next_line}", f"Code: {next_code}"], ERR)
 
                 var = var.group(1)
                 if "0x" in var:
@@ -326,7 +343,7 @@ def buildSignature(codes):
                 _tmpSign = "$4"
                 isInFormat = True
                 if "func" not in paramInfo: # default use db_FormatString
-                    paramInfo["func"] = "db_FormatString"
+                    paramInfo["func"] = ["db_FormatString"]
             elif ".writeParam" in next_code:
                 _tmpSign = "64$4"
                 isInFormat = True
@@ -335,6 +352,10 @@ def buildSignature(codes):
 
             sign.append(_tmpSign)
             sign_info["params"].append(paramInfo)
+
+            # if there is deferMark to be appended to "sign" array
+            if deferMark:
+                sign.append(deferMark)
 
             i = nextI # skip the handled line
 
@@ -347,8 +368,8 @@ def buildSignature(codes):
 
             # reset
             isInFormat = False
+            pl = False
 
-    _log_indent += 1
     rmBT()
 
 # filter out the actual codes from "JS_D" to "pack()" for each functions (for JS_D) / variants (for subcate)
@@ -356,6 +377,8 @@ def buildSignature(codes):
 # (this function will filter all the JS_J_#, JS_F before pass to build signature)
 def funcsHandler(funcsList):
     initBT("funcsHandler")
+    global _log_indent
+    _log_indent -= 1
 
     try:
         # stores all filtered code, and wait for build signature
@@ -370,6 +393,10 @@ def funcsHandler(funcsList):
                 lineNum, line = func[i]["line"], func[i]["code"]
 
                 updateBT(lineNum)
+
+                # for debug the specific packet only:
+                # if lineNum > 138:
+                #     log([f"{lineNum}: {line}"], DEBUG, indentOffset=-2)
 
                 if "JS_D: " in line:
                     # packet begins
@@ -455,7 +482,8 @@ def funcsHandler(funcsList):
 
                     tag = m[1]
                     path = m[2]
-                    log(f"Reading Fragment. Tag[{tag}] At[{path}]", LOG, indentOffset=1)
+                    print("")
+                    log(f"Reading Fragment for next Delimeter. Tag[{tag}] At[{path}]", LOG, indentOffset=1)
 
                     currCodeBeforeSubcate += readFragment(path, tag)
 
@@ -472,22 +500,24 @@ def funcsHandler(funcsList):
                     i = nextI # skip nextI
                 elif doesKeywordAppear(line, [".pack()", ".nextPacket()"]):
                     if currSubcateIdx == -1:
+                        # no subcate
                         currCodeBeforeSubcate.append(func[i])
+                        buildSignature(currCodeBeforeSubcate)
                     else:
+                        # have subcate
                         subcateVariants[currSubcateIdx].append(func[i])
+                        for subcate in subcateVariants:
+                            # merge & build
+                            buildSignature(currCodeBeforeSubcate + subcate)
 
-            # build signature
-            if currSubcateIdx == -1:
-                # no subcate
-                buildSignature(currCodeBeforeSubcate)
-            else:
-                # have subcate
-                for subcate in subcateVariants:
-                    # merge & build
-                    buildSignature(currCodeBeforeSubcate + subcate)
+                        # reset
+                        subcateVariants = []
+                        currSubcateIdx = -1
+
     except Exception as e:
         log(f"Exception occurred: {e}", ERR)
 
+    _log_indent += 1
     rmBT()
 
 
@@ -531,18 +561,22 @@ def srcHandler(lines, file):
     rmBT()
 
 if __name__ == "__main__":
-    versionInfo = ["2020-06-05", "build 22235"]
-    print(f"Builder_rev2.py for Destiny Online Project\nVersion{versionInfo}\n")
+    versionInfo = ["2020-06-09", "build 50148", "3"]
+    selfName = __file__.replace('\\', '/').split("/")[-1]
+    print(f'------------ [Destiny Online Project] ------------\nFile: {selfName}\nVersion: {" ".join(versionInfo)}')
 
+    global basePath
+    basePath = "./"
     if len(sys.argv) == 2:
-        basePath = os.path.abspath(sys.argv[1] + "/Feather_Server/Packets/")
-        print(f"Base Path set to: {basePath}")
-    else:
-        basePath = "Feather_Server/Packets/"
+        basePath = sys.argv[1]
 
-    sourceCodes = [f for f in glob.glob(basePath + "Actual/**/*.cs", recursive=True)] + [f for f in glob.glob(basePath + "Utils/**/*.cs", recursive=True)]
+    basePath = (os.path.abspath(basePath) + "/").replace("\\", "/")
+    print(f"Base Path (Server Root Path): {basePath}")
 
-    with open(basePath + "/Delimeters.cs", "r") as f:
+    print('--------------------------------------------------\n\n')
+
+    with open(basePath + "Feather_Server/Packets/Delimeters.cs", "r") as f:
+        log('Importing Delimeter List ....')
         for line in f:
             if "public static readonly byte[]" not in line:
                 continue
@@ -550,10 +584,18 @@ if __name__ == "__main__":
             k = line[0].replace(" ", "")
             v = "".join(line[1].replace("0x", "").replace(" ", "").split("}")[0][1:].split(","))
             delimeters[k] = v
+        
+    if len(delimeters) <= 1:
+        log('Failed to load delimeters.', ERR)
+
+    sourceCodes = [f for f in glob.glob(basePath + "Feather_Server/Packets/Actual/**/*.cs", recursive=True)] + [f for f in glob.glob(basePath + "Feather_Server/Packets/Utils/**/*.cs", recursive=True)]
+    if len(sourceCodes) <= 0:
+        log('Failed to file any source code file. (files that ended with ".cs")', ERR)
     
+    log('Reading Source Codes ....')
     for file in sourceCodes:
         with open(file, "r", newline='\r\n') as f:
-            file = "Feather_Server" + file.split("Feather_Server")[1].replace("\\", "/")
+            file = file.replace("\\", "/")[file.find("Feather_Server/Packets/"):]
             log(f"Processing Source [{file}] ...")
             srcHandler(f.readlines(), file)
     
@@ -562,7 +604,7 @@ if __name__ == "__main__":
 
     pkt_outputs["_builder"] = versionInfo
     pkt_outputs["_timestamp"] = int(time.time()) * 1000 # from sec to m.sec
-    jsonPath = basePath + "/_pkts.v2.json"
+    jsonPath = basePath + "Feather_Server/Packets/_pkts.v2.json"
     with open(jsonPath, "w") as f:
         json.dump(pkt_outputs, f)
 
