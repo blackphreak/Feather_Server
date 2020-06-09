@@ -190,7 +190,7 @@ td:first-child {
     min-width: 140px;
     padding-left: 15px;
 }
-td:first-child::after {
+td:first-child:not(.fg-err)::after {
     content: ' :';
 }
 td:nth-child(2) {

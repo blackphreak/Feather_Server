@@ -410,7 +410,7 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
         
         if (pkt.length == 0 && param != "[REPE]" && !repeatPattern)
         {
-            info.tooltip.push(WFLAG_MORE_EXPECTED);
+            _info.tooltip.push(WFLAG_MORE_EXPECTED);
             return false; // expacted more but end of packet
         }
         
@@ -508,8 +508,9 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             endIndex = 10;
             LHS = allParamInfo[i].name;
             byte = pkt.slice(0, endIndex);
+            let val = pkt.slice(2, endIndex);
 
-            let [value, num, hex] = lib.parseToNum(lib.le2be(byte), allParamInfo[i].type || sz);
+            let [value, num, hex] = lib.parseToNum(lib.le2be(val), allParamInfo[i].type || 8);
             paramInfo.push(`${num} [0x${hex}]`); // push value
 
             if (allParamInfo[i].param || false)
@@ -665,6 +666,12 @@ var parseWorker = (header, pkt) => {
         if (isMatchSign(_sign, v, pkt)) {
             signature = _sign;
             return false;
+        }
+        else
+        {
+            _info.packet = "";
+            _info.tooltip = [];
+            _info.class = false;
         }
     });
 
