@@ -106,7 +106,7 @@ def doesKeywordAppear(line, keywordList):
 def readFragment(path, tag):
     initBT("readFragment")
     codeList = []
-    with open(basePath + path, "r") as f:
+    with open(basePath + path, "r", encoding='utf8') as f:
         lines = f.readlines()
 
     i = 0
@@ -582,7 +582,7 @@ if __name__ == "__main__":
 
     print('--------------------------------------------------\n\n')
 
-    with open(basePath + "Feather_Server/Packets/Delimeters.cs", "r") as f:
+    with open(basePath + "Feather_Server/Packets/Delimeters.cs", "r", encoding='utf8') as f:
         log('Importing Delimeter List ....')
         for line in f:
             if "public static readonly byte[]" not in line:
@@ -601,7 +601,7 @@ if __name__ == "__main__":
     
     log('Reading Source Codes ....')
     for file in sourceCodes:
-        with open(file, "r", newline='\r\n') as f:
+        with open(file, "r", newline='\r\n', encoding='utf8') as f:
             file = file.replace("\\", "/")[file.find("Feather_Server/Packets/"):]
             log(f"Processing Source [{file}] ...")
             srcHandler(f.readlines(), file)
@@ -617,7 +617,7 @@ if __name__ == "__main__":
     else:
         jsonPath = os.path.abspath(args.output) + "/" + args.file
 
-    with open(jsonPath, "w") as f:
+    with open(jsonPath, "w", encoding='utf8') as f:
         json.dump(pkt_outputs, f)
 
     log([f"The signature file saved as \"{args.file}\".", " ! Full Path: " + jsonPath.replace('\\', '/')])
