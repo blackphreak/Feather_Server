@@ -233,6 +233,61 @@ var lib = {
         }
     },
 
+    /**
+     * Parse Big-Endian hex value to padded/signed number & hex
+     * @param {string} val Big-Endian Hex
+     * @param {string/number} type Type of convertion. If number, then unit is (n * 2) byte
+     * @returns {array} [un-/signed number, padded number, padded hex]
+     */
+    parseToNum: function(val, type = "uint") {
+        val = parseInt(val, 16);
+        let hex = val.toString(16);
+
+        if (type == "byte" || type == -2)
+        {
+            if (val & 0x80)
+            {
+                val <<= 1;
+                val >>= 1;
+                val *= -1;
+            }
+            return [val, val.toString(), hex.padStart(2, "0").toUpperCase()];
+        }
+        if (type == "ubyte" || type == 2)
+        {
+            return [val, val.toString().padStart(2, "0"), hex.padStart(2, "0").toUpperCase()];
+        }
+        if (type == "short" || type == -4)
+        {
+            if (val & 0x8000)
+            {
+                val <<= 1;
+                val >>= 1;
+                val *= -1;
+            }
+            return [val, val.toString(), hex.padStart(4, "0").toUpperCase()];
+        }
+        if (type == "ushort" || type == 4)
+        {
+            return [val, val.toString().padStart(4, "0"), hex.padStart(4, "0").toUpperCase()];
+        }
+        if (type == "int" || type == -8)
+        {
+            if (val & 0x80000000)
+            {
+                val <<= 1;
+                val >>= 1;
+                val *= -1;
+            }
+            return [val, val.toString(), hex.padStart(8, "0").toUpperCase()];
+        }
+        if (type == "uint" || type == 8)
+        {
+            return [val, val.toString(), hex.padStart(8, "0").toUpperCase()];
+        }
+        log(["Failed to parseToNum", `Input: ${val}`], ERR);
+    },
+
     _extractTextWithWhitespaceWorker: function(elems, lineBreakNodeName) {
         // src: https://stackoverflow.com/a/4140071
         var ret = "";
@@ -291,7 +346,7 @@ var buildOutput = (info) => {
                 // is flag
                 let flag = parseInt(ele);
                 if (hasFlag(flag, WFLAG_MORE_EXPECTED))
-                    tooltipInfo += `<tr><td colspan=100></td></tr>`;
+                    tooltipInfo += `<tr class="fg-err"><td colspan=100></td></tr>`;
             } else {
                 $.each(ele, (desc, actual) => {
                     tooltipInfo += `<tr><td>${desc}</td>`;
@@ -304,7 +359,10 @@ var buildOutput = (info) => {
                 });
             }
         });
-        tooltipInfo = `<table><tbody>` + tooltipInfo + `</tbody></table>`;
+        tooltipInfo = `<table><tbody>` + tooltipInfo + `</tbody></table><br/><br/>`;
+        (info.extraTooltip || []).forEach((ele) => {
+            tooltipInfo += `<div>${ele}</div>`;
+        });
         tooltipInfo = tooltipInfo.replace(/\"/gm, "&quot;"); // replace double-qoute (") to HTML charCode
         tooltipInfo = ` data-toggle="tooltip" data-original-title="${tooltipInfo}"`;
     }
@@ -338,25 +396,83 @@ var sizeCheck = (pkt) => {
 };
 
 var _info;
-// TODO: add support to REPS, REPE
 var isMatchSign = (signature, signInfo, original_pkt) => {
     // clone pkt, this variable will be used to store the unprocessed bytes.
     var pkt = original_pkt;
     var allParamInfo = signInfo["params"];
+    var deferfunc = [], // = [ [<func 1 name>, <selfValue>, <Param1 / @Name>] ]
+        funcParam = {};
+    var repeatPattern = false; // [<start param>, <index of REPE>]
     
-    var i = -1;
-    signature.split(" ").every(function (param) {
-        i++;
+    let arr_signature = signature.split(" ");
+    for (let i = 0; i < arr_signature.length; i++) {
+        const param = arr_signature[i];
+        
+        if (pkt.length == 0 && param != "[REPE]" && !repeatPattern)
+        {
+            info.tooltip.push(WFLAG_MORE_EXPECTED);
+            return false; // expacted more but end of packet
+        }
+        
         var LHS, byte = "", endIndex = 0, paramInfo = [];
         if (param == "[REPS]") {
-            
+            repeatPattern = [i, -1];
+            continue;
         }
         else if (param == "[REPE]") {
-            
+            repeatPattern[1] = i;
+            if (arr_signature.length - 1 == i)
+            {
+                // end of params.
+
+                if (pkt.length == 0)
+                {
+                    // parse completed.
+                    break;
+                }
+                else
+                {
+                    // repeat the repeat_start param
+                    i = repeatPattern[0];
+                    continue;
+                }
+            }
+            else
+            {
+                // have next param
+                if (pkt.length > 0)
+                {
+                    if (!repeatPattern)
+                        continue;
+                    else
+                    {
+                        // repeat the repeat_start param again
+                        i = repeatPattern[0];
+                        continue;
+                    }
+                }
+                else
+                    break; // parse completed.
+            }
         }
         else if (param == "73$4$gbk") {
             if (pkt.slice(0, 2) != "73" || pkt.length < 12)
-                return false; // signature not match
+            {
+                if (!repeatPattern)
+                    return false; // signature not match
+                else
+                {
+                    // not match pattern
+                    // remove the last-N parsed param
+                    for (let diff = i - repeatPattern[0]; diff > 0; diff--) {
+                        paramInfo.pop();
+                    }
+
+                    i = repeatPattern[1];
+                    repeatPattern = false; // no pattern again
+                    continue; // go next
+                }
+            }
             
             LHS = allParamInfo[i].name;
             let gbkByteLength = parseInt(lib.le2be(pkt.slice(2, 10)), 16) * 2;
@@ -364,25 +480,48 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             byte = pkt.slice(0, endIndex)
             let value = pkt.slice(10, endIndex);
             paramInfo.push(lib.parseGBK(value)); // push value
+
+            if (allParamInfo[i].param || false)
+                funcParam[allParamInfo[i].param] = value;
             
             pkt = pkt.slice(endIndex);
         }
         else if (param == "64$4") {
             if (pkt.slice(0, 2) != "64" || pkt.length < 10)
-                return false; // signature not match
+            {
+                if (!repeatPattern)
+                    return false; // signature not match
+                else
+                {
+                    // not match pattern
+                    // remove the last-N parsed param
+                    for (let diff = i - repeatPattern[0]; diff > 0; diff--) {
+                        paramInfo.pop();
+                    }
+
+                    i = repeatPattern[1];
+                    repeatPattern = false; // no pattern again
+                    continue; // go next
+                }
+            }
             
             endIndex = 10;
             LHS = allParamInfo[i].name;
             byte = pkt.slice(0, endIndex);
 
-            let value = parseInt(lib.le2be(pkt.slice(2, endIndex)), 16);
-            paramInfo.push(`${value} [0x${value.toString(16).toUpperCase()}]`); // push value
+            let [value, num, hex] = lib.parseToNum(lib.le2be(byte), allParamInfo[i].type || sz);
+            paramInfo.push(`${num} [0x${hex}]`); // push value
+
+            if (allParamInfo[i].param || false)
+                funcParam[allParamInfo[i].param] = value;
             
             if (allParamInfo[i].func || false)
             {
                 let fn = [...allParamInfo[i].func]; // duplicate array
                 if (fn.length == 1)
                     paramInfo.push(window[fn[0]](value)); // push formatted value
+                else if (fn.toString().indexOf("@") > -1)
+                    deferfunc.push([fn.shift(), value, fn]);
                 else
                     paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
             }
@@ -392,20 +531,37 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
         else if (param.startsWith("$")) {
             let sz = parseInt(param.substr(1)) * 2;
             if (pkt.length < sz)
-                return false; // signature not match
+            {
+                if (!repeatPattern)
+                    return false; // signature not match
+                else
+                {
+                    // not match pattern
+                    // remove the last-N parsed param
+                    for (let diff = i - repeatPattern[0]; diff > 0; diff--) {
+                        paramInfo.pop();
+                    }
+
+                    i = repeatPattern[1];
+                    repeatPattern = false; // no pattern again
+                    continue; // go next
+                }
+            }
             
             endIndex = sz;
             LHS = allParamInfo[i].name;
             byte = pkt.slice(0, endIndex);
-            let value = parseInt(lib.le2be(byte), 16);
 
-            paramInfo.push(`${value} [0x${value.toString(16).toUpperCase()}]`); // push value
+            let [value, num, hex] = lib.parseToNum(lib.le2be(byte), allParamInfo[i].type || sz);
+            paramInfo.push(`${num} [0x${hex}]`); // push value
             
             if (allParamInfo[i].func || false)
             {
                 let fn = [...allParamInfo[i].func]; // duplicate array
                 if (fn.length == 1)
                     paramInfo.push(window[fn[0]](value)); // push formatted value
+                else if (fn.toString().indexOf("@") > -1)
+                    deferfunc.push([fn.shift(), value, fn]);
                 else
                     paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
             }
@@ -415,7 +571,22 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
         else {
             // direct byte matching
             if (pkt.slice(0, param.length) != param)
-                return false; // signature not match
+            {
+                if (!repeatPattern)
+                    return false; // signature not match
+                else
+                {
+                    // not match pattern
+                    // remove the last-N parsed param
+                    for (let diff = i - repeatPattern[0]; diff > 0; diff--) {
+                        paramInfo.pop();
+                    }
+
+                    i = repeatPattern[1];
+                    repeatPattern = false; // no pattern again
+                    continue; // go next
+                }
+            }
 
             endIndex = param.length;
             pkt = pkt.slice(param.length);
@@ -432,14 +603,35 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
                 // this is subcate byte
                 LHS = allParamInfo[i].name;
                 paramInfo.push(signInfo["desc"]);
+                _info.title += " (" + signInfo["desc"] + ")";
             }
         }
         let map = {};
         map[LHS] = paramInfo;
         _info.tooltip.push(map);
         _info.packet += " " + byte;
-        return true;
-    });
+    };
+
+    _info.extraTooltip = [];
+    deferfunc.some(funcInfo => {
+        let fnName = funcInfo[0];
+        if (!(window[fnName] || false))
+        {
+            console.warn("[!] Function not found!", "\nFunc Name:", fnName, "\nInfo:", funcInfo);
+            return false; // skip this function
+        }
+
+        if (funcInfo.toString().indexOf("@") > -1)
+        {
+            for (let i = 2; i < funcInfo.length; i++) {
+                const item = funcInfo[i];
+                if (typeof(item) == "string" && item.startsWith("@"))
+                    funcInfo[i] = funcParam[item];
+                
+            }
+        }
+        _info.extraTooltip.push(window[fnName](funcInfo));
+    })
     return true;
 };
 
@@ -481,6 +673,10 @@ var singleParser = (pkt) => {
         log("Empty Packet Byte.", WARN);
         return;
     }
+    if (pkt.indexOf("//") > -1) {
+        log(["Ignoring Commented Line.", "Line:", pkt], WARN);
+        return;
+    }
 
     // try to parse with JSON
     var json = undefined;
@@ -494,7 +690,7 @@ var singleParser = (pkt) => {
     }
 
     // remove all spaces
-    pkt = pkt.replace(" ", "").toLowerCase();
+    pkt = pkt.replace(/\s/g, "").toLowerCase();
     if (pkt.match(/([a-f0-9]{8})([a-f0-9]{2}_)+/i)) {
         // official record format
         // format: <time (4-bytes)><size (2-bytes)>_<data ... (split by _)>_00_
@@ -568,4 +764,4 @@ var singleParser = (pkt) => {
 
 //#endregion
 
-const parserVersion = 3;
+const parserVersion = 4;

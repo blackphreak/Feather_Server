@@ -21,6 +21,9 @@ body {
     border-top: 1px solid #cfcfcf;
     border-bottom: 1px solid #cfcfcf;
 }
+#io > [data-toggle="tooltip"] {
+    margin-bottom: 21px;
+}
 .tooltip {
     position: absolute;
     z-index: 1070;
@@ -147,15 +150,17 @@ body {
 [data-toggle="tooltip"].active {
     background: #0d5575 !important;
 }
+[role="packet-item"] {
+    min-height: 35px;
+}
 div#io:empty::before {
     white-space: pre;
     color: #737373;
     cursor: text;
     user-select: none;
     content: attr(placeholder);
-}
-div#io:not(:empty)::before {
-    content: "";
+    display: block;
+    padding: 20px 0 0 40px;
 }
 .tooltip div > span {
     word-wrap: break-word;
@@ -181,7 +186,7 @@ div#io:not(:empty)::before {
 }
 td:first-child {
     text-align: right;
-    width: 22%;
+    width: 140px;
     min-width: 140px;
     padding-left: 15px;
 }
@@ -189,7 +194,7 @@ td:first-child::after {
     content: ' :';
 }
 td:nth-child(2) {
-    width: 27%;
+    width: 90px;
     min-width: 90px;
 }
 table {

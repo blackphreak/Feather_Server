@@ -18,8 +18,14 @@ $.getJSON("./js/db/Skill.json").done((json) => {
 //#endregion
 
 // init packets database
+let url = new URL(window.location);
+let pktSource = "https://raw.githubusercontent.com/blackphreak/Feather_Server/develop/Feather_Server/Packets/_pkts.v2.json";
+if (window.location.hostname == "127.0.0.1")
+    pktSource = "./_pkts.v2.ignore.json";
+else if (url.has("file"))
+    pktSource = url.get("file");
+
 var pktList = {};
-let pktSource = (window.location.hostname == "127.0.0.1") ? "/js/_pkts.v2.ignore.json" : "https://raw.githubusercontent.com/blackphreak/Feather_Server/develop/Feather_Server/Packets/_pkts.v2.json";
 $.getJSON(pktSource)
     .done((_pktList) => {
         $(`#pkt_ver`).html("Packet Source Version: " + new Date(_pktList._timestamp).toString());
@@ -60,10 +66,11 @@ $.getJSON(pktSource)
 
 var doParse = (_) => {
     $('[role="tooltip"]').tooltip("dispose");
+    $('[data-toggle="tooltip"]').remove();
 
-    lib._extractTextWithWhitespaceWorker($io, "div")
-        .split("\n")
-        .map((pkt) => singleParser(pkt));
+    let lst = lib._extractTextWithWhitespaceWorker($io, "div").split("\n");
+    $io.html(""); // clear
+    lst.map((pkt) => singleParser(pkt));
 
     // rebind tooltip
     $('[data-toggle="tooltip"]').tooltip({
@@ -86,3 +93,17 @@ $("#btn_reset").on("click", (_) => {
     document.getElementById("io").innerHTML = ``;
     $(`[role='tooltip']`).tooltip("dispose");
 });
+
+/*
+// TODO: add div for each line for better editing
+document.getElementById("io").addEventListener(function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    let data = (e.clipboardData || window.clipboardData).getData('Text');
+
+    data.split("\n").forEach(e => {
+
+    });
+});
+*/

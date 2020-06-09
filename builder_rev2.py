@@ -1,4 +1,4 @@
-import json, glob, re, traceback, os, sys, time
+import json, glob, re, traceback, os, sys, time, argparse
 
 # bit mask
 LOG = 1 << 0
@@ -309,8 +309,11 @@ def buildSignature(codes):
                 elif (_type == "Mark"):
                     if (v == "REPEAT_START" or v == "REPS"):
                         sign.append("[REPS]")
+                        sign_info["params"].append({"name": f"Mark[REPS]"})
                     elif (v == "REPEAT_END" or v == "REPE"):
                         deferMark = "[REPE]" # let this mark to be appended later
+                    elif (v.startswith("Param,")):
+                        paramInfo["param"] = v.split("Param,")[1]
                     else:
                         log([f"Invalid Mark Value[{v}].", f"Line: {line}", f"Code: {code}"], ERR)
 
@@ -356,6 +359,7 @@ def buildSignature(codes):
             # if there is deferMark to be appended to "sign" array
             if deferMark:
                 sign.append(deferMark)
+                sign_info["params"].append({"name": f"Mark{deferMark}"})
 
             i = nextI # skip the handled line
 
@@ -478,7 +482,7 @@ def funcsHandler(funcsList):
                     
                     m = re.match(".*\/\* JS_F: To\[(\w+)\@(.+\.cs)\] \*\/.*", line)
                     if not m:
-                        log(["Malform JS_F. [E-JS_F-PT", f"Line[{lineNum}] {line}"], ERR)
+                        log(["Malform JS_F. [E-JS_F-PT]", f"Line[{lineNum}] {line}"], ERR)
 
                     tag = m[1]
                     path = m[2]
@@ -561,15 +565,18 @@ def srcHandler(lines, file):
     rmBT()
 
 if __name__ == "__main__":
-    versionInfo = ["2020-06-09", "build 50148", "3"]
+    versionInfo = ["2020-06-09", "build 61842", "4"]
     selfName = __file__.replace('\\', '/').split("/")[-1]
     print(f'------------ [Destiny Online Project] ------------\nFile: {selfName}\nVersion: {" ".join(versionInfo)}')
 
-    global basePath
-    basePath = "./"
-    if len(sys.argv) == 2:
-        basePath = sys.argv[1]
+    parser = argparse.ArgumentParser(description='a signature builder for Destiny Online project.')
+    parser.add_argument('--base', '-b', type=str, default='./', help='Base Directory of the Feather_Server folder')
+    parser.add_argument('--output', '-o', type=str, default=False, help='The path to save the .json file')
+    parser.add_argument('--file', '-f', type=str, default='_pkts.v2.json', help='The .json file full name')
+    args = parser.parse_args()
 
+    global basePath
+    basePath = args.base
     basePath = (os.path.abspath(basePath) + "/").replace("\\", "/")
     print(f"Base Path (Server Root Path): {basePath}")
 
@@ -604,8 +611,13 @@ if __name__ == "__main__":
 
     pkt_outputs["_builder"] = versionInfo
     pkt_outputs["_timestamp"] = int(time.time()) * 1000 # from sec to m.sec
-    jsonPath = basePath + "Feather_Server/Packets/_pkts.v2.json"
+
+    if not args.output:
+        jsonPath = basePath + "Feather_Server/Packets/" + args.file
+    else:
+        jsonPath = os.path.abspath(args.output) + "/" + args.file
+
     with open(jsonPath, "w") as f:
         json.dump(pkt_outputs, f)
 
-    log([f"The packet file is named \"_pkts.v2.json\" at the Feather_Server/Packets directory.", " ! Full Path: " + jsonPath.replace('\\', '/')])
+    log([f"The signature file saved as \"{args.file}\".", " ! Full Path: " + jsonPath.replace('\\', '/')])
