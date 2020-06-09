@@ -518,12 +518,19 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             if (allParamInfo[i].func || false)
             {
                 let fn = [...allParamInfo[i].func]; // duplicate array
-                if (fn.length == 1)
-                    paramInfo.push(window[fn[0]](value)); // push formatted value
-                else if (fn.toString().indexOf("@") > -1)
-                    deferfunc.push([fn.shift(), value, fn]);
+                if (window[fn[0]] || false)
+                {
+                    if (fn.length == 1)
+                        paramInfo.push(window[fn[0]](value)); // push formatted value
+                    else if (fn.toString().indexOf("@") > -1)
+                        deferfunc.push([fn.shift(), value, fn]);
+                    else
+                        paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
+                }
                 else
-                    paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
+                {
+                    log(["Function not found!", "Value: " + value, "Infos: ", fn], WARN);
+                }
             }
             
             pkt = pkt.slice(endIndex);
@@ -558,12 +565,19 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             if (allParamInfo[i].func || false)
             {
                 let fn = [...allParamInfo[i].func]; // duplicate array
-                if (fn.length == 1)
-                    paramInfo.push(window[fn[0]](value)); // push formatted value
-                else if (fn.toString().indexOf("@") > -1)
-                    deferfunc.push([fn.shift(), value, fn]);
+                if (window[fn[0]] || false)
+                {
+                    if (fn.length == 1)
+                        paramInfo.push(window[fn[0]](value)); // push formatted value
+                    else if (fn.toString().indexOf("@") > -1)
+                        deferfunc.push([fn.shift(), value, fn]);
+                    else
+                        paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
+                }
                 else
-                    paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
+                {
+                    log(["Function not found!", "Value: " + value, "Infos: ", fn], WARN);
+                }
             }
             
             pkt = pkt.slice(endIndex);
