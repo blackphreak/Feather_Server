@@ -211,14 +211,16 @@ def buildSignature(codes):
                 }
 
             # for debug the specific packet only:
-            # if header == "A91A":
+            # if header == "6980":
             #     log([f"{line}: {code}"], DEBUG, indentOffset=-2)
             #     pl = True
 
             # reset
             sign = [] # sign item (01, $2, $2, $1, ...)
-            sign_info = {} # desc, params
-            sign_info["params"] = []
+            sign_info = {
+                "desc": "",
+                "params": []
+            }
             isInFormat = False
             
             # read info
@@ -274,9 +276,10 @@ def buildSignature(codes):
 
         elif "/* JS:" in code:
             paramInfo = {}
+            noCodeFlag = False
             deferMark = None
 
-            matches = re.findall("([TR]|Fn|Desc|Mark)\[(.*?)\]", code)
+            matches = re.findall("([TR]|Fn|Desc|Mark|NoCodeSign)\[(.+?)\]", code)
             for m in matches:
                 _type = m[0]
                 v = m[1]
@@ -316,43 +319,49 @@ def buildSignature(codes):
                         paramInfo["param"] = v.split("Param,")[1]
                     else:
                         log([f"Invalid Mark Value[{v}].", f"Line: {line}", f"Code: {code}"], ERR)
+                elif (_type == "NoCodeSign"):
+                    noCodeFlag = True
+                    _tmpSign = v
 
-            # read next line, the actual code
-            nextI = i + 1
-            next_line = codes[nextI]["line"]
-            next_code = codes[nextI]["code"]
-            updateBT(next_line)
+            if not noCodeFlag:
+                # read next line, the actual code
+                nextI = i + 1
+                next_line = codes[nextI]["line"]
+                next_code = codes[nextI]["code"]
+                updateBT(next_line)
 
-            if ".writeByte" in next_code:
-                _tmpSign = "$1"
-            elif ".writeWord" in next_code:
-                _tmpSign = "$2"
-            elif ".writeDWord" in next_code:
-                _tmpSign = "$4"
-            elif ".writePadding" in next_code:
-                var = re.search("\(([A-Fa-f0-9x]+)\)", next_code)
-                if not var:
-                    log([f"Failed to capture the value enclosed.", f"Line: {next_line}", f"Code: {next_code}"], ERR)
+                if ".writeByte" in next_code:
+                    _tmpSign = "$1"
+                elif ".writeWord" in next_code:
+                    _tmpSign = "$2"
+                elif ".writeDWord" in next_code:
+                    _tmpSign = "$4"
+                elif ".writePadding" in next_code:
+                    var = re.search("\(([A-Fa-f0-9x]+)\)", next_code)
+                    if not var:
+                        log([f"Failed to capture the value enclosed.", f"Line: {next_line}", f"Code: {next_code}"], ERR)
 
-                var = var.group(1)
-                if "0x" in var:
-                    # hex
-                    sz = int(var, 16)
-                else:
-                    # dec
-                    sz = int(var)
-                _tmpSign = "00" * sz
-            elif ".writeFormat" in next_code:
-                _tmpSign = "$4"
-                isInFormat = True
-                if "func" not in paramInfo: # default use db_FormatString
-                    paramInfo["func"] = ["db_FormatString"]
-            elif ".writeParam" in next_code:
-                _tmpSign = "64$4"
-                isInFormat = True
-            elif ".writeString" in next_code:
-                _tmpSign = "73$4$gbk" if isInFormat else " $gbk"
-
+                    var = var.group(1)
+                    if "0x" in var:
+                        # hex
+                        sz = int(var, 16)
+                    else:
+                        # dec
+                        sz = int(var)
+                    _tmpSign = "00" * sz
+                elif ".writeFormat" in next_code:
+                    _tmpSign = "$4"
+                    isInFormat = True
+                    if "func" not in paramInfo: # default use db_FormatString
+                        paramInfo["func"] = ["db_FormatString"]
+                elif ".writeParam" in next_code:
+                    _tmpSign = "64$4"
+                    isInFormat = True
+                elif ".writeString" in next_code:
+                    _tmpSign = "73$4$gbk" if isInFormat else " $gbk"
+    
+                i = nextI # skip the handled line
+            
             sign.append(_tmpSign)
             sign_info["params"].append(paramInfo)
 
@@ -360,8 +369,6 @@ def buildSignature(codes):
             if deferMark:
                 sign.append(deferMark)
                 sign_info["params"].append({"name": f"Mark{deferMark}"})
-
-            i = nextI # skip the handled line
 
         if ".pack()" in code or ".nextPacket" in code or ("flag" in sign_info and sign_info["flag"] == "FLAG_EOP"):
             # merge the last signature with other signatures in same packet header
@@ -387,10 +394,12 @@ def funcsHandler(funcsList):
     try:
         # stores all filtered code, and wait for build signature
         codeList = []
+        hasSubcate = []
 
         for func in funcsList:
             i = -1
-
+            currSubcateIdx = -1
+            
             # loop all lines within that function
             while i + 1 < len(func):
                 i += 1
@@ -420,7 +429,7 @@ def funcsHandler(funcsList):
                     currSubcateIdx = -1
 
                 elif "JS_SC: " in line:
-                    m = re.search("(Jump|At|Mark)\[(.*?)(,(.*?))?\]", line)
+                    m = re.search("(Jump|At|Mark)\[(.+?)\]", line)
                     if not m:
                         log(["Invalid JS_SC tag found. [E-JS_SC-0]", f"Line[{lineNum}] {line}"], ERR)
 
@@ -428,14 +437,16 @@ def funcsHandler(funcsList):
                     currSubcateIdx += 1
                     handledSubcateIdx = i # in variable "func"'s index
                     subcateVariants.append([]) # [{"line": <line>, "code": <code>}, ...]
+                    hasSubcate.append(currCodeBeforeSubcate[0]["line"])
 
                     if _type == "Jump":
-                        if len(m.groups()) < 4:
+                        val = m.group(2).split(",")
+                        if len(val) != 2:
                             log(["Malform Jump tag encountered. [E-JS_SC-1]", f"Line[{lineNum}] {line}"], ERR)
 
                         # Subcate is using "Jump" tag
-                        _begins = m.group(2)
-                        _cont = m.group(4)
+                        _begins = val[0]
+                        _cont = val[1]
 
                         flag_subcateJumpFound = False
                         flag_continueFound = False
@@ -459,17 +470,23 @@ def funcsHandler(funcsList):
                                 if flag_subcateJumpFound or flag_continueFound:
                                     # push everything enclosed
                                     subcateVariants[currSubcateIdx].append(func[nextI])
+
+                                    if doesKeywordAppear(func[nextI]["code"], [".pack(", ".nextPacket("]):
+                                        # end of subcate
+                                        break
                                 elif _cont is not None:
-                                        # continue mark exists, search for continue line
-                                        if f"/* {_cont} */" in code:
-                                            flag_continueFound = True
+                                    # continue mark exists, search for continue line
+                                    if f"/* {_cont} */" in code:
+                                        flag_continueFound = True
                             
                             nextI += 1
 
                     elif _type == "Mark":
                         # Subcate is using "Mark[EOP]" tag
                         val = m.group(2)
-                        if val != "EOP":
+                        if val.startswith("Param,") or val == "EOP":
+                            pass
+                        else:
                             log(["Invalid Mark tag for JS_SC. Only Mark[EOP] is allowed. [E-JS_SC-2]", f"Captured: {val}"], ERR)
                         subcateVariants[currSubcateIdx].append(func[i])
                     else:
@@ -496,20 +513,23 @@ def funcsHandler(funcsList):
                     # outside subcate
                     currCodeBeforeSubcate.append(func[i]) # push curr code (JS)
 
-                    nextI = i + 1
-                    if not doesKeywordAppear(func[nextI]["code"], ["writeByte", "writeWord", "writeDWord", "writeFormat", "writeString", "writePadding", "writeParam"]):
-                        log(["Missing valid write function after JS declaration. [E-JS-0]", f"Previous Line: {func[i]}"], ERR)
-                    
-                    currCodeBeforeSubcate.append(func[nextI]) # push curr code (write...)
-                    i = nextI # skip nextI
-                elif doesKeywordAppear(line, [".pack()", ".nextPacket()"]):
+                    if "NoCodeSign[" not in func[i]["code"]:
+                        nextI = i + 1
+                        if not doesKeywordAppear(func[nextI]["code"], ["writeByte", "writeWord", "writeDWord", "writeFormat", "writeString", "writePadding", "writeParam"]):
+                            log(["Missing valid write function after JS declaration. [E-JS-0]", f"Previous Line: {func[i]}"], ERR)
+                        
+                        currCodeBeforeSubcate.append(func[nextI]) # push curr code (write...)
+                        i = nextI # skip nextI
+                elif doesKeywordAppear(line, [".pack(", ".nextPacket("]):
                     if currSubcateIdx == -1:
+                        if currCodeBeforeSubcate[0]["line"] in hasSubcate:
+                            continue # skip has subcate's header
+
                         # no subcate
                         currCodeBeforeSubcate.append(func[i])
                         buildSignature(currCodeBeforeSubcate)
                     else:
                         # have subcate
-                        subcateVariants[currSubcateIdx].append(func[i])
                         for subcate in subcateVariants:
                             # merge & build
                             buildSignature(currCodeBeforeSubcate + subcate)
@@ -565,7 +585,7 @@ def srcHandler(lines, file):
     rmBT()
 
 if __name__ == "__main__":
-    versionInfo = ["2020-06-09", "build 61842", "4"]
+    versionInfo = ["2020-06-14", "build 81701", "4"]
     selfName = __file__.replace('\\', '/').split("/")[-1]
     print(f'------------ [Destiny Online Project] ------------\nFile: {selfName}\nVersion: {" ".join(versionInfo)}')
 
@@ -619,5 +639,4 @@ if __name__ == "__main__":
 
     with open(jsonPath, "w", encoding='utf8') as f:
         json.dump(pkt_outputs, f)
-
     log([f"The signature file saved as \"{args.file}\".", " ! Full Path: " + jsonPath.replace('\\', '/')])
