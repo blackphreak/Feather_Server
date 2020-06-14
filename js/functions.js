@@ -453,7 +453,7 @@ var buildOutput = (info) => {
         tooltipInfo = ` data-toggle="tooltip" data-original-title="${tooltipInfo}"`;
     }
 
-    $io.append(`<div class="${info.class || ""}"${tooltipInfo}>// ${title}<br />${packet}</div>`);
+    $io.append(`<div class="${info.class || ""}"${tooltipInfo}>// ${title.join(' ')}<br />${packet}</div>`);
 };
 
 var matchHeader = (pkt) => {
@@ -493,6 +493,9 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
     let arr_signature = signature.split(" ");
     let isFormatParam = false;
     let params = [];
+
+    // push sub-desc to title
+    _info.title.push("(" + (signInfo["desc"] || " -- No Desc --" ) + ")");
     for (let i = 0; i < arr_signature.length; i++) {
         const param = arr_signature[i];
         
@@ -751,8 +754,37 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             {
                 // this is subcate byte
                 LHS = allParamInfo[i].name;
-                paramInfo.push(signInfo["desc"]);
-                _info.title += " (" + signInfo["desc"] + ")";
+
+                if (allParamInfo[i].func || false)
+                {
+                    let fn = [...allParamInfo[i].func]; // duplicate array
+                    let value = parseInt(lib.le2be(param), 16);
+                    paramInfo.push(value);
+                    
+                    if (fn[0] == "parseFS")
+                    {
+                        isFormatParam = true;
+                        deferfunc.push([fn.shift(), value]);
+                        paramInfo.push(db_FormatString(value)); // push formatstring db value
+                    }
+                    else if (window[fn[0]] || false)
+                    {
+                        if (fn.length == 1)
+                            paramInfo.push(window[fn[0]](value)); // push formatted value
+                        else if (fn.toString().indexOf("@") > -1)
+                            deferfunc.push([fn.shift(), value, fn]);
+                        else
+                            paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
+                    }
+                    else
+                    {
+                        log(["Function not found!", "Value: " + value, "Infos: ", fn], WARN);
+                    }
+                }
+                else
+                {
+                    paramInfo.push(signInfo["desc"]);
+                }
             }
         }
         let map = {};
@@ -791,14 +823,14 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
 
 var parseWorker = (header, pkt) => {
     _info = {
-        title: "", // title with subcate (if any), extra mark (if applicable)
+        title: [], // title with subcate (if any), extra mark (if applicable)
         packet: "", // space seperated
         tooltip: [], // parsed data
         class: false // css class name (string). "false" only if using default css class
     };
 
     let target = pktList[header];
-    _info.title = `[${target.delimeter}] ${target.desc}`;
+    _info.title.push(`[${target.delimeter}] ${target.desc}`);
 
     var signature = undefined;
     $.each(target.signature, (_sign, v) => {
@@ -808,6 +840,7 @@ var parseWorker = (header, pkt) => {
         }
         else
         {
+            _info.title.pop();
             _info.packet = "";
             _info.tooltip = [];
             _info.class = false;
@@ -818,7 +851,7 @@ var parseWorker = (header, pkt) => {
     {
         return buildOutput({
             class: "bg-warn",
-            title: _info.title + ` -- Failed to match any signature`,
+            title: _info.title.join(' ') + ` -- Failed to match any signature`,
             packet: `__ ${header} ${pkt} 00`,
             log: WARN
         });
