@@ -91,8 +91,8 @@ var eStuffbag = (inp) => {
 };
 
 var eAnimationDuration = (inp) => parseInt(inp, 16) + " seconds";
-var eAnimationLayer = (inp) => (inp <= "01" ? "Front" : "Back");
-var eAnimationLoop = (inp) => (inp <= "01" ? "Once" : "Repeated");
+var eAnimationLayer = (inp) => (inp <= 1 ? "Front" : "Back - " + inp);
+var eAnimationLoop = (inp) => (inp <= 1 ? "Once" : "Repeat - " + inp);
 
 var db_FormatString = (inp, cols = ["title"]) => {
     let db = formatstringDB[inp] || false;
@@ -103,7 +103,7 @@ var db_FormatString = (inp, cols = ["title"]) => {
     cols.forEach(col => {
         data.push(db[col] || "ERR-COL");
     })
-    return data;
+    return data.join(" - ");
 }
 var db_Item = (inp, cols = ["name"]) => {
     let db = itemDB[inp] || false;
@@ -114,7 +114,7 @@ var db_Item = (inp, cols = ["name"]) => {
     cols.forEach(col => {
         data.push(db[col] || "ERR-COL");
     })
-    return data;
+    return data.join(" - ");
 }
 var db_NPC = (inp, cols = ["name", "name2"]) => {
     let db = npcDB[inp] || false;
@@ -125,7 +125,7 @@ var db_NPC = (inp, cols = ["name", "name2"]) => {
     cols.forEach(col => {
         data.push(db[col] || "ERR-COL");
     })
-    return data;
+    return data.join(" - ");
 }
 var db_Map = (inp, cols = ["name"]) => {
     let db = mapDB[inp] || false;
@@ -136,7 +136,7 @@ var db_Map = (inp, cols = ["name"]) => {
     cols.forEach(col => {
         data.push(db[col] || "ERR-COL");
     })
-    return data;
+    return data.join(" - ");
 }
 
 var db_Skill = (inp, cols = ["name"]) => {
@@ -148,7 +148,7 @@ var db_Skill = (inp, cols = ["name"]) => {
     cols.forEach(col => {
         data.push(db[col] || "ERR-COL");
     })
-    return data;
+    return data.join(" - ");
 }
 
 //#endregion Enums
@@ -414,7 +414,12 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             return false; // expacted more but end of packet
         }
         
-        var LHS, byte = "", endIndex = 0, paramInfo = [];
+        var LHS, byte = "", endIndex = 0;
+        /**
+         * Every values pushed in paramInfo are parsed to Big-Endian
+         * For strings, push the bytes to this list without parsing to GBK.
+         */
+        var paramInfo = [];
         if (param == "[REPS]") {
             repeatPattern = [i, -1];
             continue;
@@ -535,6 +540,35 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             }
             
             pkt = pkt.slice(endIndex);
+        }
+        else if (param == "$gbk") {
+            if (pkt.length <= 0)
+                return false; // signature not match
+            
+            LHS = allParamInfo[i].name;
+            value = pkt;
+
+            paramInfo.push(`${lib.parseGBK(value)}`); // push value
+            
+            if (allParamInfo[i].func || false)
+            {
+                let fn = [...allParamInfo[i].func]; // duplicate array
+                if (window[fn[0]] || false)
+                {
+                    if (fn.length == 1)
+                        paramInfo.push(window[fn[0]](value)); // push formatted value
+                    else if (fn.toString().indexOf("@") > -1)
+                        deferfunc.push([fn.shift(), value, fn]);
+                    else
+                        paramInfo.push(window[fn.shift()](value, fn)); // push formatted value
+                }
+                else
+                {
+                    log(["Function not found!", "Value: " + value, "Infos: ", fn], WARN);
+                }
+            }
+            
+            pkt = "";
         }
         else if (param.startsWith("$")) {
             let sz = parseInt(param.substr(1)) * 2;
