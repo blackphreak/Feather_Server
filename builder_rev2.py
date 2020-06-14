@@ -372,7 +372,15 @@ def buildSignature(codes):
 
         if ".pack()" in code or ".nextPacket" in code or ("flag" in sign_info and sign_info["flag"] == "FLAG_EOP"):
             # merge the last signature with other signatures in same packet header
-            info["signature"] = {**info["signature"], **{' '.join(sign): sign_info}}
+            sign = ' '.join(sign);
+            if sign in info["signature"]:
+                log(["Signature Collision Detected.",
+                    f"Delimeter: 0x{header}",
+                    f"Subcates: [{info['signature'][sign]['desc']}] and [{sign_info['desc']}]",
+                    f"Signature: {sign}"],
+                    WARN | DEBUG
+                )
+            info["signature"] = {**info["signature"], **{sign: sign_info}}
             if header not in pkt_outputs:
                 pkt_outputs[header] = {}
             pkt_outputs[header] = {**pkt_outputs[header], **info}
@@ -503,12 +511,11 @@ def funcsHandler(funcsList):
 
                     tag = m[1]
                     path = m[2]
-                    print("")
                     log(f"Reading Fragment for next Delimeter. Tag[{tag}] At[{path}]", LOG, indentOffset=1)
 
                     currCodeBeforeSubcate += readFragment(path, tag)
 
-                    log(f"Whole Fragment Read Completed.", LOG, indentOffset=1)
+                    log(f"Whole Fragment Read Completed.", LOG, indentOffset=2)
                 elif "JS: " in line and currSubcateIdx == -1:
                     # outside subcate
                     currCodeBeforeSubcate.append(func[i]) # push curr code (JS)
