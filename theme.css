@@ -215,3 +215,8 @@ table td {
 table tr:hover {
     background-color: #4d5052;
 }
+.extra {
+    background-color: #102c39;
+    margin-bottom: 15px;
+    padding: 8px 15px;
+}

@@ -116,7 +116,7 @@ var db_Item = (inp, cols = ["name"]) => {
     })
     return data.join(" - ");
 }
-var db_NPC = (inp, cols = ["name", "name2"]) => {
+var db_NPC = (inp, cols = ["name"]) => {
     let db = npcDB[inp] || false;
     if (!db)
         return "-- NPCDB Fail --";
@@ -200,8 +200,93 @@ var log = (messages, logLevel) => {
 //#endregion
 
 //#region Misc Functions
+var colOrders = {
+    ITEM: ["name", "dec", "buffdec"],
+    MAP: ["name", "block"],
+    NPC: ["name", "name2", "phyle", "attribute"],
+    SKILL: ["name", "dec", "dec2", "buffdec"],
+    FS: ["title", "content"]
+};
+const mapRange      = [1, 991];         // map
+const itemRange     = [100000, 162630]; // item
+const npcRange      = [311010, 492009]; // npc
+const skillRange    = [510000, 840033]; // skill
+// formatStringDB & itemDB collision range (inclusive): 100000 ~ 101356
+const re_fs = /`\+C0x([0-9a-fA-F]{6})`-C(.+?)`=C/g;
+const re_fs_param = /(\@|\||\^|\$)(\d){1,2}/g;
 var lib = {
     parseGBK: (hex) => GBK.decode(lib.hex2bytes(hex)),
+
+    _determineDB: (id) => {
+        if (id >= skillRange[0] && id <= skillRange[1])
+            return ["SKILL", skillDB];
+        if (id >= npcRange[0] && id <= npcRange[1])
+            return ["NPC", npcDB];
+        if (id >= itemRange[0] && id <= itemRange[1])
+            return ["ITEM", itemDB];
+        if (id >= mapRange[0] && id <= mapRange[1])
+            return ["MAP", mapDB];
+        
+        return ["FS", formatstringDB];
+    },
+
+    /**
+     * Parse format string into HTML preview
+     * @param {number/string} fs formatString ID in number/hex-byte (big-endian)
+     * @param {array} params parameters for the format string
+     * @return {string} parsed format string in HTML
+     */
+    parseFS: (fs, ...params) =>
+    {
+        if (typeof(fs) == "number")
+            fs = formatstringDB[fs] || false;
+        else
+            fs = formatstringDB[parseInt(fs, 16)] || false;
+        
+        if (!fs)
+            return "-- Failed to find FS --";
+    
+        fs = fs.title;
+
+        while ((m = re_fs.exec(fs)) !== null) {
+            if (m.index === re_fs.lastIndex)
+                re_fs.lastIndex++;
+            
+            fs = fs.replace(m[0], `<span color="#${m[1]}">${m[2]}</span>`);
+        }
+
+        while ((m = re_fs_param.exec(fs)) !== null) {
+            if (m.index === re_fs_param.lastIndex)
+                re_fs_param.lastIndex++;
+            
+            let col, val = params[m[2] - 1];
+            if (m[1] == "^")
+                col = 0;
+            else if (m[1] == "@")
+                col = 1;
+            else if (m[1]== "|")
+                col = 3;
+            
+            if (m[1] == "$")
+            {
+                // direct value
+                if (typeof (val) == "string")
+                {
+                    // gbk string
+                    val = lib.parseGBK(val);
+                }
+            }
+            else
+            {
+                let [dbName, db] = lib._determineDB(val);
+                val = db[val][colOrders[dbName][col]];
+            }
+
+            fs = fs.replace(m[0], val);
+        }
+
+        return fs.replace(/(`N|\n|\|\|\|\|)/g, "<br>");
+    },
 
     hex2bytes: (str) => {
         // src: https://gist.github.com/tauzen/3d18825ae41ff3fc8981
@@ -312,6 +397,7 @@ var lib = {
         return ret;
     }
 };
+var parseFS = lib.parseFS;
 //#endregion
 
 //#region sorting function
@@ -359,9 +445,9 @@ var buildOutput = (info) => {
                 });
             }
         });
-        tooltipInfo = `<table><tbody>` + tooltipInfo + `</tbody></table><br/><br/>`;
+        tooltipInfo = `<table><tbody>` + tooltipInfo + `</tbody></table>`;
         (info.extraTooltip || []).forEach((ele) => {
-            tooltipInfo += `<div>${ele}</div>`;
+            tooltipInfo += `<div class="extra">${ele}</div>`;
         });
         tooltipInfo = tooltipInfo.replace(/\"/gm, "&quot;"); // replace double-qoute (") to HTML charCode
         tooltipInfo = ` data-toggle="tooltip" data-original-title="${tooltipInfo}"`;
@@ -405,6 +491,8 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
     var repeatPattern = false; // [<start param>, <index of REPE>]
     
     let arr_signature = signature.split(" ");
+    let isFormatParam = false;
+    let params = [];
     for (let i = 0; i < arr_signature.length; i++) {
         const param = arr_signature[i];
         
@@ -488,6 +576,9 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
 
             if (allParamInfo[i].param || false)
                 funcParam[allParamInfo[i].param] = value;
+
+            if (isFormatParam)
+                params.push(value);
             
             pkt = pkt.slice(endIndex);
         }
@@ -538,6 +629,9 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
                     log(["Function not found!", "Value: " + value, "Infos: ", fn], WARN);
                 }
             }
+
+            if (isFormatParam)
+                params.push(value);
             
             pkt = pkt.slice(endIndex);
         }
@@ -600,7 +694,13 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             if (allParamInfo[i].func || false)
             {
                 let fn = [...allParamInfo[i].func]; // duplicate array
-                if (window[fn[0]] || false)
+                if (fn[0] == "parseFS")
+                {
+                    isFormatParam = true;
+                    deferfunc.push([fn.shift(), value]);
+                    paramInfo.push(db_FormatString(value)); // push formatstring db value
+                }
+                else if (window[fn[0]] || false)
                 {
                     if (fn.length == 1)
                         paramInfo.push(window[fn[0]](value)); // push formatted value
@@ -670,7 +770,12 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             return false; // skip this function
         }
 
-        if (funcInfo.toString().indexOf("@") > -1)
+        if (fnName == "parseFS")
+        {
+            _info.extraTooltip.push("Parsed FormatString:<br/>" + parseFS(funcInfo[1], ...params));
+            return true; // continue next func
+        }
+        else if (funcInfo.toString().indexOf("@") > -1)
         {
             for (let i = 2; i < funcInfo.length; i++) {
                 const item = funcInfo[i];
