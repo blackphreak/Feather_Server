@@ -128,7 +128,7 @@ def readFragment(path, tag):
     while i < len(lines) - 1:
         i += 1
         line = lines[i].rstrip().replace("\r\n", "")
-        updateBT(line)
+        updateBT(i + 1, path)
         
         if not line: # empty lines
             continue
@@ -150,7 +150,7 @@ def readFragment(path, tag):
             codeList += readFragment(path, tag)
 
             # search for line after .writeFragment()
-            while ".writeFragment(" not in lines[i]:
+            while not doesKeywordAppear(lines[i], [".writeFragment(", ".toFragment"]):
                 i += 1
             
             i += 1 # skip the .writeFragment() line
@@ -592,7 +592,7 @@ def srcHandler(lines, file):
     rmBT()
 
 if __name__ == "__main__":
-    versionInfo = ["2020-06-14", "build 81701", "4"]
+    versionInfo = ["2020-06-14", "build 92229", "4"]
     selfName = __file__.replace('\\', '/').split("/")[-1]
     print(f'------------ [Destiny Online Project] ------------\nFile: {selfName}\nVersion: {" ".join(versionInfo)}')
 
