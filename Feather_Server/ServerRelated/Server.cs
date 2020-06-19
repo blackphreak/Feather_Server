@@ -89,7 +89,7 @@ namespace Feather_Server.ServerRelated
             // LOGIN 1.3.0.10 11 kalvin00001 26CC6E5F10B90169818A8D7CF883829E 1 // join with hero: 1
             // DELETE_USER 1.3.0.10 11 kalvin00001 26CC6E5F10B90169818A8D7CF883829E 29969 1 // request delete user id = 29969 (0x7511)
             // DELETE_USER 1.3.0.10 11 kalvin00001 26CC6E5F10B90169818A8D7CF883829E 29969 3 //  cancel delete user id = 29969 (0x7511)
-            var client = new Client(aes, cli);
+            var client = new Client(aes, ref cli);
             loginCheck(client);
         }
 
@@ -115,7 +115,7 @@ namespace Feather_Server.ServerRelated
                 var info = loginInfo.Substring(18).Split('\r')[0].Split(" ");
                 var pw = info[1].Substring(0, 32);
 
-                List<int> heroIDs;
+                List<uint> heroIDs;
                 var isSuccess = DB2.GetInstance().LoginUser(info[0], pw, out heroIDs);
                 // filter out NULL (-1) heroID
                 heroIDs.RemoveAll(v => v == -1);

@@ -54,13 +54,35 @@ namespace Feather_Server.Packets.Actual
                         /* JS: Desc[Slot Index] */
                         .writeByte(i)
 
-                        /* JS_F: To[HeroBasicInfo.cs,Hero_Basic_Info] */
+                        /* JS_F: To[Hero_Basic_Info@Feather_Server/Entity/PlayerRelated/HeroBasicInfo.cs] */
                         .writeFragment(players[i - 1])
                         .nextPacket();
                 }
             }
 
             return stream.pack();
+        }
+
+        public static PacketStreamData lastLoginRecord(string date, string ip)
+        {
+            return new PacketStream()
+                /* JS_D: Desc[Last Login Record] */
+                .setDelimeter(Delimeters.SELF_LAST_LOGIN_RECORD)
+                /* JS: Desc[FormatStringID] Fn[ParseFS] */
+                .writeFormat(EFormatString.LAST_LOGIN_MESSAGE)
+                /* JS: Desc[Login Date] */
+                .writeString(date)
+                /* JS: Desc[Login IP] */
+                .writeString(ip)
+                .pack();
+        }
+
+        public static PacketStreamData loginUnk()
+        {
+            return new PacketStream()
+                /* JS_D: Desc[Login Unk] Mark[EOP] */
+                .setDelimeter(Delimeters.LOGIN_UNK)
+                .pack();
         }
     }
 }

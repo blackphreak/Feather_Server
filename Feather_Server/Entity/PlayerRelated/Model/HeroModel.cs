@@ -144,7 +144,7 @@ namespace Feather_Server.PlayerRelated
 
         public void toFragment(ref PacketStream stream)
         {
-            /* JS_F: Here[HeroModel.cs,Hero_Model] */
+            /* JS_F: Here[Hero_Model] */
             stream
                 /* JS: Desc[Hat ModelID] */
                 .writeWord(hat)

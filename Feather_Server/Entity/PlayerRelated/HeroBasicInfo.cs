@@ -9,7 +9,7 @@ namespace Feather_Server.ServerRelated
     public class HeroBasicInfo : IPacketStreamFragment
     {
         [JsonIgnore]
-        public int heroID;
+        public uint heroID;
         [JsonIgnore]
         public string heroName;
         public Gender gender;
@@ -23,7 +23,7 @@ namespace Feather_Server.ServerRelated
         /// </summary>
         public HeroModel model;
 
-        public HeroBasicInfo(int heroID, string heroName, Gender gender, Role role, Hair hair, byte lv, HeroModel model)
+        public HeroBasicInfo(uint heroID, string heroName, Gender gender, Role role, Hair hair, byte lv, HeroModel model)
         {
             this.heroID = heroID;
             this.heroName = heroName;
@@ -81,10 +81,10 @@ namespace Feather_Server.ServerRelated
 
         public void toFragment(ref PacketStream stream)
         {
-            /* JS_F: Here[HeroBasicInfo.cs,Hero_Basic_Info] */
+            /* JS_F: Here[Hero_Basic_Info] */
             stream
                 /* JS: Desc[Hero ID] */
-                .writeDWord((uint)heroID)
+                .writeDWord(heroID)
                 /* JS: Desc[Lv.] */
                 .writeByte(lv)
                 /* JS: Desc[Gender] */
@@ -100,7 +100,7 @@ namespace Feather_Server.ServerRelated
                 /* JS: Desc[unk] */
                 .writeDWord(0x0)
 
-                 /* JS_F: To[HeroModel.cs,Hero_Model] */
+                /* JS_F: To[Hero_Model@Feather_Server/Entity/PlayerRelated/Model/HeroModel.cs] */
                 .writeFragment(this.model)
 
                 /* JS: Desc[FormatID] */

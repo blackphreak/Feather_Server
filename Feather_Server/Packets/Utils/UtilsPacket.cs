@@ -16,5 +16,28 @@ namespace Feather_Server.Packets.Utils
                 .writeFormat(e)
             .pack();
         }
+
+        public static PacketStreamData showProgressBar(ushort time, int msgID)
+        {
+            return new PacketStream()
+                /* JS_D: Desc[Show Progress Bar] */
+                .setDelimeter(Delimeters.PROGRESS_BAR_SHOW)
+                /* JS: Desc[Time (sec)] */
+                .writeWord(time)
+                /* JS: Desc[Progress Bar Msg] R[FS] */
+                .writeDWord(msgID)
+            .pack();
+        }
+
+        public static PacketStreamData progressBarComplete(bool isSuccess)
+        {
+            return new PacketStream()
+                /* JS_D: Desc[Progress Bar Complete] */
+                .setDelimeter(Delimeters.PROGRESS_BAR_COMPLETE)
+                /* JS: Desc[isSuccess] */
+                .writeByte((byte)(isSuccess ? 1 : 0))
+            .pack();
+        }
+
     }
 }

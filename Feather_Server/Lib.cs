@@ -20,11 +20,11 @@ namespace Feather_Server
     public static class Lib
     {
         public static string dbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public static int lastUID = 10000;
+        public static uint lastUID = 10000u;
         public static uint lastItemUID = 0;
         public static bool endSrv = false;
         public static Encoding textEncoder;
-        public static Dictionary</*player-id*/int, Client> clientList = new Dictionary<int, Client>();
+        public static Dictionary</*player-id*/uint, Client> clientList = new Dictionary<uint, Client>();
         public static Dictionary</*map*/ushort, List<IEntity>> entityListByMap = new Dictionary<ushort, List<IEntity>>();
         public static readonly JsonSerializerSettings jsonSetting = new JsonSerializerSettings()
         {
@@ -249,9 +249,9 @@ namespace Feather_Server
             return -1;
         }
 
-        public static List<int> broadcast(byte[] plain_packet)
+        public static List<uint> broadcast(byte[] plain_packet)
         {
-            List<int> failed = new List<int>();
+            var failed = new List<uint>();
             clientList.Values.ToList().ForEach(p =>
             {
                 try
@@ -327,7 +327,7 @@ namespace Feather_Server
             });
         }
 
-        public static HeroBasicInfo[] getBasicInfos(List<int> heroIDs)
+        public static HeroBasicInfo[] getBasicInfos(List<uint> heroIDs)
         {
             var lst = new List<HeroBasicInfo>();
             if (heroIDs.Count == 0)
@@ -345,7 +345,7 @@ namespace Feather_Server
                 foreach (var row in res)
                 {
                     tmp = HeroBasicInfo.fromJson(row[2]);
-                    tmp.heroID = int.Parse(row[0]);
+                    tmp.heroID = uint.Parse(row[0]);
                     tmp.heroName = row[1];
                     lst.Add(tmp);
                 }
@@ -353,7 +353,7 @@ namespace Feather_Server
             return lst.ToArray();
         }
 
-        public static void sendPktByHeroID(int heroID, byte[] pkts)
+        public static void sendPktByHeroID(uint heroID, byte[] pkts)
         {
             Client cli;
             if (!Lib.clientList.TryGetValue(heroID, out cli))
@@ -378,7 +378,7 @@ namespace Feather_Server
                 return null;
 
             var tmp = Hero.fromJson(res[0][2]);
-            tmp.heroID = int.Parse(res[0][0]);
+            tmp.heroID = uint.Parse(res[0][0]);
             tmp.heroName = res[0][3];
             return tmp;
         }

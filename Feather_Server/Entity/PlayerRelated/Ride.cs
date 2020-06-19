@@ -40,15 +40,15 @@ namespace Feather_Server.ServerRelated
         public ushort[] stat = new ushort[] {
             // usable stat point
             0,
-            // power // 力量
+            // Str. // 力量
             10,
-            // intelligence // 智力
+            // Intell. // 智力
             10,
-            // spirit // 精神
+            // Spir. // 精神
             10,
-            // stamina // 耐力
+            // Stam. // 耐力
             10,
-            // strength // 體質
+            // Vit. // 體質
             10
         };
 

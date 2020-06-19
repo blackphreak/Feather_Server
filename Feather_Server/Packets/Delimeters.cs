@@ -13,20 +13,23 @@ namespace Feather_Server.Packets
         //   NPC: Non-Player-Control (i.e.: Mobs, Boss, Pets)
         //   Hero: Player Entity
         //   Entity: NPC / Hero
-        //   Self: Data Receiver (the game client)
+        //   Self: Data Receiver (the game client) (only if no EntityID)
 
         public static readonly byte[] ALERT_BOX = { 0x21, 0x02 };
         
         public static readonly byte[] LOGIN_SUCCESS = { 0x49, 0x0e };
+        public static readonly byte[] LOGIN_UNK = { 0x49, 0x02 }; // TODO: what is this?
         public static readonly byte[] LOGIN_HERO_VIEW = { 0x49, 0x0d };
         public static readonly byte[] HERO_CREATION = { 0x3d, 0x2f }; // !REVIEW! confirm signature will not crush with another pkt
+
+        public static readonly byte[] LOGIN_UNK2 = { 0x5a, 0x01 }; // TODO: what is this?
 
         public static readonly byte[] PROGRESS_BAR_SHOW = { 0x5e, 0x02 };
         public static readonly byte[] PROGRESS_BAR_COMPLETE = { 0x5e, 0x01 };
 
         public static readonly byte[] DROP_ITEM_SPAWN = { 0x2e };
         public static readonly byte[] BAG_ITEM_ADD = { 0x2b };
-        public static readonly byte[] BAG_ITEM_ACTIVE = { 0xa6, 0x0a };
+        public static readonly byte[] BAG_ITEM_ACTIVATE = { 0xa6, 0x0a };
 
         public static readonly byte[] NPC_SPAWN = { 0x69, 0x80 };
         public static readonly byte[] HERO_SPAWN_NORMAL = { 0x69, 0x0a };
@@ -88,6 +91,25 @@ namespace Feather_Server.Packets
         // @782
 
         public static readonly byte[] SELF_LAST_LOGIN_RECORD = { 0x3e, 0x01 };
+        public static readonly byte[] SELF_WINDOW_TITLE = { 0x3d, 0xa0 };
+        public static readonly byte[] SELF_HERO_GIFTS = { 0x3d, 0xa2 };
+        public static readonly byte[] SELF_HERO_STATUS = { 0x3d, 0xa3 };
+        public static readonly byte[] SELF_HERO_AMOUNT = { 0x3d, 0xa4 };
+        public static readonly byte[] SELF_HERO_AMOUNT2 = { 0x3d, 0xa5 };
+        public static readonly byte[] SELF_HERO_CRIT_HIT_RATE = { 0x3d, 0x1d };
+        public static readonly byte[] SELF_HERO_BACKPACK = { 0x3d, 0x48 };
+        public static readonly byte[] SELF_HERO_DODGE = { 0x3d, 0xf6 };
+        public static readonly byte[] SELF_HERO_HIT = { 0x3d, 0xf7 };
+        public static readonly byte[] SELF_HERO_HONOR_POINT = { 0xa5, 0x08 };
+        public static readonly byte[] SELF_HERO_CULTIVATION_LEVEL = { 0xa2, 0x0a };
+        // TODO: wt is this? @ PacketEncoder.cs - 1098
+        public static readonly byte[] SELF_HERO_UNK1 = { 0xa2, 0x11 };
+        public static readonly byte[] SELF_HERO_GOLD = { 0x45, 0x07 };
 
+        public static readonly byte[] SELF_HERO_SKILL_TREE = { 0x53 };
+        /// <summary>
+        /// Skill Item on ItemBar?
+        /// </summary>
+        public static readonly byte[] SELF_HERO_SKILL_ITEM = { 0x64 };
     }
 }

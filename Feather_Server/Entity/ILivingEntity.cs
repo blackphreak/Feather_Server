@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Feather_Server.MobRelated
+namespace Feather_Server
 {
     /// <summary>
     /// An interface that defines an entity should contains basic stats,

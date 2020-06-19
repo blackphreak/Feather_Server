@@ -7,7 +7,7 @@ namespace Feather_Server.Entity
 {
     public interface IEntity
     {
-        public int entityID { get; }
+        public uint entityID { get; }
 
         public ushort locX { get; }
         public ushort locY { get; }

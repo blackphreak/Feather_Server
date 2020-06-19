@@ -7,6 +7,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Feather_Server.Entity;
 using System;
+using Feather_Server.Packets;
+using FeatherServer;
 
 namespace Feather_Server.ServerRelated
 {
@@ -19,7 +21,7 @@ namespace Feather_Server.ServerRelated
 
         public List<Effect> effects; // 人物效果
 
-        public ushort xwLv; // 修為等級 (2 bytes)
+        public ushort cultivationLevel; // 修為等級 (2 bytes)
 
         // hidden stats
         public int critical_damage; // 爆擊傷害 (TODO: check existance & size)
@@ -41,15 +43,15 @@ namespace Feather_Server.ServerRelated
         /// <summary>
         /// 體力
         /// </summary>
-        public ushort tl;
+        public ushort vigor;
         /// <summary>
         /// 功德
         /// </summary>
-        public int gd;
+        public int virtue;
         /// <summary>
         /// 戰績
         /// </summary>
-        public int zj;
+        public int honorPoint;
         /// <summary>
         /// pk值
         /// </summary>
@@ -73,21 +75,25 @@ namespace Feather_Server.ServerRelated
         [JsonIgnore]
         public string aiming; // selected target
 
-        // 屬性
-        
+        /// <summary>
+        /// Gifts (屬性)
+        /// </summary>
         public ushort[] gifts = {
-            // strength // 體質
+            // Vit. // 體質
             23,
-            // spirit // 精神
+            // Spir. // 精神
             23,
-            // intelligence // 智力
+            // Intell. // 智力
             23,
-            // power // 力量
+            // Str. // 力量
             23,
-            // stamina // 耐力
+            // Stam. // 耐力
             23,
         };
-        public ushort giftPoint = 0;
+        /// <summary>
+        /// Points available for gifts (屬性配點)
+        /// </summary>
+        public ushort bonusPoints = 0;
 
         public uint exp = 0;
 
@@ -95,7 +101,7 @@ namespace Feather_Server.ServerRelated
 
         //public byte team; // check size
 
-        public Hero(int heroID, string heroName, Gender gender, Role role, Hair hair, byte lv, HeroModel model)
+        public Hero(uint heroID, string heroName, Gender gender, Role role, Hair hair, byte lv, HeroModel model)
         {
             base.heroID = heroID;
             base.heroName = heroName;
@@ -134,13 +140,13 @@ namespace Feather_Server.ServerRelated
             return JsonConvert.SerializeObject(this, Formatting.Indented, Lib.jsonSetting);
         }
 
-        int IEntity.entityID { get => heroID; }
+        uint IEntity.entityID { get => heroID; }
 
         #region Map / Location / Facing
         // REVIEW: update default location to Map.LYC[x, y] @ FinalRelease
         public ushort locX { get; protected set; } = 0x00EA; // 234
         public ushort locY { get; protected set; } = 0x006F; // 111
-        public ushort map { get; protected set; } = (ushort)Map.TYC;
+        public ushort map { get; protected set; } = (ushort)Map.CarpVillage;
         public byte facing { get; protected set; } = 0x04;
 
         void IEntity.updateLoc(ushort x, ushort y)
@@ -237,8 +243,53 @@ namespace Feather_Server.ServerRelated
             // TODO: damage logic
             //int meleeDamage = damagedBy.meleeDamage;
             //if (damagedBy is Hero)
-            
+
             this.HP -= damagedBy.PA;
+        }
+
+        public void toFragment_HeroInfos(ref PacketStream stream)
+        {
+            /* JS_F: Here[Hero_Infos] */
+            stream
+                /* JS: Desc[EntityID] */
+                .writeDWord(this.heroID)
+                /* JS: Desc[LocX] */
+                .writeWord(this.locX)
+                /* JS: Desc[LocY] */
+                .writeWord(this.locY)
+                /* JS: Desc[Facing] */
+                .writeByte(this.facing)
+                /* JS: Desc[State] */
+                .writeByte(this.state)
+                /* JS: Desc[Act] */
+                .writeByte(this.act)
+                /* JS: Desc[Icon] */
+                .writeWord(this.hair.icon)
+                /* JS: Desc[Gender] */
+                .writeWord((ushort)this.gender)
+                /* JS: Desc[Padding] */
+                .writePadding(4)
+                /* JS: Desc[Hair Style] */
+                .writeWord(this.hair.model)
+                /* JS: Desc[Hair Color] */
+                .writeWord(this.hair.color)
+                /* JS: Desc[Padding] */
+                .writePadding(4)
+                /* JS: Desc[Padding] */
+                .writePadding(4);
+
+            /* JS_F: To[Hero_Model@Feather_Server/Entity/PlayerRelated/Model/HeroModel.cs] */
+            this.model.toFragment(ref stream);
+
+            stream
+                /* JS: Desc[Unk] */
+                .writeWord(0x0)
+                /* JS: Desc[Health Bar] Fn[eHPBar] */
+                .writeByte((byte)(this.HP / this.maxHP * 0x32))
+                /* JS: Desc[Unk] */
+                .writeByte(0x0)
+                /* JS: Desc[HeroID] */
+                .writeDWord(this.heroID);
         }
     }
 }

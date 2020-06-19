@@ -41,21 +41,40 @@ namespace Feather_Server.Packets
             return this;
         }
 
+        public PacketStream writeByte(bool data)
+        {
+            writeByte((byte)(data ? 1 : 0));
+            return this;
+        }
         public PacketStream writeByte(byte data)
         {
             packet.Add(data);
             return this;
         }
 
+        public PacketStream writeWord(short data)
+        {
+            return writeWord((ushort)data);
+        }
         public PacketStream writeWord(ushort data)
         {
             packet.AddRange(BitConverter.GetBytes(data));
             return this;
         }
 
+        public PacketStream writeDWord(int data)
+        {
+            return writeDWord((uint)data);
+        }
         public PacketStream writeDWord(uint data)
         {
             packet.AddRange(BitConverter.GetBytes(data));
+            return this;
+        }
+
+        public PacketStream writeString(string data)
+        {
+            packet.AddRange(Lib.gbkToBytes(data));
             return this;
         }
 
@@ -129,7 +148,15 @@ namespace Feather_Server.Packets
             return packet;
         }
 
-        public static PacketStream operator +(PacketStream left, PacketStream right)
+        /// <summary>
+        /// Combine two PacketStream into same Stream.
+        /// <br />
+        /// Both PacketStream will forced to be sized before combine.
+        /// </summary>
+        /// <param name="left">LHS</param>
+        /// <param name="right">RHS</param>
+        /// <returns>LHS</returns>
+        public static PacketStream combine(PacketStream left, PacketStream right)
         {
             // make sure both are sized.
             left.doPacketSizing();
@@ -159,26 +186,19 @@ namespace Feather_Server.Packets
             return left;
         }
 
-        public static PacketStream operator +(PacketStream left, byte[] right)
+        public static PacketStream operator +(PacketStream left, PacketStreamData right)
         {
-            // make sure both are sized.
-            left.doPacketSizing();
-
-            // store self current packet in previous_packet variable
-            if (left.previous_packet == null)
-                left.previous_packet = left.packet;
-
-            // add to LHS previous_packet
-            left.previous_packet.AddRange(right);
-
-            // reset LHS
-            left.packet = null;
-            left.isSized = false;
-
+            left.packet.AddRange(right);
             return left;
         }
 
-        // TODO: optimization for GC (Garbage Collection): clear used variables
+        ~PacketStream()
+        {
+            packet.Clear();
+            packet = null;
+            previous_packet.Clear();
+            previous_packet = null;
+        }
     }
 
     public class ParamPacketStream
@@ -207,6 +227,10 @@ namespace Feather_Server.Packets
             return new PacketStream(ref this.previous_packet);
         }
 
+        public ParamPacketStream writeParam(int data)
+        {
+            return writeParam((uint)data);
+        }
         public ParamPacketStream writeParam(uint data)
         {
             packet.Add(0x64);
@@ -216,6 +240,10 @@ namespace Feather_Server.Packets
             return this;
         }
 
+        public ParamPacketStream writeParam(short data)
+        {
+            return writeParam((ushort)data);
+        }
         public ParamPacketStream writeParam(ushort data)
         {
             packet.Add(0x64);
@@ -293,7 +321,13 @@ namespace Feather_Server.Packets
             return packet;
         }
 
-        // TODO: optimization for GC (Garbage Collection): clear used variables
+        ~ParamPacketStream()
+        {
+            packet.Clear();
+            packet = null;
+            previous_packet.Clear();
+            previous_packet = null;
+        }
     }
 
     public class PacketStreamData : List<byte>
@@ -301,14 +335,6 @@ namespace Feather_Server.Packets
         public PacketStreamData() { }
 
         public PacketStreamData(byte[] delimeter) : base(delimeter) { }
-
-        public static PacketStreamData operator +(PacketStreamData left, List<byte> right)
-        {
-            left.AddRange(right);
-            // free RHS for GC
-            right.Clear();
-            return left;
-        }
 
         public static PacketStreamData operator +(PacketStreamData left, PacketStreamData right)
         {

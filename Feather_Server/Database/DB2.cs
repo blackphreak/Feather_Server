@@ -194,9 +194,9 @@ namespace Feather_Server.Database
         }
 
         //This is probably not correctly implemented. Did it in a hurry last night. Might only return 1 hero.
-        public bool LoginUser(string Username, string Passwd, out List<int> heroIDs)
+        public bool LoginUser(string Username, string Passwd, out List<uint> heroIDs)
         {
-            heroIDs = new List<int>();
+            heroIDs = new List<uint>();
             //Empty username, no point in sending query
             if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Passwd))
                 return false;
@@ -214,7 +214,7 @@ namespace Feather_Server.Database
                 return false;
 
             for (int i = 0; i < 6; i++)
-                heroIDs.Add(Res[0][i] == null ? -1 : int.Parse(Res[0][i]));
+                heroIDs.Add(Res[0][i] == null ? 0u : uint.Parse(Res[0][i]));
 
             return true;
 

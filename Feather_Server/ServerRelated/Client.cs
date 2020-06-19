@@ -31,7 +31,7 @@ namespace Feather_Server.ServerRelated
         private Thread listenerThread;
 
         #region idk wt name
-        public Client(AES aes, TcpClient cli)
+        public Client(AES aes, ref TcpClient cli)
         {
             this.aes = aes;
             this.tcp = cli;
