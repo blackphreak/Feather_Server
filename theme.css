@@ -4,6 +4,9 @@ body {
     color: #e3e3e3;
     padding: 10px 10px 120px 10px;
 }
+:focus {
+    outline: none;
+}
 #io {
     border: 1px solid #333333;
     margin: 10px 0;
@@ -12,17 +15,7 @@ body {
     min-height: 640px;
     height: 60vh;
     overflow-y: unset;
-    outline: none;
     margin-bottom: 400px;
-}
-#io > div {
-    background: #222222;
-    padding: 5px 0;
-    border-top: 1px solid #cfcfcf;
-    border-bottom: 1px solid #cfcfcf;
-}
-#io > [data-toggle="tooltip"] {
-    margin-bottom: 21px;
 }
 .tooltip {
     position: absolute;
@@ -141,13 +134,16 @@ body {
 .bg-warn {
     background: #756e0a !important;
 }
+.bg-ignored {
+    background: #5d4635 !important;
+}
 .cli {
     background: #482f6f !important;
 }
 .fg-err {
     background: #cf6868 !important;
 }
-[data-toggle="tooltip"].active {
+[role="item"].active {
     background: #0d5575 !important;
 }
 [role="packet-item"] {
@@ -219,4 +215,46 @@ table tr:hover {
     background-color: #102c39;
     margin-bottom: 15px;
     padding: 8px 15px;
+}
+
+#io > div {
+    background: #222222;
+    border-top: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+    margin-bottom: 10px;
+}
+[role="editable"] {
+    display: block;
+    padding: 10px 0 10px 20px;
+    z-index: 10;
+}
+[role="control"] {
+    z-index: 20;
+    float: right;
+    position: relative;
+    right: 10px;
+    background-color: #636363a1;
+    height: 40px;
+}
+[role="control"] > * {
+    float: right;
+    height: 40px;
+    width: 40px;
+}
+[role="header"]:empty {
+    display: none;
+}
+[role="header"] {
+    margin: 10px 0 0 20px;
+    color: #fcfcfc;
+}
+[role="item"] > [role="editable"]:empty::after {
+    content: " ----- Here Is An Empty Line -----";
+    margin-left: 40%;
+    color: #cf6868;
+}
+#io > [role="item"]:last-child > [role="editable"]:empty::after {
+    content: "More packet goes here ...";
+    color: #7b7f81;
+    margin-left: 2%;
 }

@@ -17,13 +17,15 @@
         <button id="btn_reset" class="btn btn-warning">
             Reset
         </button>
+        <button id="btn_tocb" class="btn btn-primary">
+            To Clipboard
+        </button>
         <br />
         <label id="pkt_ver"></label>
         <br />
         <!-- Parser Body -->
         <div
             id="io"
-            contenteditable="plaintext-only"
             spellcheck="false"
             placeholder="Any of the following formats are valid for parsing:&#xa;-- &lt;pktBody (without size prefix)&gt;&#xa;__ &lt;pktBody (without size prefix)&gt;&#xa;&lt;timeCode&gt; &lt;pktSize&gt;_&lt;pktBody...&gt;_ (Official Packet Record)&#xa;&lt;pkt (with size prefix, no underscore, no space)&gt;&#xa;{...} (JSON KVP format, dump with pkt_dump.py)"
         ></div>

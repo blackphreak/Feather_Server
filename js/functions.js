@@ -180,7 +180,7 @@ var _logSign = (logLevel) => {
 };
 
 var log = (messages, logLevel) => {
-    if (hasFlag(logMode, DEBUG) && !hasFlag(logLevel, DEBUG)) return;
+    if (!hasFlag(logMode, DEBUG) && hasFlag(logLevel, DEBUG)) return;
 
     let fn,
         logSign = _logSign(logLevel),
@@ -193,7 +193,7 @@ var log = (messages, logLevel) => {
     } else fn = console.log;
 
     if (typeof messages == "object") messages.forEach((msg) => whole.push(`[${logSign}] ${msg}`));
-    else whole.push(`[${logSign}] ${messages}`);
+    else whole.push(`\n[${logSign}] ${messages}`);
 
     fn(...whole);
 };
@@ -446,14 +446,23 @@ var buildOutput = (info) => {
             }
         });
         tooltipInfo = `<table><tbody>` + tooltipInfo + `</tbody></table>`;
-        (info.extraTooltip || []).forEach((ele) => {
-            tooltipInfo += `<div class="extra">${ele}</div>`;
-        });
         tooltipInfo = tooltipInfo.replace(/\"/gm, "&quot;"); // replace double-qoute (") to HTML charCode
-        tooltipInfo = ` data-toggle="tooltip" data-original-title="${tooltipInfo}"`;
-    }
+        (info.extraTooltip || []).forEach((ele) => {
+            tooltipInfo += `<div class="extra">${ele.replace(/\"/gm, "&quot;")}</div>`;
+        });
 
-    $io.append(`<div class="${info.class || ""}"${tooltipInfo}>// ${title.join(' ')}<br />${packet}</div>`);
+        window.currItem.tooltip({
+            html: true,
+            animation: false,
+            placement: "right",
+            trigger: "click hover",
+            boundary: "window",
+            title: tooltipInfo
+        });
+    }
+    window.currItem.addClass(`${info.class || ""}`);
+    window.currItem.find(" > [role=header]").html(`// ${title.join(' ')}`);
+    window.currItem.find(" > [role=editable]").html(`${packet}`);
 };
 
 var matchHeader = (pkt) => {
@@ -495,7 +504,9 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
     let params = [];
 
     // push sub-desc to title
-    _info.title.push("(" + (signInfo["desc"] || " -- No Desc --" ) + ")");
+    if (signInfo["desc"] && signInfo["desc"] != "")
+        _info.title.push("(" + (signInfo["desc"] || " -- No Desc --") + ")");
+    
     for (let i = 0; i < arr_signature.length; i++) {
         const param = arr_signature[i];
         
@@ -861,13 +872,22 @@ var parseWorker = (header, pkt) => {
     buildOutput(_info);
 };
 
-var singleParser = (pkt) => {
+var singleParser = ($ele) => {
+    var pkt = $ele.find(` > [role="editable"]`).text();
+    window.currItem = $ele;
+
     if (pkt == "") {
         log("Empty Packet Byte.", WARN);
         return;
     }
-    if (pkt.indexOf("//") > -1) {
-        log(["Ignoring Commented Line.", "Line:", pkt], WARN);
+    if (pkt.replace(/\s+/g, "").startsWith("//")) {
+        log(["Ignoring Comment Line.", "Line:", pkt], WARN);
+        buildOutput({
+            class: "bg-ignored",
+            title: ["Comment Line [Ignored]"],
+            packet: pkt.replace(/\s{2,}/g, ""),
+            log: WARN
+        });
         return;
     }
 
@@ -896,7 +916,7 @@ var singleParser = (pkt) => {
         if (!sizeCheck(pkt.slice(8))) {
             return buildOutput({
                 class: "bg-warn",
-                title: "Mismatch Packet Size. [Packet Size Check Failed - F1]",
+                title: ["Mismatch Packet Size. [Packet Size Check Failed - F1]"],
                 packet: `${pkt}`,
                 log: WARN
             });
@@ -925,7 +945,7 @@ var singleParser = (pkt) => {
         if (!sizeCheck(pkt)) {
             return buildOutput({
                 class: "bg-warn",
-                title: "Mismatch Packet Size. [Packet Size Check Failed - F2]",
+                title: ["Mismatch Packet Size. [Packet Size Check Failed - F2]"],
                 packet: `${pkt}`,
                 log: WARN
             });
@@ -935,7 +955,7 @@ var singleParser = (pkt) => {
         // failed to match any
         return buildOutput({
             class: "bg-err",
-            title: "Invalid Format",
+            title: ["Invalid Format"],
             packet: `${pkt}`,
             log: ERR
         });
@@ -946,7 +966,7 @@ var singleParser = (pkt) => {
         // not in known-packet database
         return buildOutput({
             class: "",
-            title: "-- Not Known Yet --",
+            title: ["-- Not Known Yet --"],
             packet: `__ ${pkt} 00`,
             log: ERR
         });
