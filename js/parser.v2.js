@@ -128,15 +128,24 @@ document.getElementById("io").addEventListener("paste", function(evt) {
     $(`[role=item]`).unbind();
 
     let data = (evt.clipboardData || window.clipboardData).getData("Text");
+    
+    let isPasteOnLastItem = evt.srcElement == (this.lastElementChild && this.lastElementChild.children && this.lastElementChild.children[1] || undefined);
 
     data.split("\n").forEach((ele) => {
         if (!ele || ele == "\n" || ele.charCodeAt(0) == 0x0d) return; // ignore empty line
 
-        $io.addItem(ele);
+        if (isPasteOnLastItem)
+        {
+            evt.srcElement.textContent = ele;
+            isPasteOnLastItem = false;
+        }
+        else
+            $io.addItem(ele, false, document.activeElement.tagName == "BODY" ? undefined : document.activeElement.parentElement);
     });
 
-    // add one empty line after all
-    $io.addItem();
+    // add one empty line after all if there is not empty line
+    if (this.lastElementChild.children[1].textContent)
+        $io.addItem();
 });
 
 document.getElementById("io").addEventListener("keydown", function(evt) {

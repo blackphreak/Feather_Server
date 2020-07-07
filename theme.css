@@ -182,9 +182,6 @@ div#io:empty::before {
 }
 td:nth-child(2) {
     text-align: right;
-    width: 140px;
-    min-width: 140px;
-    padding-left: 15px;
 }
 td:nth-child(2):not(.fg-err)::after {
     content: ' :';

@@ -94,6 +94,15 @@ var eAnimationDuration = (inp) => parseInt(inp, 16) + " seconds";
 var eAnimationLayer = (inp) => (inp <= 1 ? "Front" : "Back - " + inp);
 var eAnimationLoop = (inp) => (inp <= 1 ? "Once" : "Repeat - " + inp);
 
+var eFacing = (gbk) => {
+    let hex = parseInt(gbk, 16);
+    if (hex < 0x30 || hex > 0x37)
+        // 0 ~ 7
+        return `<div class="bg-err">Invalid Facing</div>`;
+    
+    return `<div style="transform: rotate(${parseInt(lib.parseGBK(gbk)) * 45}deg);display: inline-block;">↙</div>`;
+};
+
 var db_FormatString = (inp, cols = ["title"]) => {
     let db = formatstringDB[inp] || false;
     if (!db)
@@ -447,11 +456,14 @@ var buildOutput = (info) => {
             }
         });
         tooltipInfo = `<table><tbody>` + tooltipInfo + `</tbody></table>`;
-        tooltipInfo = tooltipInfo.replace(/\"/gm, "&quot;"); // replace double-qoute (") to HTML charCode
+        // tooltipInfo = tooltipInfo.replace(/\"/gm, "&quot;"); // replace double-qoute (") to HTML charCode
         (info.extraTooltip || []).forEach((ele) => {
             tooltipInfo += `<div class="extra">${ele.replace(/\"/gm, "&quot;")}</div>`;
         });
 
+        if (window.currItem.tooltip)
+            window.currItem.tooltip("dispose");
+        
         window.currItem.tooltip({
             html: true,
             animation: false,
@@ -674,7 +686,7 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             paramInfo.push(pktByteOffset);
             
             LHS = allParamInfo[i].name;
-            value = pkt;
+            byte = value = pkt;
 
             // push ending offset
             pktByteOffset += pkt.length / 2;
