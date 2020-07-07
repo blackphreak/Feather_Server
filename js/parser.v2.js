@@ -204,16 +204,16 @@ document.getElementById("io").addEventListener("keydown", function(evt) {
         // arrow up
         if (
             document.activeElement.parentElement.previousSibling &&
-            document.activeElement.parentElement.previousSibling.firstChild
+            document.activeElement.parentElement.previousSibling.childNodes[1]
         )
-            document.activeElement.parentElement.previousSibling.firstChild.focus();
+            document.activeElement.parentElement.previousSibling.childNodes[1].focus();
     } else if (evt.keyCode == 40) {
         // arrow down
         if (
             document.activeElement.parentElement.nextSibling &&
-            document.activeElement.parentElement.nextSibling.firstChild
+            document.activeElement.parentElement.nextSibling.childNodes[1]
         )
-            document.activeElement.parentElement.nextSibling.firstChild.focus();
+            document.activeElement.parentElement.nextSibling.childNodes[1].focus();
     }
     // else if (evt.keyCode == 89 && evt.ctrlKey)
     // {

@@ -435,7 +435,8 @@ var buildOutput = (info) => {
                     tooltipInfo += `<tr class="fg-err"><td colspan=100></td></tr>`;
             } else {
                 $.each(ele, (desc, actual) => {
-                    tooltipInfo += `<tr><td>${desc}</td>`;
+                    // actual[<1st>], actual[<2nd>] are packet byte offset
+                    tooltipInfo += `<tr><td>[0x${actual.shift().toString(16).padStart(2, '0').toUpperCase()} - 0x${actual.shift().toString(16).padStart(2, '0').toUpperCase()}]</td><td>${desc}</td>`;
                     let last = actual.pop();
                     actual.forEach(e => {
                         tooltipInfo += `<td>${e}</td>`;
@@ -507,6 +508,7 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
     if (signInfo["desc"] && signInfo["desc"] != "")
         _info.title.push("(" + (signInfo["desc"] || " -- No Desc --") + ")");
     
+    var pktByteOffset = (_info.pkt_header.length / 2) + 1; // +1 is for sizeByte
     for (let i = 0; i < arr_signature.length; i++) {
         const param = arr_signature[i];
         
@@ -580,11 +582,19 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
                     continue; // go next
                 }
             }
+
+            // push starting offset
+            paramInfo.push(pktByteOffset);
             
             LHS = allParamInfo[i].name;
             let gbkByteLength = parseInt(lib.le2be(pkt.slice(2, 10)), 16) * 2;
             endIndex = 10 + gbkByteLength;
-            byte = pkt.slice(0, endIndex)
+            byte = pkt.slice(0, endIndex);
+
+            // push ending offset
+            pktByteOffset += endIndex / 2;
+            paramInfo.push(pktByteOffset - 1);
+
             let value = pkt.slice(10, endIndex);
             paramInfo.push(lib.parseGBK(value)); // push value
 
@@ -614,11 +624,18 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
                     continue; // go next
                 }
             }
+
+            // push starting offset
+            paramInfo.push(pktByteOffset);
             
             endIndex = 10;
             LHS = allParamInfo[i].name;
             byte = pkt.slice(0, endIndex);
             let val = pkt.slice(2, endIndex);
+
+            // push ending offset
+            pktByteOffset += endIndex / 2;
+            paramInfo.push(pktByteOffset - 1);
 
             let [value, num, hex] = lib.parseToNum(lib.le2be(val), allParamInfo[i].type || 8);
             paramInfo.push(`${num} [0x${hex}]`); // push value
@@ -653,8 +670,15 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
             if (pkt.length <= 0)
                 return false; // signature not match
             
+            // push starting offset
+            paramInfo.push(pktByteOffset);
+            
             LHS = allParamInfo[i].name;
             value = pkt;
+
+            // push ending offset
+            pktByteOffset += pkt.length / 2;
+            paramInfo.push(pktByteOffset - 1);
 
             paramInfo.push(`${lib.parseGBK(value)}`); // push value
             
@@ -698,9 +722,16 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
                 }
             }
             
+            // push starting offset
+            paramInfo.push(pktByteOffset);
+            
             endIndex = sz;
             LHS = allParamInfo[i].name;
             byte = pkt.slice(0, endIndex);
+
+            // push ending offset
+            pktByteOffset += endIndex / 2;
+            paramInfo.push(pktByteOffset - 1);
 
             let [value, num, hex] = lib.parseToNum(lib.le2be(byte), allParamInfo[i].type || sz);
             paramInfo.push(`${num} [0x${hex}]`); // push value
@@ -750,15 +781,22 @@ var isMatchSign = (signature, signInfo, original_pkt) => {
                     continue; // go next
                 }
             }
+            
+            // push starting offset
+            paramInfo.push(pktByteOffset);
 
             endIndex = param.length;
             pkt = pkt.slice(param.length);
             byte = param;
 
+            // push ending offset
+            pktByteOffset += endIndex / 2;
+            paramInfo.push(pktByteOffset - 1);
+
             if (param.match(/^(00)+$/))
             {
                 // this is padding
-                LHS = allParamInfo[i].name;
+                LHS = allParamInfo[i].name || "Padding";
                 paramInfo.push(param);
             }
             else
@@ -837,7 +875,8 @@ var parseWorker = (header, pkt) => {
         title: [], // title with subcate (if any), extra mark (if applicable)
         packet: "", // space seperated
         tooltip: [], // parsed data
-        class: false // css class name (string). "false" only if using default css class
+        class: false, // css class name (string). "false" only if using default css class
+        pkt_header: header // packet header bytes
     };
 
     let target = pktList[header];
@@ -876,10 +915,9 @@ var singleParser = ($ele) => {
     var pkt = $ele.find(` > [role="editable"]`).text();
     window.currItem = $ele;
 
-    if (pkt == "") {
-        log("Empty Packet Byte.", WARN);
+    if (pkt == "")
         return;
-    }
+
     if (pkt.replace(/\s+/g, "").startsWith("//")) {
         log(["Ignoring Comment Line.", "Line:", pkt], WARN);
         buildOutput({
