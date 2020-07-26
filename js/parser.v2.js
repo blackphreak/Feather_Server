@@ -21,7 +21,7 @@ $.getJSON("./js/db/Skill.json").done((json) => {
 let url = new URL(window.location);
 let pktSource =
     "https://raw.githubusercontent.com/blackphreak/Feather_Server/develop/Feather_Server/Packets/_pkts.v2.json";
-if (window.location.hostname == "127.0.0.1") pktSource = "./_pkts.v2.ignore.json";
+if (window.location.hostname == "127.0.0.1" || window.location.hostname == "feather.hkwtc.org") pktSource = "./_pkts.v2.ignore.json";
 else if (url.searchParams.has("file")) pktSource = url.searchParams.get("file");
 
 var pktList = {};

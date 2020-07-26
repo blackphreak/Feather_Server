@@ -422,7 +422,7 @@ const WFLAG_MORE_EXPECTED = 1 << 0;
 var $io = $(`#io`);
 
 var buildOutput = (info) => {
-    let title = info.title || "default title",
+    let title = info.title || ["default title"],
         packet = info.packet || "default packet";
 
     if (info.log) log([title, `Packet: ${packet}`], info.log);
@@ -913,7 +913,7 @@ var parseWorker = (header, pkt) => {
     {
         return buildOutput({
             class: "bg-warn",
-            title: _info.title.join(' ') + ` -- Failed to match any signature`,
+            title: [_info.title.join(' '), ` -- Failed to match any signature`],
             packet: `__ ${header} ${pkt} 00`,
             log: WARN
         });
@@ -950,6 +950,7 @@ var singleParser = ($ele) => {
     if (json != undefined) {
         // packet is using JSON format
         // TODO: ...
+
     }
 
     // remove all spaces
