@@ -26,7 +26,7 @@ namespace Feather_Server.Packets.Actual
             {
                 stream
                     /* JS_D: Desc[Hero Creation] */
-                    .setDelimeter(Delimeters.HERO_CREATION)
+                    .setDelimeter(Delimeters.SELF_HERO_CREATION)
                     /* JS: Desc[unk1] */
                     .writeDWord(0xBFCAE4CE)
                     .nextPacket();
@@ -63,13 +63,13 @@ namespace Feather_Server.Packets.Actual
             return stream.pack();
         }
 
-        public static PacketStreamData lastLoginRecord(string date, string ip)
+        public static PacketStreamData lastLoginRecord(bool showLogout, string date, string ip)
         {
             return new PacketStream()
                 /* JS_D: Desc[Last Login Record] */
                 .setDelimeter(Delimeters.SELF_LAST_LOGIN_RECORD)
                 /* JS: Desc[FormatStringID] Fn[ParseFS] */
-                .writeFormat(EFormatString.LAST_LOGIN_MESSAGE)
+                .writeFormat(showLogout ? EFormatString.LAST_LOGOUT_MESSAGE : EFormatString.CURRENT_LOGIN_MESSAGE)
                 /* JS: Desc[Login Date] */
                 .writeString(date)
                 /* JS: Desc[Login IP] */

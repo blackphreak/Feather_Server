@@ -1,8 +1,4 @@
-﻿using Feather_Server.Entity.PlayerRelated.Items;
-using Feather_Server.PlayerRelated;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Feather_Server.PlayerRelated;
 
 namespace Feather_Server.Packets.Actual
 {
@@ -32,6 +28,21 @@ namespace Feather_Server.Packets.Actual
                 .writeDWord(itemUID)
                 /* JS: Desc[Unk1] */
                 .writeDWord(0xDEADBEEF) // TODO: find out this unk1
+            .pack();
+        }
+
+        public static PacketStreamData setBagSlot(Bag bag)
+        {
+            return new PacketStream()
+                /* JS_D: Desc[Avaliable Bag Slot] */
+                .setDelimeter(Delimeters.SELF_HERO_BAG_SLOT_AVALIABLE)
+                /* JS: Desc[Bag Slots] Fn[eStuffbag] */
+                .writeDWord(uint.Parse(
+                    bag.extraBag[2].ToString()
+                    + bag.extraBag[1].ToString()
+                    + bag.extraBag[0].ToString()
+                    + "24")
+                )
             .pack();
         }
     }

@@ -66,11 +66,11 @@ namespace Feather_Server.Database
             MyConnection.Close();
         }
 
-        public int getLastInsertedID(string table, string colName)
+        public uint getLastInsertedID(string table, string colName)
         {
             var Result = Select("MAX(" + colName + ") AS " + colName, table, null);
             if (Result != null)
-                return int.Parse(Result[0][0] ?? "10000");
+                return uint.Parse(Result[0][0] ?? "10000");
             else
                 return 0;
         }

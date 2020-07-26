@@ -1,6 +1,8 @@
 ﻿using Feather_Server.Database;
 using Feather_Server.Entity;
 using Feather_Server.Entity.NPC_Related;
+using Feather_Server.Packets;
+using Feather_Server.Packets.Actual;
 using Feather_Server.ServerRelated;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1;
@@ -12,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -19,13 +22,22 @@ namespace Feather_Server
 {
     public static class Lib
     {
+        [DllImport("winmm.dll", EntryPoint = "timeGetTime")]
+        public static extern uint timeGetTime();
+
         public static string dbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static uint lastUID = 10000u;
         public static uint lastItemUID = 0;
         public static bool endSrv = false;
         public static Encoding textEncoder;
-        public static Dictionary</*player-id*/uint, Client> clientList = new Dictionary<uint, Client>();
-        public static Dictionary</*map*/ushort, List<IEntity>> entityListByMap = new Dictionary<ushort, List<IEntity>>();
+        /// <summary>
+        /// HeroID : ClientClass
+        /// </summary>
+        public static Dictionary<uint, Client> clientList = new Dictionary<uint, Client>();
+        /// <summary>
+        /// MapID : List&lt;IEntity&gt;
+        /// </summary>
+        public static Dictionary<ushort, List<IEntity>> entityListByMap = new Dictionary<ushort, List<IEntity>>();
         public static readonly JsonSerializerSettings jsonSetting = new JsonSerializerSettings()
         {
             TypeNameHandling = TypeNameHandling.All
@@ -249,7 +261,7 @@ namespace Feather_Server
             return -1;
         }
 
-        public static List<uint> broadcast(byte[] plain_packet)
+        public static List<uint> broadcast(dynamic plain_packet)
         {
             var failed = new List<uint>();
             clientList.Values.ToList().ForEach(p =>
@@ -303,13 +315,13 @@ namespace Feather_Server
 
             lock (entityListByMap)
                 return (from tmp_entity in entities
-                   where
-                   (!includeSelf ? tmp_entity.entityID != entity.entityID : true)
-                   &&
-                    (Math.Pow(tmp_entity.locX - X, 2)
-                    + Math.Pow(tmp_entity.locY - Y, 2))
-                    < (distance * distance)
-                   select tmp_entity).ToList();
+                        where
+                        (!includeSelf ? tmp_entity.entityID != entity.entityID : true)
+                        &&
+                         (Math.Pow(tmp_entity.locX - X, 2)
+                         + Math.Pow(tmp_entity.locY - Y, 2))
+                         < (distance * distance)
+                        select tmp_entity).ToList();
         }
 
         public static void spawnNearbys(Client client, IEntity baseEntity, int distance = 16, bool includeSelf = true)
@@ -318,11 +330,11 @@ namespace Feather_Server
             {
                 if (nearby is Hero)
                     client.send(
-                        PacketEncoder.spawnHero(nearby as Hero, false)
+                        HeroPacket.spawnPlayerNormal(nearby as Hero)
                     );
                 else if (nearby is NPC)
                     client.send(
-                        PacketEncoder.spawnNPC(nearby as NPC)
+                        NPCPacket.spawnNPC(nearby as NPC)
                     );
             });
         }
@@ -413,8 +425,8 @@ namespace Feather_Server
                         }
                         else
                         {
-                            sb.Append($"\t[{index++}] sz[0x{hexs[0..2]}] __ {hexs[2..4]} {hexs[4..(sz*2)]} 00\n");
-                            hexs = hexs[(sz*2 + 2)..];
+                            sb.Append($"\t[{index++}] sz[0x{hexs[0..2]}] __ {hexs[2..4]} {hexs[4..(sz * 2)]} 00\n");
+                            hexs = hexs[(sz * 2 + 2)..];
                         }
 
                     }
@@ -422,6 +434,22 @@ namespace Feather_Server
             } while (hexs.Length != 0);
             sb.Append("\t[+] End of Packets\n");
             return sb.ToString();
+        }
+    }
+
+    public static class DictionaryExtension
+    {
+        public static TValue GetValueOrDefault<TKey, TValue>(
+            this Dictionary<TKey, TValue> dict,
+            TKey key,
+            TValue defaultValue = default
+            )
+        {
+            if (dict == null)
+                throw new NullReferenceException("The dictionary is not initalized. (Null Ref.)");
+
+            TValue value;
+            return dict.TryGetValue(key, out value) ? value : defaultValue;
         }
     }
 }

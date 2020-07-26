@@ -1,6 +1,7 @@
 ﻿using Feather_Server.Database;
 using Feather_Server.MobRelated;
 using Feather_Server.Packets;
+using Feather_Server.Packets.Actual;
 using Feather_Server.PlayerRelated;
 using Feather_Server.PlayerRelated.Model;
 using Feather_Server.PlayerRelated.Skills;
@@ -118,7 +119,7 @@ namespace Feather_Server.ServerRelated
                 List<uint> heroIDs;
                 var isSuccess = DB2.GetInstance().LoginUser(info[0], pw, out heroIDs);
                 // filter out NULL (-1) heroID
-                heroIDs.RemoveAll(v => v == -1);
+                heroIDs.RemoveAll(v => v == 0);
 
                 if (!isSuccess)
                 {
@@ -638,7 +639,7 @@ namespace Feather_Server.ServerRelated
             ((ILivingEntity)hero).state = 0x02;
 
             // sync to all nearby players
-            Lib.sendToNearby(hero, PacketFactory.spawnHero(hero, true));
+            Lib.sendToNearby(hero, HeroPacket.spawnPlayerAnimated(hero).ToArray());
 
             // spawn nearbys
             Lib.spawnNearbys(client, hero, 16, false);

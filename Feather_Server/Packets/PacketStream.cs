@@ -22,6 +22,7 @@ namespace Feather_Server.Packets
         public PacketStream setDelimeter(byte[] delimeter)
         {
             packet = new PacketStreamData(delimeter);
+            this.isSized = false;
             return this;
         }
 
@@ -93,6 +94,7 @@ namespace Feather_Server.Packets
         {
             var self = this;
             target_fragment.toFragment(ref self);
+            this.isSized = false;
             return self;
         }
 
@@ -105,7 +107,10 @@ namespace Feather_Server.Packets
             if (this.previous_packet == null)
                 this.previous_packet = packet;
             else
+            {
                 this.previous_packet.AddRange(packet);
+                this.packet = null; // re-null
+            }
 
             // next packet must start with setDelimeter()
             return this;
@@ -145,7 +150,13 @@ namespace Feather_Server.Packets
             if (doSizing)
                 doPacketSizing();
 
-            return packet;
+            if (this.previous_packet == null)
+                return packet;
+            else
+            {
+                this.previous_packet.AddRange(packet);
+                return this.previous_packet;
+            }
         }
 
         /// <summary>
@@ -194,9 +205,9 @@ namespace Feather_Server.Packets
 
         ~PacketStream()
         {
-            packet.Clear();
+            packet?.Clear();
             packet = null;
-            previous_packet.Clear();
+            previous_packet?.Clear();
             previous_packet = null;
         }
     }
@@ -211,6 +222,7 @@ namespace Feather_Server.Packets
         {
             this.packet = packet;
             this.previous_packet = previous_packet;
+            this.isSized = false;
         }
 
         public PacketStream nextPacket(bool packSelf = true)
@@ -222,7 +234,10 @@ namespace Feather_Server.Packets
             if (this.previous_packet == null)
                 this.previous_packet = packet;
             else
+            {
                 this.previous_packet.AddRange(packet);
+                this.packet = null; // re-null
+            }
 
             return new PacketStream(ref this.previous_packet);
         }
@@ -318,14 +333,20 @@ namespace Feather_Server.Packets
             if (withSizing)
                 doPacketSizing();
 
-            return packet;
+            if (this.previous_packet == null)
+                return packet;
+            else
+            {
+                this.previous_packet.AddRange(packet);
+                return this.previous_packet;
+            }
         }
 
         ~ParamPacketStream()
         {
-            packet.Clear();
+            packet?.Clear();
             packet = null;
-            previous_packet.Clear();
+            previous_packet?.Clear();
             previous_packet = null;
         }
     }

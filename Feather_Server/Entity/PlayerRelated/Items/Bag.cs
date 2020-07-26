@@ -113,18 +113,6 @@ namespace Feather_Server.PlayerRelated
             return true;
         }
 
-        public string fullBagToHex()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            foreach (var item in itemDict)
-            {
-                sb.Append(item.Value.toHex());
-            }
-
-            // 2b49ac040067b2d80100000001000A0300a8d8010000
-
-            return sb.ToString();
-        }
+        public List<Item> getAllItems() => this.itemDict.Values.ToList();
     }
 }

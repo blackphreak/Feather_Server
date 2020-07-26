@@ -14,7 +14,7 @@ namespace Feather_Server
         public static void handle(string cmd)
         {
             var inp = cmd.Split(" ");
-            int heroID;
+            uint heroID;
             Client cli;
 
             switch (inp[0].ToLower())
@@ -34,7 +34,7 @@ namespace Feather_Server
                     Console.WriteLine("    -- Type \"exit\" to exit this mode --");
                     Console.Write("\t[+] Please type the HeroID to send to.\n\tHeroID: ");
 
-                    if (!int.TryParse(Console.ReadLine(), out heroID))
+                    if (!uint.TryParse(Console.ReadLine(), out heroID))
                     {
                         Console.WriteLine($"\t[!] Failed to parse heroID to integer.");
                         Console.WriteLine("\t[!] Exited Give Test Item Mode.");
@@ -128,16 +128,16 @@ namespace Feather_Server
                     Console.WriteLine("    -- Press ENTER or \"s\" after packet to send the packets --");
                     Console.Write("\t[+] Please type the HeroID to send to. (-1 is broadcast)\n\tHeroID: ");
 
-                    if (!int.TryParse(Console.ReadLine(), out heroID))
+                    if (!uint.TryParse(Console.ReadLine(), out heroID))
                     {
                         Console.WriteLine($"\t[!] Failed to parse heroID to integer. Fallback to broadcast mode.");
-                        heroID = -1;
+                        heroID = uint.MaxValue;
                     }
 
                     if (!Lib.clientList.ContainsKey(heroID))
                     {
                         Console.WriteLine($"\t[!] HeroID[{heroID}] is not connected. Fallback to broadcast mode.");
-                        heroID = -1;
+                        heroID = uint.MaxValue;
                     }
 
                     Console.WriteLine("\t[.] Enter the pkt.\n");
@@ -152,7 +152,7 @@ namespace Feather_Server
                         pkt = Console.ReadLine();
                         if (pkt == "" || pkt == "s")
                         {
-                            if (heroID == -1)
+                            if (heroID == uint.MaxValue)
                                 Lib.broadcast(fullPkt.SelectMany(x => x).ToArray());
                             else
                             {
@@ -306,14 +306,14 @@ namespace Feather_Server
                 case "give":
                     if (inp[1] == "item")
                     {
-                        int targetID = int.Parse(inp[2]);
+                        uint targetID = uint.Parse(inp[2]);
                         uint itemID = uint.Parse(inp[3]);
                         uint baseID = 0;
 
                         if (inp.Length == 5)
                             baseID = uint.Parse(inp[4]);
 
-                        cli = Lib.clientList.GetValueOrDefault(targetID, null);
+                        cli = Lib.clientList.GetValueOrDefault(targetID);
 
                         if (cli == null)
                         {

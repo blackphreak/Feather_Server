@@ -5,6 +5,7 @@ using Feather_Server.Entity.PlayerRelated.Items;
 using Feather_Server.Entity.PlayerRelated.Items.Activable;
 using Feather_Server.MobRelated;
 using Feather_Server.Packets;
+using Feather_Server.Packets.Actual;
 using Feather_Server.PlayerRelated;
 using Feather_Server.ServerRelated;
 using System;
@@ -25,6 +26,9 @@ namespace Feather_Server.ServerRelated
         public TcpClient tcp;
         public NetworkStream stream;
         public bool isJoined = false; // in game server
+        /// <summary>
+        /// IP:Port
+        /// </summary>
         public string addrInfo;
         public string accountName;  // Login account
         public Hero hero;
@@ -203,7 +207,7 @@ namespace Feather_Server.ServerRelated
                     hero.ride = null;
 
                     // respawn the player
-                    Lib.broadcast(PacketEncoder.spawnHero(hero, false));
+                    Lib.broadcast(HeroPacket.spawnPlayerNormal(hero));
 
                     // spawn nearby (again, since spawn ride will despawn all existing models) -- also sync the ride models
                     Lib.spawnNearbys(this, hero);
@@ -612,7 +616,7 @@ namespace Feather_Server.ServerRelated
                     hero.ride = null;
 
                     // respawn the player
-                    Lib.sendToNearby(hero, PacketEncoder.spawnHero(hero, false), true);
+                    Lib.sendToNearby(hero, HeroPacket.spawnPlayerNormal(hero).ToArray(), true);
 
                     // also send de-activate ride item (must after spawn player)
                     this.send(PacketEncoder.rideItem(hero,

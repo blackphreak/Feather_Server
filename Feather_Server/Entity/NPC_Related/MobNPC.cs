@@ -1,4 +1,5 @@
-﻿using Feather_Server.Entity.NPC_Related;
+﻿using Feather_Server.Entity;
+using Feather_Server.Entity.NPC_Related;
 using Feather_Server.Packets.PacketLibs;
 using System;
 
@@ -6,13 +7,13 @@ namespace Feather_Server.MobRelated
 {
     public class MobNPC : NPC
     {
-        public int nameID;
-        public int level;
+        public uint nameID;
+        public uint level = 0;
 
-        protected MobNPC(int entityID, int modelID)
+        protected MobNPC(uint entityID, uint modelID, FormatString fs = null) : base(entityID, modelID, fs)
         {
-            base.entityID = entityID;
-            base.modelID = modelID;
+            if (fs == null)
+                base.FormatString = new FormatString(EFormatString.TEMPLATE_ENTITY_NAME_ID_LV, nameID, level);
         }
     }
 }

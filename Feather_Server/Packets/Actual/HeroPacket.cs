@@ -34,7 +34,7 @@ namespace Feather_Server.Packets.Actual
             p.toFragment_HeroInfos(ref stream);
 
             /* JS: Desc[Player Name] */
-            stream.writeString(Lib.padWithString(Lib.toHex(Lib.gbkToBytes(p.heroName)), "20", 16 * 2));
+            stream.writeString(p.heroName.PadRight(16, ' '));
 
             return stream.pack();
         }
@@ -57,9 +57,135 @@ namespace Feather_Server.Packets.Actual
             stream.writeDWord(p.heroID);
 
             /* JS: Desc[Player Name] */
-            stream.writeString(Lib.padWithString(Lib.toHex(Lib.gbkToBytes(p.heroName)), "20", 16 * 2));
+            stream.writeString(p.heroName.PadRight(16, ' '));
 
             return stream.pack();
+        }
+
+        public static PacketStreamData setWindowTitle(Hero p)
+        {
+            return new PacketStream()
+                /* JS_D: Desc[Set Window Title] */
+                .setDelimeter(Delimeters.SELF_SET_WINDOW_TITLE)
+                /* JS: Desc[HeroID] */
+                .writeDWord(p.heroID)
+                /* JS: Desc[Hero Name] */
+                .writeString(p.heroName)
+                .pack();
+        }
+
+        public static PacketStreamData mapInfo(Hero p)
+        {
+            return new PacketStream()
+                /* JS_D: Desc[Map Info] */
+                .setDelimeter(Delimeters.SELF_HERO_MAP_INFO)
+                /* JS: Desc[SubCate Byte 27] */
+                .writeByte(0x27)
+                /* JS: Desc[Map ID] */
+                .writeWord(p.map)
+                /* JS: Desc[Map ID] */
+                .writeWord(p.map)
+                /* JS: Desc[Loc X] */
+                .writeWord(p.locX)
+                /* JS: Desc[Loc Y] */
+                .writeWord(p.locY)
+                /* JS: Desc[Map ID] */
+                .writeWord(p.map)
+                /* JS: Desc[Padding?] */
+                .writePadding(2)
+                .pack();
+        }
+
+        public static PacketStreamData locationSync(Hero p)
+        {
+            // sz    heroID-- ???? ???? X--- Y--- f- --
+            // 0f 67 34271600 6c39 9b12 6000 9e00 34 00
+            return new PacketStream()
+                /* JS_D: Desc[Hero Location Sync] */
+                .setDelimeter(Delimeters.HERO_LOCATION_SYNC)
+                /* JS: Desc[entityID] */
+                .writeDWord(p.heroID)
+                /* JS: Desc[Time] */
+                .writeDWord(Lib.timeGetTime())
+                /* JS: Desc[LocX] */
+                .writeWord(p.locX)
+                /* JS: Desc[LocY] */
+                .writeWord(p.locY)
+                /* JS: Desc[Facing] Fn[eFacing] */
+                .writeString(p.facing.ToString())
+                .pack();
+        }
+
+        public static PacketStreamData setCH(Hero p)
+        {
+            return new PacketStream()
+                .setDelimeter(Delimeters.SELF_HERO_CRIT_HIT_RATE)
+                .writeDWord(0x64)
+                .pack();
+        }
+
+        public static PacketStreamData setNumbersB(Hero p)
+        {
+            return new PacketStream()
+                .setDelimeter(Delimeters.SELF_HERO_AMOUNT2)
+                .writePadding(32)
+                .writeWord(0x64)
+                .writePadding(17)
+                .pack();
+        }
+        
+        public static PacketStreamData setNumbersA(Hero p)
+        {
+            return new PacketStream()
+                .setDelimeter(Delimeters.SELF_HERO_AMOUNT)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .writeDWord(0x64)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .writeDWord(0x64)
+                .writeDWord(0x640)
+                .writeDWord(0x640)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .pack();
+        }
+        
+        public static PacketStreamData setAttributes(Hero p)
+        {
+            return new PacketStream()
+                .setDelimeter(Delimeters.SELF_HERO_ATTRIBUTES)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeDWord(1000)
+                .writeWord(1000)
+                .writeWord(1000)
+                .writeWord(1000)
+                .pack();
+        }
+        
+        public static PacketStreamData setGifts(Hero p)
+        {
+            return new PacketStream()
+                .setDelimeter(Delimeters.SELF_HERO_GIFTS)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .writeWord(0x64)
+                .pack();
         }
     }
 }

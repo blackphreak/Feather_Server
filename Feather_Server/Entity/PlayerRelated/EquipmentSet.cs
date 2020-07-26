@@ -1,4 +1,5 @@
-﻿using Feather_Server.PlayerRelated.Items;
+﻿using Feather_Server.Packets;
+using Feather_Server.PlayerRelated.Items;
 using System.Collections.Generic;
 
 namespace Feather_Server.PlayerRelated
@@ -78,16 +79,16 @@ namespace Feather_Server.PlayerRelated
             return equips.GetValueOrDefault(slot);
         }
 
-        public string toModelHex()
+        public void toFragment(ref PacketStream stream)
         {
-            return new HeroModel(
+            new HeroModel(
                 equips.GetValueOrDefault(EquipmentSlot.MASK),
                 equips.GetValueOrDefault(EquipmentSlot.HAT),
                 equips.GetValueOrDefault(EquipmentSlot.WINGS),
                 equips.GetValueOrDefault(EquipmentSlot.BODY),
                 equips.GetValueOrDefault(EquipmentSlot.TAIL),
                 (WeaponItem)equips.GetValueOrDefault(EquipmentSlot.WEAPON)
-            ).toModelHex();
+            ).toFragment(ref stream);
         }
     }
 }

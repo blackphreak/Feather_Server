@@ -3,6 +3,7 @@ using Feather_Server.Packets.Actual;
 using Feather_Server.Packets.PacketLibs;
 using Feather_Server.Packets.Utils;
 using Feather_Server.ServerRelated;
+using System;
 
 namespace Feather_Server.Packets
 {
@@ -41,7 +42,62 @@ namespace Feather_Server.Packets
         {
             var stream = new PacketStreamData();
             stream += LoginPacket.loginSuccess();
+            stream.AddRange(new byte[] { 0x07, 0x3d, 0x2f, 0xce, 0xe4, 0xca, 0xbf, 0x00 }); // TODO: give them a name?
+            stream.AddRange(new byte[] { 0x03, 0x49, 0x02, 0x00 });
+            stream.AddRange(new byte[] { 0x04, 0x5a, 0x01, 0x00, 0x00 });
+
+            // 5. lastLoginRecord
+            var cli = Lib.clientList.GetValueOrDefault(hero.heroID);
+            if (cli == null)
+                throw new System.Exception($"Failed to get client object by heroID.\n    heroID[{hero.heroID}]");
+
+            // TODO: replace placeholder, insert login record to database
+            stream += LoginPacket.lastLoginRecord(true, "{Placeholder}", cli.addrInfo);
+            stream += LoginPacket.lastLoginRecord(false, DateTime.Now.ToString("u")[..^1], cli.addrInfo);
+
+            // 6. game notice board
+            //stream += 
+
+
             stream.AddRange(new byte[] { 0x07, 0x3d, 0x2f, 0xce, 0xe4, 0xca, 0xbf, 0x00 });
+            stream.AddRange(new byte[] { 0x04, 0x3d, 0x91, 0x00, 0x00 });
+
+            // 9. player bag
+            foreach (var item in hero.bag.getAllItems())
+                stream += BagPacket.addBagItem(item);
+
+            stream.AddRange(new byte[] { 0x07, 0x49, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00 });
+
+            stream += HeroPacket.mapInfo(hero); // 3c11 27 ...
+            stream += HeroPacket.spawnPlayerAnimated(hero);
+
+            // omitted 13. ~ 16.
+            // TODO: add back 13 ~ 16
+
+            // 17. getHeroFullInfo
+            #region getHeroFullInfo
+            // set window title
+            stream += HeroPacket.setWindowTitle(hero);
+            // hero title list ...
+            // TODO: title list
+
+            // hero gifts
+            stream += HeroPacket.setGifts(hero);
+            // hero attributes
+            stream += HeroPacket.setAttributes(hero);
+            // some numbers ...
+            stream += HeroPacket.setNumbersA(hero);
+            // some more numbers ...
+            stream += HeroPacket.setNumbersB(hero);
+
+            // set criticate hit rate
+            stream += HeroPacket.setCH(hero);
+
+            // set bag slot
+            stream += BagPacket.setBagSlot(hero.bag);
+            #endregion
+
+            stream.AddRange(new byte[] { 0x09, 0x81, 0x24, 0x5c, 0x0c, 0x00, 0x00, 0x00, 0x01, 0x00 });
 
             return stream;
         }

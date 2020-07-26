@@ -10,9 +10,9 @@ namespace Feather_Server.MobRelated
 {
     public class Mob_Duck : MobNPC
     {
-        public Mob_Duck(int entityID) : base(entityID, 410011) // 0x6419B
+        public Mob_Duck(uint entityID, byte level) : base(entityID, 410011) // 0x6419B
         {
-
+            base.level = level;
         }
     }
 }

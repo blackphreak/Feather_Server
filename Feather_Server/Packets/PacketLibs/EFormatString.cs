@@ -19,7 +19,16 @@ namespace Feather_Server.Packets.PacketLibs
         /// 1: DataTime, 2: IP
         /// </para>
         /// </summary>
-        LAST_LOGIN_MESSAGE = 0x0F26,
+        LAST_LOGOUT_MESSAGE = 0x0F25,
+        /// <summary>
+        /// Format_CHS: 您现在是 $1 从 $2 连线。`N
+        /// <br />
+        /// Format_ENG: You are logged in from $2 at $1
+        /// <para>
+        /// 1: DataTime, 2: IP
+        /// </para>
+        /// </summary>
+        CURRENT_LOGIN_MESSAGE = 0x0F26,
 
         #endregion
 
