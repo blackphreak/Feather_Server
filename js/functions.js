@@ -104,12 +104,19 @@ var eFacing = (gbk) => {
 };
 
 var eRGB565 = (hex) => {
-    let r = (hex & 0xF800) << 6,
-        g = (hex & 0x7E0) << 4,
-        b = (hex & 0x1F) << 4,
+    let r = (hex & 0xF800) << 8,
+        g = (hex & 0x7E0) << 5,
+        b = (hex & 0x1F) << 3,
         c = (r + g + b).toString(16).padStart(6, "0");
+
+    if (c == "000000")
+        return "- None -";
     
-    return `<div style="height: 30px; width: 60px; background: #${c}; display: inline-block"></div>`;
+    return `<div style="height: 19.4px; width: 60px; background: #${c};"></div>`;
+}
+
+var eHPBar = (int) => {
+    return int * 2 + "%";
 }
 
 var db_FormatString = (inp, cols = ["title"]) => {
