@@ -103,6 +103,15 @@ var eFacing = (gbk) => {
     return `<div style="transform: rotate(${parseInt(lib.parseGBK(gbk)) * 45}deg);display: inline-block;">↙</div>`;
 };
 
+var eRGB565 = (hex) => {
+    let r = (hex & 0xF800) << 6,
+        g = (hex & 0x7E0) << 4,
+        b = (hex & 0x1F) << 4,
+        c = (r + g + b).toString(16).padStart(6, "0");
+    
+    return `<div style="height: 30px; width: 60px; background: #${c}; display: inline-block"></div>`;
+}
+
 var db_FormatString = (inp, cols = ["title"]) => {
     let db = formatstringDB[inp] || false;
     if (!db)
