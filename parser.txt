@@ -1,0 +1,2173 @@
+// Term define:
+// HeroUID: player's hero id
+// PlayerUID: entity id (entity object id) -- expected as "player type"
+// EntityUID: entity id (entity object id)
+
+//<infos>
+//SameAs[ItemDescFamily]: 31,ab,4c03
+//</infos>
+
+<parser>
+Packet[Set AES Secret]:4901
+Data1:$4
+AES Key:$32:T[raw]
+Data3:$4
+Data4:$1
+pack
+</parser>
+
+<parser>
+Fragment[HeroBasicInfo]
+EntityUID:$4
+LocX:$2
+LocY:$2
+Facing:$1
+State:$1
+Act:$1
+Icon:$2
+Gender:$2
+Useless (Pls Keep Zeros):$4
+Hair Style:$2
+Hair Dye:$2
+Wings:$2
+Wings Dye:$2
+Data14:$2
+Data15:$2
+</parser>
+
+<parser>
+Fragment[HeroModel]
+Hat:$2
+Hat Dye:$2
+Body:$2
+Body Dye:$2
+Data20:$2
+Data21:$2
+Mask:$2
+Mask Dye:$2
+Tail:$2
+Tail Dye:$2
+Weapon:$2
+Weapon Color:$2:Fn[eRGB565]
+Weapon Effect Color:$2:Fn[eRGB565]
+</parser>
+
+<parser>
+Fragment[FormatString]
+FormatStringID:$4:Fn[parseFS]
++ REP
+Param <index>:param
+- REP
+</parser>
+
+<parser>
+// @ 4CA528
+// Sample: __ 690a 43664601 9e00 8900 02 83 01 0000 1227 0000727a 0500 0872 0700 0b75 0700 0b75 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 3d06 0000 4f7c 00 00 32 04 00000000 00 91b00a00 64346a0600 6428000000 00 // 天羽守卫分身(40级)
+// Sample: __ 690a e3d65101 fe00 a600 02 02 01 ec03 f92a 00000000 e903 e780 0304 089a 0304 c84b 1d04 6a46 ef03 6b39 0000 0000 0000 0000 0700 0000 400c 0000 1ff8 05 05 21 00 1d6f0000 bbaacdd3d4dacac03120202020202020 00
+// Order: [690a>a214>b9a201>b9a901>a225>6f>83>a20d>956802]
+Packet[Spawn Hero - Without Animation]:690A
++ Fragment[HeroBasicInfo]
++ Fragment[HeroModel]
+Rebirth0:$1 // same
+Rebirth1:$1 // same
+Health Bar:$1:Fn[eHPBar]  // unit: percentage, max value: 0x30% (50%)
+Attack Speed:$1 // inh/user/user.c
+HeroUID:$4
++ SubCate
+pack
+
+// Sample: __ 690a dedf0d00 E700 7000 02 0201 0100 1127 00000000 0200 a4aa 0000 0000 0000 0000 1400 0000 1600 0000 0000 0000 0000 0000 0200 0000 3e08 0000 df7b 0000 30 00 9d360000 c0adcbb9c0d7b6c8202020202020202000
+SubCate[Normal Hero]
+Hero Name:$gbk
+
+// Sample (Hero Like Special Pet): __ 690a c47e1600 ec00 af00 03 810f 0000 0000 00000000 0400 9ad6 0800 4a62 0800 4a62 0d00 0000 0000 0000 0000 0000 0400 0000 0000 0000 3d0b 088a 00f8 0000 32 02 00000000 00 b6ae0a00 73020000004e42 730a000000d8af417265 73d8bcc1e8 00
+// FSID should be: b6ae0a00 (0x0aaeb6)
+SubCate[Hero Like Special Pet]:00
++ Fragment[FormatString]
+Hero Name:$gbk
+</parser>
+
+<parser>
+// Sample: __ 690b e3060000 E300 6F00 01 0100 0100 1127 00000000 0100 e780 00000000 00000000 0800 0000 1800 0000 0000 0000 0000 0000 0000 0000 3d01 0000 0000 0000 31 1a5c0c00 01 0200 e3060000 bcd3d0fd303520202020202020202020 00
+//            690b c4a0fd00 8500 6400 08 0201 0100 1127 00000000 0800 2f6a 0800e490 0800e490 e903 9b42 0700 9e43 0000 0000 0000 0000 0700 0000 3d08 0000 bffc 0202 31 1a5c0c00 01 0200 a7200000 d1ccd3eaa4a320202020202020202020 00
+Packet[Spawn Hero - With Animation]:690B
++ Fragment[HeroBasicInfo]
++ Fragment[HeroModel]
+Data26:$1
+Data27:$1
+Health Bar:$1:Fn[eHPBar]  // unit: percentage, max value: 0x30% (50%)
+Ani. ID:$4:Fn[eAnimation]
+Ani. Enable:$1:Fn[eTri,Disable,Enable]            // 0x00: disable (do not run the animation), >=0x01: enable (run the animation)
+Data31:$1
+Data32:$1
+HeroUID:$4
+Hero Name:$gbk
+pack
+</parser>
+
+<parser>
+// Sample: __ 6980 d3690000 e300 8500 02 80 01 79170000 00 00 00000000 00 6acb1000 645ac00400 00 // 幸运兑换使者
+// Sample: __ 6980 b8c43b00 eb00 8a00 03 80 01 121b0600 00 00 00000000 00 66420f00 646cc00400 00 // 古树妖 (新年使者 - 嘉年)
+// Sample: __ 6980 c5680000 d200 7800 08 80 01 a81f0000 00 00 00000000 00 6acb1000 642fc00400 00
+// Sample: __ 6980 1c690000 d400 8100 03 80 01 69690600 00 00 00000000 00 6acb1000 64a5bf0400 00
+// Sample: __ 6980 f1291f01 d700 f000 04 82 01 9b690600 32 05 00000000 00 6c420f00 649b690600 6435150000 00 // 草原护卫宝宝
+// Sample: __ 6980 566c0000 b500 d800 02 84 01 9c690600 32 04 00000000 00 91b00a00 64a6690600 641a000000 00 // 精英护卫队长(26级)
+// Sample: __ 6980 237e8800 c800 e100 05 84 01 9b690600 32 03 00000000 00 91b00a00 64a5690600 641c000000 00 // 精英草原护卫(28级)
+// Sample: __ 6980 1a97d300 d700 a000 00 80 01 51140000 00 00 00000000 00 66420f00 6450c00400 00 // 陶元信 - 下凡天将 (打大量 boss 活動)
+// Sample: __ 6980 b6a91d01 d600 9600 01 82 01 83b80600 32 05 00000000 00 91b00a00 6483b80600 6431000000 00 // 小彩蛋龟(49级)
+// Sample: __ 6980 0ce53301 d900 9200 01 82 01 84b80600 32 05 00000000 00 91b00a00 6484b80600 6431000000 00 // 彩蛋龟
+// Sample: __ 6980 a5690000 d700 8c00 08 80 01 ed1c0000 00 00 00000000 00 6acb1000 64f20d0500 00 // 饰物店老板 @ 困龍關
+// Sample: __ 6980 90690000 ed00 be00 04 80 01 7a170000 00 00 00000000 00 66420f00 649abf0400 00 // TYC - 宠物医生
+// Sample: __ 6980 90690000 ed00 be00 04 80 01 7a170000 00 00 00000000 00 66420f00 649abf0400 00 // TYC - 衙门捕头
+// Sample: __ 6980 6b690000 ff00 ab00 04 80 01 22150000 00 00 00000000 00 66420f00 6428bf0400 00 // TYC - car
+// Sample: __ 6980 14690000 0801 a000 04 80 01 27150000 00 00 00000000 00 66420f00 64e2be0400 00 // TYC - healer
+// Sample: __ 6980 35690000 f000 9d00 01 80 01 121b0600 00 00 00000000 00 66420f00 646fc00400 00 // TYC - 招魂使者 (evt NPC)
+// Sample: __ 6980 d0a04f01 f000 a200 07 81 0f 752f0700 18 02 00000000 00 b6ae0a00 7308000000cdfab2c6cdfab2c6 730a000000c7e9d2e5d8bcbddcb8e7 00 // Pet - 旺财旺财(情义丶杰哥)
+//         __ b9a3 d0a04f01 01 00        // ?
+//         __ 40   d0a04f01 53fd8a09 0f 00 // do act
+// Sample: __ 6980 12585801 9b00 7800 02 83 01 bc7f0700 32 04 00000000 00 91b00a00 64e2810700 6491000000 00 // 界門 - 火元素 - 怪仔 - 火巨灵(145级)
+// Sample: __ 6980 c9575801 8000 6100 08 83 01 752f0700 32 04 00000000 00 91b00a00 64e0810700 648c000000 00 // 界門 - 火元素 - 怪仔 - 灰烬猫(140级)
+// Sample: __ 6980 d4575801 8000 5e00 01 83 01 5be00600 32 04 00000000 00 91b00a00 64e1810700 648c000000 00 // 界門 - 火元素 - 怪仔 - 烈焰牛(140级)
+// Sample: __ 6980 50535801 8000 5e00 08 83 01 7f570700 32 04 00000000 00 91b00a00 64ff7f0700 648c000000 00 // 界門 - 火元素 - 怪仔 - 烈焰牛(140级)
+// Sample: __ 6980 c43e3801 7000 9000 06 84 01 2ae00600 32 04 00000000 00 91b00a00 6434e00600 6440000000 00 // elite mob (map 還三)
+//         __ 7a05 c43e3801 6300000032520000000000000000 00 // modifier for elite mob (model color)
+// Order[Elite Mob]: [6980>7a05]
+// Sample[boss][6980>66]: __ 6980 cf465801 a400 7400 03 83 01 d71a0600 32 0a 00000000 00 91b00a00 6460650600 646e000000 00 // boss (花仙)
+//                        __ 66   cf465801 800080 00 00 // update entity name color
+// Sample[pet][6980>b9a3]: __ 6980 e4624800 e500 8900 01 81 0f 9c410600 0d 02 00000000 00 b6ae0a00 730700000034bbb7c9eed6aa 7304000000e9aab1a6 00 // pet 波波 -- 4环深知(楠宝)
+// Sample[pet][....>b9a3]: __ b9a3 e4624800 01 00 // [attack mode maybe? 1 = peace]
+// Sample: __ b9a3 83634800 01 00
+// [+] [1623893891.247066] [55054<] Data['0678e436d30000', '0678965f370100', '0678479bc90000', '06789b61ed0000', '0678fc7dc70000', '06786b9bc90000', '0c7f0165b80400004800540000', '0c7f0166b80400005c00690000', '0c7f0167b80400002800500000', '0c7f0168b80400008800960000', '0c7f0169b804000030003c0000', '0c7f016ab8040000a500b40000', '0c7f016bb80400007000780000', '0c7f016cb80400005000540000', '0c7f016db804000040004d0000', '0c7f016eb80400002f003c0000', '0c7f016fb80400002d00390000', '0c7f0170b804000030003c0000', '2769803659370175008400068201f64106003206000000000091b00a0064f6410600640d00000000', '2769804659370174008500078201f64106003206000000000091b00a0064f6410600640e00000000', '276980b29ac9006e007b00078201f64106003206000000000091b00a0064f6410600640d00000000', '276980f657ff0070007d00068201f54106003206000000000091b00a0064f5410600640e00000000', '27698051602f0174007c00088201f54106003206000000000091b00a0064f5410600640d00000000', '276980cb2bd40076006e00028201f54106003206000000000091b00a0064f5410600640b00000000', '246980d0de3601700073000080019e070700000000000000b9d6ceefcfc8b7e6b6d3b3a400', '0f672b5237010bf5450982007e003400'] I[594]
+// [+] [1623893891.963969] [55054<] Data['276980a9dbc9006d006f00018201f54106003206000000000091b00a0064f5410600640a00000000', '0f67a9dbc90012f545096d006f003100', '0f675c34370112f54509840080003600', '0f674659370112f54509740085003100'] I[595]
+Packet[Spawn NPC]:6980
+EntityUID:$4
+LocX:$2
+LocY:$2
+Facing:$1:Fn[eFacing]
+NPC Cate:$1:Fn[eNPCCate]
+Animate Time (sec):$1
+ModelID:$4:R[NPC,name,name2]
+Health Bar:$1
+Entity Action Rate (Max 0xFF):$1
+unk:$4
++ SubCate
+pack
+
+SubCate[Direct GBK Named]
+Name:$gbk
+
+SubCate[Named with ID - 1 Name]
+pad-1
+Name:$4:R[NPC,name,name2]
+
+// Sample: __ 6980 31690000 b000 9a00 01 80 01 ee130000 00 00 0000 0000 00 66420f00 6432bf0400 00
+// Sample: 
+SubCate[Named with ID - 2 Names]
+pad-1
+FormatStringID:$4:Fn[parseFS] // value: 66420f00 (0x0f4266)
+NameID:64$4:R[NPC,name,name2]
+
+SubCate[Named with ID, GBK]
+pad-1
+FormatStringID:$4:Fn[parseFS]
+NameID:64$4:R[NPC]
+Owner Name:73$4$gbk
+
+SubCate[Named with ID, LV]
+pad-1
+FormatStringID:91b00a00:Fn[parseFS]
+NameID:64$4:R[NPC]
+Level:64$4
+
+SubCate[Named with ID, FSID]
+pad-1
+FormatStringID:6c420f00:Fn[parseFS]
+NameID:64$4:R[NPC]
+Sub-Name:64$4:R[FS]
+
+SubCate[Named with GBK, GBK]
+pad-1
+FormatStringID:$4:Fn[parseFS]
+Pet Name:73$4$gbk
+Owner Name:73$4$gbk
+
+</parser>
+
+<parser>
+// Sample: __ 6981 83634800 e700 7f00 01 81 01 9c690600 18 1a5c0c00 01 02 02 00000000 00 b6ae0a00 73 0a000000 d0a1d0a1c0b6beabc1e9 73 06000000 d1ccd3eaa4a3 00 // TODO: wtf? why pet hv 2 different packet type lol
+// Sample: __ 6981 10270000 ea00 6f00 07 81 01 257f0700 32 1a5c0c00 01 02 02 00000000 00 b6ae0a00 73 06000000 b2f8cbc0c4e3 73 06000000 bbb9cbc0b9ed 00
+Packet[Spawn Entity With Animation]:6981
+
+</parser>
+
+<parser>
+// Sample: __ 7a05 c43e3801 6300 0000 3200 0000 0000 0000 0000 00 // modifier for elite mob (model color)
+Packet[Entity Model Color Modifier]:7a05
+EntityUID:$4
+unk:$2 // keep it as 0x0063 for elite mob
+unk:$2
+Color:$2:Fn[eRGB565] // big-end 3200 == 0x3200
+unk:$2
+unk:$2
+unk:$2
+unk:$2
+pack
+</parser>
+
+<parser>
+// Sample: __ 2101 a20c0000 7303000000d0fd31 6409370000 00
+// Sample: __ 2101 f10a0000 64 b48a0100 00
+// Sample: __ 2101 800d0000 00 // you cannot exchange to urself
+Packet[Chat - Nameless Notice]:2101
++ Fragment[FormatString]
+pack
+</parser>
+
+// !REVIEW! further analyse: Add friend:
+// __ 4601 09370000 0000 01002900 cee4cabf 202020202020202020202020d0fd31 00
+// __ 2000 09370000 00
+// __ 4609 09370000 00
+// __ 21 01 9e0c0000 7303000000d0fd31 00
+// __ 460f 09370000 0000000000000000 f7150000 00
+// __ 21 01 a20c00007303000000d0fd31 6409370000 00
+// 
+// gp1 + __ 21 01 9e0c0000 7303000000d0fd31 00
+// gp1 + __ 460f 09370000 0000000000000000 f7150000 00
+
+<parser>
+Packet[Friend List]:46
++ SubCate
+pack
+
+// Sample: __ 46 01 09370000 0000 0100 2900 cee4cabf 2020 20202020202020202020 d0fd31 00
+// Sample: __ 46 01 ed060000 0000 0200 7800 bcc0caa6 2020 b1b4bfcbbdd632323142eb75b5b0d7d0d1a9b8e2 00 # x <00> 祭师  贝克街221B雞蛋仔雪糕
+// Sample: __ 46 01 9e050000 0000 0200 3200 cee4cabf 2020 c8edd1a9b8e2202020204fd3a3ccd2cde8d7d34f 00 # 2 <00> 武士  软雪糕    O樱桃丸子O
+SubCate[Friend Info]:01
+HeroUID:$4
+pad-2
+Gender:$2:Fn[eIf,==0x01,Boy,==0x02,Girl]
+Level:$2
+Role:$4:Fn[parseGBK]:T[raw]
+Spaces:2020 // seperator
+Tribe+Name:$gbk
+
+// Sample: __ 46 08 09370000 00
+SubCate[Friend Offline]:08
+HeroUID:$4
+
+// Sample: __ 46 09 09370000 00
+SubCate[Friend Online]:09
+HeroUID:$4
+
+// Sample: __ 46 0f 59050000 db010000 db010000 f6150000 00
+SubCate[Friend Intimacy (親密度)]:0f
+HeroUID:$4
+Current:$4
+Max In History:$4
+FSID:$4:R[FS]
+</parser>
+
+<parser>
+// Sample: __ 5d01 2c380c00 73 0a000000 b2eeb2bbb6e0cfc8c9fa 64 5e060000 00 // `+C0xff0000`-C您将$1($2)救醒，他将决定是否接受您的救助。`=C
+Packet[Chat Headerless - Format String Only]:5d01
++ Fragment[FormatString]
+pack
+</parser>
+
+<parser>
+Packet[Alert Box]:2102
++ Fragment[FormatString]
+pack
+</parser>
+
+<parser>
+Packet[Progress Bar]:5a
++ SubCate
+pack
+
+// Sample: __ 5a 01 01 00
+// Event: PlayerMove, ActionComplete
+SubCate[Done]:01
+isSuccess:$1:Fn[eBool,Success,Fail]   // 01 (true): success, 00 (false): fail
+
+// Sample: __ 5a 02 0a00 d5070000 6401000000 00
+// Sample: __ 5a 02 0500 b31d0000 00 // 騎寵召喚中...
+// Event: ActionStart
+SubCate[Start]:02
+Time (sec):$2
+FormatStringID:$4:R[FS]
++ REP
+Param <index>:param
+- REP
+</parser>
+
+<parser>
+//                                           RGB  ?    ?
+// Sample: __ 2e deadbeef e700 7000 C98A0100 f88f 0000 0000 C98A0100 00 // 
+// Sample: __ 2e fe473601 8c00 6e00 04270200 0100 0000 0000 04270200 00 // 
+// Sample: __ 2e 5d703801 4100 7c00 4a4a0200 0000 0000 0000 b38a0100 00 // (model: 神秘宝箱 150090) 月宫宝箱 101043
+//          0  1  2 3 4 5  6 7  8 9  A B c D  E F 1011 1213 14151617
+Packet[Spawn DropItem]:2e
+EntityUID:$4  // new an EntityUID for that dropitem
+LocX:$2
+LocY:$2
+Item ModelID:$4:R[ITEM]
+Item Color (By RGB/Quality):$2:Fn[eDropNameColor]
+Data5:$2
+Data6:$2
+Item DescID:$4:R[ITEM]
+pack
+</parser>
+
+<parser>
+// Sample: __ 2b ea152c00 01 BC2E0200 6300 01 04 00 00 00 BC2E0200 00
+//         __ 2b ea152c00 01 BC2E0200 6300 01 04 00 00 00 BC2E0200 00
+//          0  1  2 3 4 5  6  7 8 9 A  B C  D  E  F 10 11 12131415 
+Packet[Set Item In Bag]:2b
+ItemUID:$4
+Bag Position:$1
+Item ModelID:$4:R[ITEM]
+Stack:$2
+Item Type:$1:Fn[eItemType]
+Quality:$1:Fn[eQualityColor]
+Lv. Req.:$1
+Equip Desc Index:$1:Fn[eEquipDescIndex]
+FormatDeterminePoint:$1 // 00: use FormatString
+Item DescID:$4:R[ITEM]
+pack
+</parser>
+
+<parser>
+// Sample: __ 7f01 65 a7200000 f700 fa00 00
+// Sample: __ 7f01 66 a7200000 fd00 ff00 00
+// Sample: __ 7f01 67 a7200000 1e00 4f00 00
+// Sample: __ 7f01 68 a7200000 fd00 ff00 00
+// Sample: __ 7f01 69 a7200000 6100 6400 00
+// Sample: __ 7f01 6a dedf0d00 5400 5400 00
+// Sample: __ 7f01 69 a7200000 6100 6400 00
+// Sample: __ 7f01 6b a7200000 3a01 3b01 00
+// Sample: __ 7f01 6c a7200000 b300 b400 00
+// Sample: __ 7f01 6d a7200000 3900 3c00 00
+// Sample: __ 7f01 6e a7200000 3900 3c00 00
+// Sample: __ 7f01 6f a7200000 3a00 3c00 00
+// Sample: __ 7f01 70 a7200000 3900 3c00 00
+// Order: [69*>a214>b9a2>62>b9a9>7f01] // TODO: check packet order (only keep necessary)
+Packet[Update Hero Model (Style Only)]:7f01
+Equip Index:$1:Fn[eEquipPos]
+EntityUID:$4
+ModelID-1:$2
+ModelID-2:$2
+pack
+</parser>
+
+<parser>
+// Sample: __ a60a 01 deadbeef 00000000 00
+Packet[De-/Activate Bag Item]:a60a
+isActive:$1:Fn[eBool,Activate,Deactivate]  // 01 (true): Activate, 00 (false): Deactivate
+ItemUID:$4
+Ticks:$4       // seems useless?
+pack
+</parser>
+
+<parser>
+// Sample: __ 6f dedf0d00 165c0c00 0a 01 01 00 // iced
+// Sample: __ 6f c4a0fd00 b7a60c00 08 02 02 00 // leader flag animation (head)
+// Sample: __ 6f 3708c100 29230000 01 02 02 00 // team shortcut icon flashing (shortcut key: T)
+// Sample: __ 6f 67083301 115c0c00 01 02 02 00 // slow walk buff
+// Sample: __ 6f 67083301 185c0c00 01 02 02 00 // dizzy
+// Sample: __ 6f 08063201 185c0c00 01 02 00 00 // foreverSleep
+// Sample: __ 6f 67083301 6f000000 0a 02 02 00 // fake die
+// Sample: __ 6f 67083301 215c0c00 02 02 21 5c0c0002 02 01 00 // respawn after & stand up (after fake die)
+// Sample: __ 6f 93f85001 70d10c00 02 01 02 00 // from 840044 to 840054
+// TODO: check for aniID: 0x00002329, 0x02000c5c
+Packet[Entity Effects]:6f
+EntityUID:$4
++ SubCate
+
+// Sample: __ 6f cf465801 d78d0102 01 00
+SubCate[No Layer]
++ REP
+Ani. ID:$4:Fn[eAnimation]
+Ani. Duration (sec):$1
+- REP
+pack
+
+SubCate[With Layer]
++ REP
+Ani. ID:$4:Fn[eAnimation]
+Ani. Duration (sec):$1
+Ani. Layer:$1:Fn[eAniLayer]
+Ani. Mode:$1:Fn[eAniMode]
+- REP
+pack
+</parser>
+
+<parser>
+// Sample: __ 4f 38007f00 1a5c0c00 01 02 01 00
+// Sample: __ 4f a6007500 3aaa0c00 01 02 3aaa0c00 01 02 01 00 // !REVIEW!
+Packet[Play Animation On Entity]:4f
+EntityUID:$4
+Ani. ID:$4:Fn[eAnimation]
+Ani. Duration (sec):$1
+Ani. Layer:$1:Fn[eAniLayer]
+Ani. Mode:$1:Fn[eAniMode]
+pack
+</parser>
+
+<parser>
+// Sample: __ 81 743d0800 0807 01 00 // 0x708 (30mins buff)
+// Sample: __ 81 245c0c00 00 00 40d10c00 40 42 01 00 // 0x0c5c24: skill id, 40d10c00: cf buff, unk, pkt: 8124 // TODO: check usage // Src: blToTYC.json
+Packet[Self (Received Client) Buff]:81
+SkillID:$4:R[SKILL,name]
+Buff Duration (sec):$2
+Buff Pos:$1:Fn[eTri,Row2,Row1]   // 00: Row2, >=01: Row1
+pack
+</parser>
+
+<parser>
+// Sample: __ 83 dedf0d00 d83d0800 05 00 00
+// Sample: __ 83 e4d75601 bcc80700 40d10c00 bf930800 01 01 00
+// Sample: __ 83 93f85001 40d10c00 bf930800 01 01 00
+Packet[Entity Buff]:83
+EntityUID:$4
++ REP
+SkillID:$4:R[SKILL,name]
+- REP
+Countdown (sec.):$1
+Buff Pos:$1:Fn[eIf,==0,2nd row,==1,1st row]
+pack
+</parser>
+
+<parser>
+// Sample: __ 2f 5f703801 00
+Packet[DeSpawn DropItem]:2f
+DropItemEID:$4
+pack
+</parser>
+
+<parser>
+// Sample: __ 78 57a35301 00
+// Sample: __ 78 57a35301 06000000 00 // animated entity dead (no despawn)
+// Sample: __ 78 57a35301 03000000 01 02 00 // animated despawn? (entity dead)
+Packet[DeSpawn DropItem/Entity]:78
+EntityUID:$4
++ SubCate
+pack
+
+SubCate[Animated]
+Ani. ID:$4:Fn[eAnimation]
+Ani. Duration (sec):$1
+Ani. Layer:$1:Fn[eAniLayer]
+
+SubCate[Direct Despawn]
+</parser>
+
+<parser>
+// Remark: Sends when (equipment change / skill effect) make the maxHP/maxMP change
+// Event: EquipmentChange, SkillEffect(Buff/De-Buff)
+// Order[Joined Team]: 17>18>01>0a>03>04>1d>29
+// Order[Update Member HP]: 03>04
+Packet[Update Hero Info]:54
++ SubCate
+pack
+
+SubCate[Update Team Info]
+
+// Sample: __ 54 00 a7200000 00
+// Remark: Sends when someone leave team
+// Order[]: __ 43 00 07 00000000 5d310000 7306000000d1ccd3eaa4a3 00 // 1st pkt
+// Order[]: __ 54 00 a7200000 00 // 2nd pkt (teammate's HeroUID)
+SubCate[Additional String Param Info -- (For Previous Pkt - ID Value)]:00
+HeroUID:$4
+
+//         00 01 02 0304 0506 0708090A 0B0C 0D0E 0F10 11
+//                  ???? icon eUID---- locX locY map  --
+// Sample: __ 54 32 0f00 6500 3192e900 5200 6f00 2d01 00 // elite mob
+// Sample: __ 54 32 0f00 6500 9404d700 d200 be00 2d01 00 // elite mob
+// Sample: __ 54 32 0f00 6500 9404d700 d200 be00 2d01 00 // elite mob
+// Sample: __ 54 32 0f00 6700 8f3f5201 bb00 4500 2f01 00 // area boss
+// Sample: __ 54 32 0f00 6600 27a84c01 9600 2a00 2e01 00 // 怪物先鋒隊
+// Sample: __ 54 32 0f00 6600 28a84c01 7200 9e00 2e01 00 // 怪物先鋒隊
+// Sample: __ 54 32 0f00 6600 2ba84c01 5800 a200 2e01 00 // 怪物先鋒隊
+// Sample: __ 54 32 0f00 6600 13a84c01 7b00 aa00 6a00 00 // 怪物先鋒隊
+// Sample: __ 54 32 0f00 7300 cf465801 0000 0000 0000 00 // boss (花仙子 @ 好运岛)
+// Sample: __ 54 32 0f00 6e00 4b6d5801 f600 6b00 9101 00 // boss (大佛 @ 流沙)
+// Trggier: open mob detection skill -> auto update every 5s
+SubCate[Elite Mob Detect Skill - Mob Pos Update]:32
+unk:$2
+Icon On Map:$2
+EntityUID:$4
+LocX:$2
+LocY:$2
+MapID:$2:R[MAP]
+
+// Sample: __ 54 ff 00
+// Remark: Sends when someone leave team
+// Order[]: __ 4300 07 00000000 5d310000 7306000000d1ccd3eaa4a3 00 // 1st pkt
+// Order[]: __ 54 ff 00 // 2nd pkt (current team leader: self, HeroUID is 1630)
+SubCate[Additional String Param Info (For Previous Pkt - SelfID)]:ff
+
+// Sample: __ 54 01 5e060000 01000000 5d b2eeb2bbb6e0cfc8c9fa 00
+// Sample: __ 54 01 5e060000 01000000 5d b2eeb2bbb6e0cfc8c9fa 00
+// Sample: __ 54 01 09370000 01000000 29 d0fd31 00
+// Remark: Sends when someone joined team
+// Order[]: __ 54 01 5e060000 01000000 5d b2eeb2bbb6e0cfc8c9fa 00 // 1st pkt
+// Order[]: __ 43 00 07 00000000 8b310000 730a000000 b2eeb2bbb6e0cfc8c9fa 00 // 2nd pkt (current team leader: self, HeroUID is 1630)
+SubCate[Add Team Member]:01
+HeroUID:$4
+Unk:$4
+MemberType:$1:Fn[eIf,==0x5d,Leader,==0x29,Member]
+Name:$gbk
+
+// Sample: __ 54 02 5e060000 01000000 5d b2eeb2bbb6e0cfc8c9fa 00
+// Remark: Sends when someone leave team
+// Order[]: __ 54 02 5e060000 01000000 5d b2eeb2bbb6e0cfc8c9fa 00 // 1st pkt
+// Order[]: __ 43 00 07 00000000 8b310000 730a000000 b2eeb2bbb6e0cfc8c9fa 00 // 2nd pkt (current team leader: self, HeroUID is 1630)
+// TODO: test Icon ($4) with values: 0x01 (boy) and 0x03E9 (1001, girl)
+SubCate[Remove Team Member]:02
+HeroUID:$4
+Icon:$4
+MemberType:$1:Fn[eIf,==0x5d,Leader,==0x29,Member]
+Name:$gbk
+
+// Sample: __ 54 1d 09370000 01000000 00
+// Sample: __ 54 1d 5e060000 04000000 00
+// TODO: test Unk icon/head? with values: 0x01 (girl, red, long hair) and 0x04 (boy, purple, long hair)
+SubCate[-- Unknown 1d --]:1d
+HeroUID:$4
+Unk:$4
+
+// Sample: __ 54 29 09370000 00 00
+// Sample: __ 54 29 09370000 01 00
+SubCate[Team Member On-/Off-line]:29
+HeroUID:$4
+IsOnline:$1:Fn[eBool,Online,Offline]
+
+// ------------------------------------ ^End of party pkt
+
+// Sample: __ 54 03 dedf0d00 00640000 00680000 00
+// Sample: __ 54 03 5e060000 851b0000 de1c0000 00
+// Sample: __ 54 03 a7200000 53300000 29660000 00
+SubCate[HP]:03
+EntityUID:$4
+Current HP:$4
+Max HP:$4
+
+// Sample: __ 54 04 dedf0d00 00700000 00720000 00
+// Sample: __ 54 04 5e060000 d91b0000 1f1c0000 00
+// Sample: __ 54 04 a7200000 3a060000 76090000 00
+SubCate[MP]:04
+EntityUID:$4
+Current MP:$4
+Max MP:$4
+
+// Sample: __ 54 0a 09370000 0301 8800 6800 00
+SubCate[Location]:0a
+HeroUID:$4
+LocX:$2
+LocY:$2
+Map:$2:R[MAP]
+
+// Sample: __ 54 17 00000000 00
+SubCate[-- Unknown 17 --]:17
+Value:$4
+
+// Sample: __ 54 18 00000000 00
+SubCate[-- Unknown 18 --]:18
+Value:$4
+</parser>
+
+<parser>
+// lsrc[sys/sys/connect.c]: init_user()
+// Order[OnJoinMainServer]: [3da0>3d31>3da1>3d2e>3da2>3da3>3da4>3da5>?3da6>3d8f>3d90>3d1d>74>5300>[6001|55|53]>4b>430a]
+Packet[Set Self Value]:3d
++ SubCate
+pack
+
+// Sample: __ 3d 01 dedf0d00 01 00
+SubCate[Update Player State]:01
+EntityUID:$4
+State:$1:Fn[eBool,NotReady,Ready]        // 01: NotReady, 02: Ready
+
+SubCate[Top Left Hero Name]:04  // max length: 12-eng-char / 6-chs-char
+Name:$gbk
+
+// Trigger: Attacker killed entity[37113201]
+// Sample: __ 3d 02 37113201 01 00 // EID: 37113201
+SubCate[Is Player Dead]:02 // TODO: test: __ 3d 02 37113201 01 00: set die || __ 3d 02 37113201 00 00: set normal
+EntityUID:$4
+Value:$1
+
+SubCate[Vital]:0a          // 體質
+Value:$2
+
+SubCate[Sprite]:0b         // 精神
+Value:$2
+
+SubCate[Intelligence]:0c   // 智力
+Value:$2
+
+SubCate[Strength]:0d       // 力量
+Value:$2
+
+SubCate[Stamina]:0e        // 耐力
+Value:$2
+
+SubCate[Current HP]:14
+Value:$4
+
+SubCate[Max HP]:15
+Value:$4
+
+SubCate[Current MP]:16
+Value:$4
+
+SubCate[Max MP]:17
+Value:$4
+
+SubCate[Physical Attack (PA)]:18
+Value:$4
+
+// use this when the damage (PA) value need to set below 35? or no need to use at all?
+SubCate[Physical Attack (PA) - Type 2]:18
+Min Value:$4
+Max Value:$4
+
+SubCate[Physical Defense (PD)]:19
+Value:$4
+
+SubCate[Magical Attack (MA)]:1a
+Value:$4
+
+SubCate[Magical Defense (MD)]:1b
+Value:$4
+
+SubCate[Critical Hit Rate]:1d
+Value:$4:Fn[eCHRate]
+
+// Sample: __ 3d28 0000 25000000 5f010000 00 // set player EXP, 5f010000: 351
+// Remark: the client will self-determine the EXP is gain or lose based old the updated value.
+SubCate[Exp]:28          // TODO: more research
+Data1:$2
+Data2:$4       // dafaq is this? TODO: research
+New Exp Amount:$4  // if > currentExp -> +exp, if < currentExp -> -exp
+
+SubCate[Unknown Yet, But Exists lol]:29 // TODO: review
+Value:$4
+
+SubCate[Virtue Amount]:2a // 功德
+Value:$4
+
+SubCate[Bonus Point]:2b
+Value:$2
+
+// Sample: __ 3d 2c ffff feffff7f 00
+SubCate[Level Update]:2c
+New Level:$2
+New Lv Up Exp Req.:$4
+
+// Sample: __ 3d 2f cee4cabf 00 // cee4cabf -> gbk: 武士
+SubCate[Hero Status Char ('w')]:2f
+Value:$gbk
+
+// Sample: __ 3d 44 ffff 00
+SubCate[Vigor]:44    // 體力
+Value:$2
+
+// Sample: __ 3d 46 ffffffff 00
+SubCate[Silver]:46    // 銀
+Value:$4
+
+// Sample: __ 3d 48 24242424 00
+SubCate[Bag Slot]:48
+Value:$4:Fn[eBagSlot]
+
+// Sample: __ 3d 52 ea203e00 cab2c3b4b6bcd3d02d2d2d2d2db3e8ceefb5ea 00
+SubCate[Open Player Shop]:52
+EntityUID:$4
+Shop Name:$gbk
+
+// Sample: __ 3d 7a 00 00 // allow teleport
+// Sample: __ 3d 7a 01 00 // disallow teleport
+// 禁止瞬移, inh/user/setting.c
+SubCate[Teleportation]:7a
+Flag:$1:Fn[eBool,Disallow,Allow]
+
+// Sample: __ 3d 7f 00 00
+// Sample: __ 3d 7f 01 00
+// 禁止交易, inh/user/setting.c
+SubCate[Tradable]:7f
+Flag:$1:Fn[eBool,Disallow,Allow]
+
+// Sample: __ 3d 82 00 00
+// Sample: __ 3d 82 01 00
+// 说话开关, inh/user/setting.c
+SubCate[Talk]:82
+Value:$1:Fn[eBool,Disallow,Allow]
+
+// Sample: __ 3d 8f 00 00
+// Sample: __ 3d 8f 01 00
+// 鼠标模式, inh/user/setting.c
+SubCate[Mouse Mode]:8f
+Mouse Mode:$1
+
+// Sample: __ 3d 90 00 00
+// Sample: __ 3d 90 01 00
+// 显示模式, inh/user/setting.c
+SubCate[Display Mode]:90
+Display Mode:$1
+
+// Sample: __ 3d 91 00 00
+// Sample: __ 3d 91 01 00
+// 攻击时的移动模式, inh/user/setting.c
+// !REVIEW!: what this means?
+SubCate[Attack Move]:91
+Attack Move:$1
+
+// Sample: __ 3d a0 dedf0d00 c0adcbb9c0d7b6c8 00
+SubCate[Window Title]:a0
+HeroUID:$4
+Hero Name:$gbk
+
+// 武士    武士导师－－      －－                                
+// Sample: __ 3d a1 01 cee4cabf20202020 cee4cabf b5bccaa6 a3ada3ad 202020202020 a3ada3ad 2020202020202020202020202020202020202020202020202020202020202020 00
+SubCate[Unk]:a101
+Any:$gbk
+
+// Sample: __ 3d a2 1700 1700 1700 1700 1700 00
+SubCate[Hero Bonus Points]:a2
+Vital:$2
+Sprite:$2
+Intelligence:$2
+Strength:$2
+Stamina:$2
+
+// Sample: __ 3d a3  00
+SubCate[Hero Attributes]:a3
+HP:$4
+Max HP:$4
+MP:$4
+Max MP:$4
+Min PA:$4
+Max PA:$4
+Min PD:$4
+Max PD:$4
+Min MA:$4
+Max MA:$4
+Min MD:$4
+Max MD:$4
+Yuan:$2
+Max Yuan:$2
+Cultivation Level:$2
+
+// TODO: rebuild signature
+//25 3da40000fd930c0000000000/*功德*/ffffff7f/*屬性配點*/fff1/*lv*/ff00/*exp-int*/2a810100/*lvexp-int*/03620200/*money-int*/ffffff7f0000000000
+// fd930c00: 824317 (0x0c93fd)
+// Sample: __ 3d a4 00 00 fd930c00 00000000 ffffff7f fff1 ff00 2a810100 03620200 ffffff7f 00000000 00 // TODO: test
+// lsrc[inc/user/prop.c]: send_user( me, "%c%c%w%d%d%d%w%w%d%d%d%d", 0x3d, 164, me->get_billion_exp(), me->get_exp(), me->get_potential(), me->get_bonus() / 10, me->get_gift_point(), level = me->get_level(), me->get_upgrade_exp(), USER_EXP_D->get_level_exp( me->get_reincarnation(), level ), me->get_cash(), me->get_savings() );
+SubCate[Hero Amount]:a4
+BillionExp:$2 // (%w) 总经验(十亿标志), inc/user/prop.c
+Exp:$4
+Protential:$4 // 潜能属性, inc/user/prop.c@358
+Virtue:$4
+Bonus Points:$2 // Gift Point
+Level:$2
+Upgrade Exp:$4
+Lv Up Exp:$4 // 升级所需经验, sys/user/exp.c
+Silver:$4  // game money 銀
+Savings:$4 // portable bank saving? (存款)
+
+// Sample: __ 3d a5 00000000 00000000 0000F1F2 F3F4F5F6 F7F80000 00000000 00000000 00000000 0100 0000 00000000 00143da600000000000000010101010101010100 00
+// lsrc[sys/sys/connect.c]: send_user( me, "%c%c%d%d%d%d%d%d%d%d%c%w%d", 0x3d, 165, me->get_gift_ra(), me->get_gift_zy(), me->get_gift_zs(), me->get_gift_cx(), me->get_gift_yg(), me->get_gift_zm(), me->get_repute(), me->get_contribute(), me->get_strength(), me->get_occupation_level(), me->get_occupation_exp() );
+SubCate[Hero Amount 2]:a5
+ra:$4 // 仁爱属性
+zy:$4 // 正义属性
+zs:$4 // 忠实属性
+cx:$4 // 诚信属性
+yg:$4 // 勇敢属性
+zm:$4 // 智谋属性
+Repute:$4 // 声望点数
+Contribute:$4 // 贡献点数
+Virgor:$2 // 体力点数
+Occupation Level:$2 // 职业等级
+Occupation Exp:$4 // 职业经验
+Data3:$40
+
+//             eUID
+// TODO: __ 70 44745401 3c000000 00 // toxic?
+// TODO: __ 70 74070000 c0000000 00000000 00 // show anti-cheat validation 防外掛驗證
+// [+] [1623935694.853666] [64496<] Data['04 3d b1 01 00', '0e 70 74070000c000000000000000 00'] I[1716]
+// Sample: __ 3d b1 01 00 // enable freeze (bool iBusy == 1)
+// Trigger[CMD]: get_info whatis 0
+// [+] [1623935699.446699] [64496<] Data['043db10000', '0d3d280000b5d07c08bf04260000'] I[1720]
+// Sample: __ 3d b1 00 00 // disable freeze
+SubCate[Freeze (Self)]:b1
+isFreezing:$1:Fn[eBool,Freezing (Yes),Unfreeze]
+
+// Sample: __ 3df1 01 00
+SubCate[Hero Move Speed]:f1
+Value:$1:Fn[eIf,==0x01,Slow,==0x02,Normal]
+
+SubCate[Hero Dodge]:f6
+Value:$4
+
+SubCate[Hero Hit]:f7
+Value:$4
+
+// Sample: __ 3d f8 f9d41800 03 00 // TODO: test, dafaq is this?
+SubCate[Unk]:f8
+EntityUID:$4
+Data2:$1
+
+</parser>
+
+<parser>
+// Sample: __ a501 00 fe770900 6468000000 00 // TODO: test...
+Packet[Shown Map Name]:a501
+pad-1
+FormatStringID:$4:Fn[parseFS] // fe770900 (0x0977fe)
+MapID:64$4:R[MAP]
+pack
+</parser>
+
+<parser>
+// Sample: __ a508 ff000000 00
+Packet[Set Honor Point]:a508         // 戰績
+Value:$4
+pack
+</parser>
+
+<parser>
+// Sample: __ 4507 FF000000 00
+Packet[Set Gold Amount]:4507
+Value:$4
+pack
+</parser>
+
+<parser>
+// Sample: __ 2a dedf0d00 32 00
+Packet[Update Entity Health Bar]:2a
+EntityUID:$4
+Health Bar:$1:Fn[eHPBar]
+pack
+</parser>
+
+<parser>
+// Sample: __ 5e dedf0d00 02 00
+Packet[Update Entity Facing]:5e
+EntityUID:$4
+Facing:$1:Fn[eFacing]
+pack
+</parser>
+
+<parser>
+// lsrc[sys/sys/connect.c]: send_user( me, "%c%d", 0x74, time2() );    // 动作时钟
+Packet[Sync Action Base Time]:74
+Time2:$4
+pack
+</parser>
+
+//<parser>
+// Sample: __ a916 37774a4624244a313339377e2a4a38327537 00 // TODO: test, dafaq...
+//Packet[Unk]:a916
+//
+//pack
+//</parser>
+
+<parser>
+// Sample: __ a917 a54aa54a dedf0d00 02 00 // TODO: test, wtf?, wt trigger? wrong pkt body??
+Packet[Entity Path Sync]:a917
+Time:$4
+EntityUID:$4
+Data3:$4
+Path:$gbk
+pack
+</parser>
+
+<parser>
+Packet[Display Countdown Message On Screen]:a925
++ SubCate
+pack
+
+// Sample: __ a9 25 00 02 64000000 00
+SubCate[Display Newbie Gift Msg On Middle-Left]:00
+Static Text Index:$1 // TODO: create enum? (value range: 1 ~ 5)
+Countdown for sec.:$4
+
+// Sample: __ a9 25 01 00
+SubCate[Clear Msg On Middle-Left]:01
+pack
+
+// Sample: __ a9 25 0a 0a000000 00
+// Order[Countdown only]: [a9250a]
+SubCate[Start Countdown Timer On Top-Right Corner]:0a
+Countdown for sec.:$4
+
+// Sample: __ a9 25 0b 7d9c0000 6400000000 64e39c0000 73 02000000 2035 64e49c0000 6408000000 64e49c0000 73 04000000 20323435 00 // 100元素副本 - |1|2$3`N|4$5`N|6$7`=C
+// Order[Countdown with Message]: [a9250a>a9250b]
+// Desc: a9250b cant work without a9250a
+SubCate[Display Msg On Top-Right Corner - With FSDB]:0b
+FormatStringID:$4:Fn[parseFS]
++ REP
+Param <index>:param
+- REP
+
+// Sample: __ a9 25 0c 00
+SubCate[Clear Msg On Top-Right Corner]:0c
+pack
+</parser>
+
+<parser>
+// Sample: __ 67 dedf0d00 a54aa54a E700 7000 38 00
+// Sample: __ 67 40ed2900 7424ee12 7f00 8b00 34 00
+Packet[Entity Location and Facing Sync]:67
+EntityUID:$4
+Time2:$4
+LocX:$2
+LocY:$2
+Facing:$gbk:Fn[eFacing]
+pack
+</parser>
+
+<parser>
+Fragment[TaskLog]
+Data1:$2
+Data2:$2
+Lv. Req.:$1
+Task Attempted:$1
+Max Attempt Allowed:$1
+pad-1
+FormatStringID:$4:Fn[parseFS]
+Task Cate:64$4:R[FS]
+Task Name:64$4:R[FS]
+Task Duration:64$4:R[FS]
+Task NPC:64$4:R[FS]
+Task Map:64$4:R[FS]
+NPC X:64$4:R[FS]
+NPC Y:64$4:R[FS]
+</parser>
+
+<parser>
+// Sample: __ a91a ... 00
+Packet[TaskLog]:a91a
++ SubCate
+pack
+
+SubCate[Begins]:00
+
+SubCate[Display]:09
+
+SubCate[Normal Task Avaliable]:01
++ Fragment[TaskLog]
+
+SubCate[Normal Task Avaliable]:02
++ Fragment[TaskLog]
+
+SubCate[Normal Task Avaliable]:04
++ Fragment[TaskLog]
+</parser>
+
+<parser>
+// Arg0: map->get_client_id()
+// Arg1: mapA -> actual map on screen
+// mapB: sound and see
+// x$2, y$2, unk$1
+// mapC: Mini Map Name -> map name
+// Sample: __ 3c 1127 6800 6800 d200 5700 01 6800 00 [GBK_map_name_here] 00
+//               Arg0 Arg1 mapB              mapC
+// Sample: 11 3c 1127 de03 0100 6900 4100 00 0100 00 00 00 // peace PvP map
+// Sample: 11 3c 1127 c90b 2800 d400 2f01 00 2800 00 00 00 // island dungeon
+// Sample: __ 3c 1127 6800 6800 d200 5700 00 6800 00 00 00
+// Sample: __ 3c 1127 0000 6800 9000 5a00 00 5f00 00 00 00
+// Sample: __ 3c 1127 6b00 6b00 a600 cb00 00 6b00 00 00 00
+// Sample: __ 3c 1127 bb0b 2300 2000 3000 00 2300 00 00 00
+//          0  1  2 3  4 5  6 7  8 9  A B  c  D E  F 10
+Packet[Hero Map]:3c
+Data1:$2
+pad-1
+Locate Map:$2:Fn[eMap] // also sound? // TODO: test
+LocX:$2
+LocY:$2
+fmtStrDeterminePoint:$1:Fn[eIf,==0x00,autoDB,>0x0,DirectGBK]
+Map Name & Mini Map:$2:Fn[eMap]
+pad-2
+pack
+</parser>
+
+<parser>
+// Sample: __ 3e01 2a0e0000 6464000000 00
+// Sample: __ 3e01 63310000 00 // PK mode set to: peaceful
+// Sample: __ 3e01 2cb00a00 64b38a0100 00 // 您捡起 月宫宝箱
+Packet[Formatted Message (No Channel Header)]:3e01
++ Fragment[FormatString]
+pack
+</parser>
+
+<parser>
+// Sample: 
+Packet[Entity Title (Other Player's)]:b902
+Data1:01
+EntityUID:$4
+Title:$gbk
+pack
+</parser>
+
+// TODO: analysis packets:
+//<parser>
+// Sample: __ b9 a2 01 870a7f01 04 00
+// Sample: __ b9 a2 01 166a4300 01 00
+//Packet[-- Unknown b9a2 --]:b9a2
+//Unk:$1
+//EntityUID:$4
+//Unk:$1
+//pack
+//</parser>
+//
+//<parser>
+// Sample: __ b9 a9 01 870a7f01 01 00
+// Sample: __ b9 a9 01 166a4300 01 00
+//Packet[-- Unknown b9a9 --]:b9a9
+//Unk:$1
+//EntityUID:$4
+//Unk:$1
+//pack
+//</parser>
+
+<parser>
+// Sample: __ 82 743d0800 02 743d0800 64743d0800 646e000000 00
+Packet[Skill Description]:82
+SkillID:$4:R[SKILL]
+Unk:$1
+SkillID:$4:Fn[parseFS,!SKILL@buffdec]
++ REP
+Param <index>:param
+- REP
+pack
+</parser>
+
+<parser>
+// Sample: __ a214 f748ac00 00 2d450f00 6429270000 00
+// Sample: __ a214 ab7b5701 00 2b450f00 642a780900 6460160000 00 // 归德中郎将
+// Trigger[OnEntityUpdateTitle]: [+] [1623809830.744496] [56409>] Data['title hide'] I[6]
+// Order: [a214]
+// Desc: Update entity title (not tribe related)
+// Sample: __ a214 e8733501 00 // hide title
+Packet[Entity Title (In Use)]:a214
+EntityUID:$4
++ SubCate
+pack
+
+SubCate[Hide Title]
+pack
+
+SubCate[Title Only]
+pad-1
+FormatStringID:$4:Fn[parseFS]
+FormatStringID (Title):64$4:R[FS]
+
+SubCate[Title With Color]
+pad-1
+FormatStringID:$4:Fn[parseFS]
+Color Code:64$4:Fn[eColorCode] // TODO: test
+FormatStringID (Title):64$4:R[FS]
+
+// Sample: __ a214 9bbbab00 00 70270000 7304000000b6a4d7d3 6423270000 00 // FS: `+C0xa956ce`-C$1|2 --- 73$4$gbk:钉子 -- |2:首领
+// Trigger[OnEntityUpdateTitle]: [+] [1623809823.772137] [56409>] Data['title show C006'] I[4]
+// Order: [a214>9568]
+// Sample: [+] [1623809823.911437] [56409<] Data['20a214e87335010070270000730a00000052757368d8bcb7cbcdbd642827000000', '0c 95 68 02 e8733501 00000000 00'] I[5]
+SubCate[Title With Colored Tribe Title]
+pad-1
+FormatStringID:70270000:Fn[parseFS] // value: 70270000, ... // TODO: collect more FSID & distinguish with FSID
+GBK Value:73$4$gbk
+FormatStringID (Title):64$4:R[FS]
+
+SubCate[Title With GBK Color]
+pad-1
+FormatStringID:$4:Fn[parseFS]
+Color Code:73$4$gbk:Fn[eGBKColorCode] // TODO: test
+FormatStringID (Title):64$4:R[FS]
+
+SubCate[Gang Title With GBK Color]
+pad-1
+FormatStringID:$4:Fn[parseFS]
+Gang Name:73$4$gbk
+FormatStringID (Role):64$4:R[FS]
+FormatStringID (Pos):64$4:R[FS]
+
+SubCate[GBK Title]
+Title (GBK):$gbk
+</parser>
+
+<parser>
+// Sample: __ a215 00000000 00 00
+// Sample: __ a215 22f53f00 01 00
+// Sample: __ a215 4e650600 01 000000 ccfdcbb5bba8cfc9d7d3d4d9b4ceb3f6cfd6d4dabac3d4cbb5baa3a1 00 // original, 听说花仙子再次出现在好运岛！
+// Event[OnBossSpawn]
+Packet[Display Full Screen Effect]:a215
+EffectID:$4 // TODO: create enum, 0x3FF521 100lv boss respawn, 0x6654E bigF shocking the screen, 0x66550 100lv suck souls from zombie map mobs
+Make Screen Dark:$1:Fn[eBool,Yes,No]
++ SubCate
+
+SubCate[END]
+pack
+
+SubCate[Useless]:00 // no need to use this, as it has no use at all ..
+pad-2
+Msg:$gbk
+pack
+</parser>
+
+<parser>
+// Sample: __ 95 68 02 870a7f01 00000000 00
+// Sample: __ 95 68 02 166a4300 00000000 00
+// Sample: __ 95 68 02 93f85001 00000000 00 // TODO: ???
+Packet[-- Unknown 9568 --]:9568
+Unk:$1
+EntityUID:$4
+Unk:$4
+pack
+</parser>
+
+
+<parser>
+// Sample: __ a20a ff 00
+Packet[Set Cultivation Level]:a20a   // 修為等級
+Value:$1
+pack
+</parser>
+
+<parser>
+// Sample: __ a204 a2 01 f0515400 f0515400 00 // TODO: test .. dafaq is this = =? @ 0x409555
+Packet[Unk]:a204
+CaseA:$1
+CaseB:$1
+Data3:$4
+Data4:$4
+pack
+</parser>
+
+<parser>
+// Sample: __ a211 FFFFFF7F 00
+Packet[PK Value]:a211
+Value:$4
+pack
+</parser>
+
+<parser>
+// Sample: __ a2 19 00000000 00000000 00000000 c4d20da2 00 @ 0x40948E
+Packet[Mobile Bank Security Time]:a219
+Data1:$4
+Data2:$4
+Data3:$4
+Data4:$4
+pack
+</parser>
+
+<parser>
+// Sample: __ a2 01 00 75270000 73 04000000 42303031 73 0e000000 602b433078323766353263602d43 64 11270000 00 
+// Remark: title priority: from A to Z, A001 = highest, Z999 = lowest.
+Packet[Hero Title List Items (Avaliable)]:a201
+FormatDeterminePoint:$1
+FormatStringID:$4:Fn[parseFS]
+Title Priority:73$4$gbk
++ REP
+Param <index>:param
+- REP
+pack
+</parser>
+
+<parser>
+// Sample: __ a20d dedf0d00 41424344 00
+// Remark: Update Hero's foot title
+Packet[Update Hero Title's Tribe Name (With EntityUID)]:a20d
+EntityUID:$4
+Title:$gbk
+pack
+</parser>
+
+<parser>
+// Sample: __ a225 b3b33a00 00 7f760000 642f780900 6493760000 6484760000 00
+// Sample: __ a225 4a465801 00 7f760000 642c780900 6494760000 6481760000 00 // 上仙·二重
+// Sample: __ a225 ab7b5701 00 7f760000 642a780900 648f760000 6482760000 00 // 剑痴·三重
+// Sample: __ a225 13195801 00 7f760000 6430780900 648b760000 6485760000 00 // 武神·六重
+Packet[Set Player Side Title]:a225 // 天元等級 - 右方稱號
+EntityUID:$4
+pad-1
+FormatStringID:$4:Fn[parseFS] // 7f760000 (0x767f)
++ REP
+Param <index>:param
+- REP
+pack
+</parser>
+
+<parser>
+// Sample: __ ad 00 18000000 00 // TODO: test
+Packet[Unk]:ad00
+Value:$4
+pack
+</parser>
+
+<parser>
+// Sample: __ 62 dedf0d00 0200 0000 b962 0000 0200 0000 0000 0000 00  // TODO: test
+// Sample: __ 62 80654300 0400 0000 e8fa ffff 0000 0000 0000 0000 00
+Packet[Spawn Ride Model]:62
+EntityUID:$4
+Ride ModelID:$2:Fn[eRideModel,@RMC]
+pad-2
+Ride Model Color:$2:Fn[eRGB565]:P[@RMC]
+pad-2
+Wings Generation:$2
+pad-2
+Wings ModelID:$2:Fn[eRideWingModel]
+pad-2
+pack
+</parser>
+
+<parser>
+// Sample: __ b3 00 0100 A98B0100 00 // TODO: test
+Packet[Ride List]:b3
++ SubCate
+pack
+
+SubCate[Description Begins]:00
+Ride Index:$4
+Item ModelID:$4:R[ITEM]
+
+SubCate[Ride Infos]:01
+Ride Index:$2
+pad-2
+Ride Generation:$2 // Limit: 1 ~ 3 (default: 1)
+pad-2
+Ride Level:$2   // Limit: 0 ~ 150 (default: 0)
+pad-2
+Ride Str.:$2
+pad-2
+Ride Intell.:$2
+pad-2
+Ride Spir.:$2
+pad-2
+Ride Sta.:$2
+pad-2
+Ride Vit.:$2
+pad-2
+Bonus Point:$2
+pad-2
+Data19:$4
+Data20:$4
+Ride Exp:$4
+Lv Up Exp Req.:$4
+Ride ModelID:$2
+pad-2
+Ride Model Color:$2:Fn[eRGB565]
+pad-2
+Ride Wings Generation:$2
+pad-2
+Ride Wings ModelID:$2
+pad-2
+Ride Item DescID:$4:R[ITEM]
+Share Attributes:$2          // Limit: 0gen: 25, 1gen: 50, 2gen: 100 (default: 25%)
+pad-2
+
+SubCate[Ride Item In Use]:02
+Ride Index:$4
+isActive:$4:Fn[eBool,Activate,Deactivate] // 01: Activate, 00: Deactivate
+
+SubCate[Ride Item Description]:04
+Ride Index:$4
+pad-1
+Item DescID:$4:R[ITEM]
+
+SubCate[Ride Speak]:05
+Ride Index:$4
+Text:$gbk
+
+SubCate[Ride Skill]:14
+Ride Index:$4
+SkillID:$4:R[SKILL]
+Skill Cate:$2:Fn[eIf,==0x0,Gifted,==0x1,Basic,==0x2,Advance] // 0x0: Gifted (天賦), 0x1: Basic (初階), 0x2: Advance (高階)
+Param <index>:param // TODO: dafaq?
+</parser>
+
+<parser>
+// Sample: // TODO: add sample and confirmation
+Packet[Hero Skill Tree]:53
++ SubCate
+pack
+
+SubCate[Tree Begins]:00000000
+
+SubCate[Tree Name]
+SkillID (TreeName):$4:R[SKILL]
+Tree Level:$2
+pad-2
+Data4:$4
+pad-1
+SkillID (TreeName):$4:R[SKILL]
+</parser>
+
+<parser>
+// Sample: __ 50 4ec80700 0000 0000 0100 0000 00 00000000 6acb1000 644ec80700 00 // TODO: test
+// Sample: __ 50 19940800 0000 0000 1e00 0000 00 00000000 6acb1000 6419940800 00 // TODO: test -- 0x089419: 面具触发效果
+// Sample: __ 50 26b30800 0b00 0000 0100 0000 00 00000000 6acb1000 6426b30800 00 // TODO: test -- 0x08b326: 雲遊商人
+// Sample: __ 50 44c80700 ff00 0000 0000 0000 00 // TODO: test -- CD: -1 (sec)
+// Sample: __ 50 3ac80700 ff00 0000 0000 0000 00 // TODO: test -- CD: -1 (sec) - 510010 [0x0007C83A]	寒风斩
+Packet[Hero Skill Item]:50
+SkillID:$4:R[SKILL]
+unk1:$2
+pad-2
+CoolDown (sec):$2
+Data5:$2
++ SubCate
+
+SubCate[Description]
+pad-4
+pad-1 // if this byte == 00, then it is fmtStr
+FormatStringID:$4:Fn[parseFS]
+SkillID:64$4:R[SKILL]
++ REP
+Skill Level:64$4
+- REP
+
+SubCate[Start Cooling Down]
+</parser>
+
+<parser>
+// Sample: __ 4b 01 353730313430 00 // TODO: test -- 353730313430 == (gbk): 570140
+// Sample: [+] [1623936511.919057] [64496<] Data['08 4e 407938010800 00', '0c 2101 f10a0000 64 b48a0100 00', '06 2d 65703801 00'] I[44] // item bar 月宫宝箱 used all (set item bar page 3(1~4) pos 0(left most) empty) // itemEId: 65703801 (0x1387065)
+Packet[Item Bar Item]:4b
+Item Slot Index:$1
+Item Name:$gbk
+</parser>
+
+<parser>
+// @ heroSkillItem_sub_5C37A0
+// Sample: __ 64 3ac80700 0600 00 04 07 0a 05 00 00 // TODO: test
+// Sample: __ 64 7a640800 0800 00 0d 5e 00 05 00 00
+Packet[Skill Item]:64
+SkillID:$4:R[SKILL]
+MP Cost:$2
+Data3:$1
+Data4:$1
+Data5:$1
+Data6:$1
+Data7:$1
+Data8:$1
+pack
+</parser>
+
+// <!-- Missing YBShop -->
+
+<parser>
+// Sample: __ 43 00 02 35390c00 00 // Nameless - N-FS
+// Sample: __ 43 00 07 00000000 56310000 00 // Nameless - FS
+// Sample: __ 43 00 0a 5e060000 4b2f0000 00 // Nameless - FS (5e060000: HeroUID)
+// Sample: __ 43 00 0a 00000000 c4090000 7338000000b9d6ceefbdcbc3f0d5bdbbeeb6afbdabd3dabdf1cded32313a30303a3030bfaab7c5a3accdfbb8f7cebbd3c2cabfd7f6bac3d7bcb1b8a3a100
+// Sample: __ 43 06 5e060000 1b 3a092b31363737373231352cb2eeb2bbb6e0cfc8c9fa3d31363330092d3a2e 00 // ":\t#16777215,差不多先生=1630\t:."
+Packet[Channel Chat]:43
++ SubCate
+pack
+
+SubCate[Nameless]:00
+Channel:$1:Fn[eChatChannel]
+HeroUID/Padding:$4
++ Fragment[FormatString]
+
+SubCate[Nameless - NonFormatString]:00
+Channel:$1:Fn[eChatChannel]
+HeroUID:$4
+
+SubCate[From Player]
+Channel:$1:Fn[eChatChannel]
+HeroUID:$4
+Content:$gbk:Fn[parseStyling]
+</parser>
+
+<parser>
+// Sample[Start]: __ 43 ff 10 cf465801 00000000 00
+// Sample:        __ 43 ff 10 cf465801 3ecb1000 73 02000000 1b3a 73 02000000 1b5b 64 60650600 73 02000000 1b5d 00 // $1$2^3$4:
+// Sample:        __ 43 ff 10 cf465801 cfb60a00 73 06000000 5368656c6279 00 // `+C0x00ff00`-C$1`=C，不要这么凶哦，打得我好疼呀！
+// Sample[End]:   __ 43 ff 10 cf465801 ffffffff 00
+Packet[Channel Chat Nameless Block]:43ff
+Channel:$1:Fn[eChatChannel]
+HeroUID:$4
++ SubCate
+pack
+
+SubCate[Begin]:00000000
+
+SubCate[End]:ffffffff
+
+SubCate[Chat Content]
+FormatStringID:$4:Fn[parseFS]
++ REP
+Param <index>:param
+- REP
+</parser>
+
+<parser>
+// tested: poped a makestar gui, wtf?
+// Sample: __ a8 01 89240e00 05 b3cfcadbb1bebac5 00 // !REVIEW!
+// Sample: __ a8 16 01 01 00 // TODO: dafaq?! @ starmake
+Packet[Update GUI]:a8
++ SubCate
+pack
+
+// Sample: __ a8 00 855e7901 00 // ? 855e7901: eUID
+// Sample: __ a8 00 f748ac00 00 // TODO: test usage
+// Order: [69*>...>7f01>a800]
+SubCate[Unk]:00
+EntityUID:$4
+
+// Sample: __ a8 01 4a465801 06 31353030c2f436d7aad5fbbac5d0e8d2aac1f4d1d4 00
+// Order: [69*>...>6f>a801]
+SubCate[Entity Head Signature]:01
+EntityUID:$4
+Signature Style:$1
+Text:$gbk
+
+// Sample: __ a8 14 01 00
+SubCate[Open MakeStar GUI]:14
+Open:01
+
+// Sample: __ a8 15 01 01 18010000 0a000000 01 00 // PD & MD +10
+// Sample: __ a8 15 01 02 a4010000 14000000 01 00 // PD & MD +20
+SubCate[Update MakeStar GUI]:15
+Open:01
+Current MakeStar Target Lv:$1 // the value indicates the star lv that will be made.
+Money In Take:$4
+Additions Value:$4
+Additions Type:$1:Fn[eMakeStarTypes]
+
+// Sample: __ a8 16 01 01 00
+SubCate[MakeStar Roll & Stop]:16
+Open:01
+IsSuccess:$1:Fn[eBool,Success,Fail]
+
+SubCate[Set Entity Top Title]
+EntityUID:$4
+pad-1
+Title Cate:$1:Fn[eTopTitleCate]
+Title:$gbk
+</parser>
+
+<parser>
+// Sample: __ a301 4c320000 6465000000 646a000000 646b000000 6466000000 64cd000000 00
+// Sample: __ a300 414243 00 # TODO: test this PoC (@0x40A2B8)
+Packet[Broadcast (Marquee)]:a301
++ Fragment[FormatString]
+pack
+</parser>
+
+<parser>
+Packet[System Mail]:4dfb
+pad-5
++ SubCate
+pack
+
+// Sample: __ 4dfb 0000000000 00000000 00
+SubCate[Begins]:00000000
+
+// Smaple: __ 4dfb 0000000000 8b350000 7313000000323032302d30392d33302031393a30303a3031 00
+// Smaple: __ 4dfb 0000000000 99b30a00 00
+SubCate[Message (No Params)]
+FormatStringID:$4:Fn[parseFS]
+
+// Sample: __ 4dfb 0000000000 8b350000 7313000000323032302d30382d33312031333a33343a3033 00
+// Sample: __ 4dfb 0000000000 20350000 730c000000a4e1c4b0c9cfbda3bfcda4e1 6451000000 00
+SubCate[Message (Formatted)]
++ Fragment[FormatString]
+
+// Sample: __ 4dfb 0000000000 ffffffff 00
+SubCate[Ends]:ffffffff
+</parser>
+
+<parser>
+// 0x00003159: 12633: `+C0xfad67e`-C$1($2)邀请您加入其队伍。`=C
+// Sample: __ 4dfe a7200000 59310000 7306000000d1ccd3eaa4a3 64a7200000 00
+Packet[Mail Message (Bottom Right Corner with Transparent Bg)]:4dfe
+HeroUID:$4
++ Fragment[FormatString]
+pack
+</parser>
+
+<parser>
+Packet[Shop UI]:28
++ SubCate
+pack
+
+// 5d450f00: ^1`N|2
+//                     ?        -- fs
+// Sample: __ 28 00 00 146c0000 00 5d450f00 64 020d0500 64 7c160000 00
+SubCate[Shop Title]:0000
+Unk:$4
+pad-1
++ Fragment[FormatString]
+
+//                  price    itemID   quality  -- FS          itemID
+// Sample: __ 28 01 05000000 fa490200 00000000 00 6acb1000 64 fa490200 00
+// Sample: __ 28 02 64000000 de510200 00000000 00 6acb1000 64 de510200 00
+// Sample: __ 28 03 e0010000 e8510200 00000001 00 6acb1000 64 e8510200 00
+// Sample: __ 28 04 14000000 fc510200 00000000 00 6acb1000 64 fc510200 00
+// Sample: __ 28 05 60090000 7e520200 00000001 00 6acb1000 64 7e520200 00
+// Sample: __ 28 06 e8030000 a1530200 00000002 00 6acb1000 64 a1530200 00
+// Sample: __ 28 07 88130000 a2530200 00000002 00 6acb1000 64 a2530200 00
+// Sample: __ 28 08 f4010000 2e590200 00000001 00 6acb1000 64 2e590200 00
+// Sample: __ 28 09 a0860100 4a4a0200 00000001 00 6acb1000 64 4a4a0200 00
+// Sample: __ 28 0a 70110100 73590200 00000002 00 6acb1000 64 73590200 00
+// Sample: __ 28 0b 30570500 74590200 00000002 00 6acb1000 64 74590200 00
+SubCate[Shop Item]
+ItemPos:$1
+Unit Price:$4
+ItemModelID:$4:R[ITEM]
+Quality:$4:Fn[eQualityColor]
+pad-1
+FormatStringID:$4:Fn[parseFS]
+ItemID - Name:64$4:R[ITEM]
+</parser>
+
+<parser>
+//                           fs          $1          $2          $3          $4          $5       --
+// Sample: __ 3a 0a 00001a15 af440f00 64 020d0500 64 146c0000 64 c4110100 64 a90f0000 64 aa0f0000 00
+// 0x000F44AF: ^1：`N    |3`OD|4`OOlist &2#`OD|5`OOCLOSE
+// Sample: __ 3a 0a 00000000 44af0a00 64 e3110000 64 a7200000 64 e4110000 00
+// 0x000AAF44: 队长您确定要离开队伍吗？`OD|1`OOteam x $2`OD|3
+// Sample: __ 3a 0a 00000000 49af0a00 64 78000000 64 fe110000 7306000000d1ccd3eaa4a3 64a40f0000 64a7200000 646a120000 00
+// 0x000AAF49: $1级的|2$3邀请您加入队伍，您是否同意？`OD|4`OOteam + $5`OD|6`OOteam cancel $5
+Packet[Prompt For Options]:3a0a
+Unk:$4
++ Fragment[FormatString]
+pack
+</parser>
+
+<parser>
+//                      ???? format   param
+// Sample: __ 3a 0c 0000b514 5e420f00 64 ecbe0400 64 77110100 00
+// Sample: __ 3a 0c 0000b514 7c420f00 64 0f120000 73 0c0000007061776e2036633062232031 00
+// Sample: __ 3a 0c 0000b514 7c420f00 64 10120000 73 110000007061776e2072656e742036633062232030 00
+// Sample: __ 3a 0c 0000b514 6b420f00 64 a50f0000 00
+Packet[Dialog (Player<->NPC Talk)]:3a0c
+NPCEID:$4
++ SubCate
+pack
+
+// Sample: __ 3a0c 0000b514 00000000 00
+SubCate[Begins]:00000000
+
+SubCate[Option]
++ Fragment[FormatString]
+
+// Sample: __ 3a0c 0000b514 ffffffff 00
+SubCate[Ends]:ffffffff
+</parser>
+
+<parser>
+// Sample: __ 5100 00
+Packet[Quest Related - Unk]:5100
+pack
+</parser>
+
+<parser>
+// Order[Create Quest Cate & Item]: [0b>06>0c>0d]
+// Order[Remove Quest Cate & Item]: [03>02>01]
+Packet[Quest Detail - Normal]:5101
++ SubCate
+pack
+
+// Sample: __ 5101 01 e803 00
+SubCate[-- Unknown 01 --]:01
+QuestUID:$2
+
+// Sample: __ 5101 02 e803 0600 00
+SubCate[Remove Quest Tree Root]:02
+QuestUID:$2
+Q.SubID:$2
+
+// Sample: __ 5101 03 e803 0600 00
+SubCate[Clear Quest Detail]:03
+QuestUID:$2
+Q.SubID:$2
+
+// Sample: __ 5101 06 e803 0600 0000 00
+// Sample: __ 5101 06 421f 0100 0000 00
+SubCate[-- Unknown 06 --]:06
+QuestUID:$2
+Q.SubID:$2
+Unk:$2
+
+// Sample: __ 51 01 0b dcf2 489c0000 00 // 一般任務
+SubCate[Quest Cate]:0b
+QuestUID:$2
+FormatStringID:$4:Fn[parseFS]
+
+// Sample: __ 51 01 0c dcf2 0100 249d0000 00 // 捐献物资
+SubCate[Quest Tree Item]:0c
+QuestUID:$2
+Q.SubID:$2
+FormatStringID:$4:Fn[parseFS]
+
+SubCate[Quest Detail]:0d
+QuestUID:$2
+Q.SubID:$2
++ Fragment[FormatString]
+
+// Sample[Show - Not Complete]: __ 5101 10 e803 0600 0100 43790900 6407220000 6403000000 6403000000 00
+// Sample[Show - Completed]:    __ 5101 10 e803 0600 0101 43790900 6407220000 6403000000 6403000000 00
+SubCate[Update Quest Track - Show/Hide]:10
+QuestUID:$2
+Q.SubID:$2
+Show Progress:$1:Fn[eBool,Show,Hide]             // 01 (true): show, 00 (false): hide
+Is Completed:$1:Fn[eBool,Completed,InProgress]   // 01 (true): completed, 00 (false): in progress (incomplete)
++ Fragment[FormatString]
+</parser>
+
+<parser>
+// 02: AKA tab 2
+// only tab2 have begins & ends
+Packet[Quest Detail - Story]:5102
+Unk:$1
+QuestUID:$2
+Unk:$2
++ SubCate
+pack
+
+SubCate[Begins]:00000000
+
+SubCate[Ends]:ffffffff
+
+SubCate[Description]
++ Fragment[FormatString]
+</parser>
+
+<parser>
+// Sample: 3a 0a 00000000 59b10a00 641c340500646e00000064b700000064ad00000064710000006463000000 00
+Packet[Pop Role-Teacher Message Dialog]:3a
+Unk:$1 // requirement: >00
+pad-4
++ Fragment[FormatString]
+</parser>
+
+<parser>
+// Sample: __ a210 00 00
+Packet[Update Attack Mode]:a210
+Mode:$1:Fn[eAttackMode]
+pack
+</parser>
+
+<parser>
+// !REVIEW! revision, currently gussing:
+// Request: stuffbag sub 1 14 // 1: lifemake slot1, 14: target bag pos
+// Sample: __ ad02 01 00
+Packet[Get Item From LifeMake Bag]:ad02
+Item Position:$1
+pack
+</parser>
+
+<parser>
+// Request: desc 17fc1ff#
+// Sample: __ 31 ffc17f01 01 00000000 00
+// Sample: __ 31 ffc17f01 01 7f780900 642d780900 647e750200 00
+// Sample: __ 31 ffc17f01 01 18790900 00
+// Sample: __ 31 ffc17f01 01 8c780900 6414000000 00
+// Sample: __ 31 ffc17f01 01 ffffffff 00
+
+// Request: desc 2272c#
+//            -- $1------ __ $2------ __ $param1- __ $param2- __ $param3- __ $param4- __
+// Sample: __ 31 2c270200 01 00000000 00                                                 // tag start (item desc)
+// Sample: __ 31 2c270200 01 0b780900 64 2c270200 64 06000000 64 30780900 64 2c780900 00 // (|3^1 `=C|4+$2`=C) $1: itemID $2: 強化數 $3 colorCode $4: 強化ColorCode
+// Sample: __ 31 2c270200 01 09780900 00                                                 // 永綁 (09780900) (`N`+C0xff0000`-C [永久绑定]`=C)
+// Sample: __ 31 2c270200 01 0a780900 64 04000000 00                                     // 星星數
+// Sample: __ 31 2c270200 01 18790900 00                                                 // tag start (620824 `N 道具描述(后面无空格))
+// Sample: __ 31 2c270200 01 16780900 00                                                 // itemType [16780900: 戒指]
+// Sample: __ 31 2c270200 02 2c270200 00                                                 // item desc (by itemID)
+// Sample: __ 31 2c270200 01 18790900 00                                                 // tag end (620824 `N 道具描述(后面无空格))
+// Sample: __ 31 2c270200 01 48790900 64 27780900 64 64000000 00                         // lv Req 100 [red] (装备要求: |1$2 级`=C`N)
+// Sample: __ 31 2c270200 01 41780900 64 78000000 64 ff000000 00                         // 耐久 120/255 (耐久: $1 / $2`N)
+// Sample: __ 31 2c270200 01 44780900 64 30780900 73 03000000 2b3235 00                  // 精神 +25 [red] | 44780900
+// Sample: __ 31 2c270200 01 46780900 64 30780900 73 03000000 2b3236 00                  // 體質 +26 [red] | 46780900
+// Sample: __ 31 2c270200 01 47780900 64 30780900 73 03000000 2b3531 00                  // 命中 +51 [red] | 47780900
+// Sample: __ 31 2c270200 01 5e780900 64 30780900 73 05000000 2b33333933 00              // 生命 +3393 [red] | 5e780900
+// Sample: __ 31 2c270200 01 62780900 64 30780900 73 04000000 2b343238 00                // 法力 +428 [red] | 62780900 (|1法力: $2`=C`N)
+// Sample: __ 31 2c270200 01 77780900 64 31780900 73 05000000 2b31372e30 00              // 附加生命 | value: +17.0 [purple] | 77780900
+// Sample: __ 31 2c270200 01 78780900 64 31780900 73 05000000 2b31372e30 00              // 附加法力 | value: +17.0 [purple] | 78780900
+// Sample: __ 31 2c270200 01 7d780900 64 91e10800 64 01000000 00                         // 黑暗恐懼 Lv.1 - 91e10800 | 7d780900
+// Sample: __ 31 2c270200 01 7e780900 73 02000000 3037 73 02000000 3030 00               // 洞洞數 07 (可用) 00 (已入) | 7e780900 ([4:H$1:U$2]`N)
+// Sample: __ 31 2c270200 01 8c780900 64 59010000 00                                     // 賣出價 (345) | 8c780900
+// Sample: __ 31 2c270200 01 97780900 00                                                 // itemQuality [97780900: 六品裝備] (`+C0xffff00`-C[六品装备]`=C`N)
+// Sample: __ 31 2c270200 01 9b780900 73 04000000 cea8d2bb 00                            // maker name | 9b780900 (`N`+C0xffff00`-C[製作者：^1]`=C`N)
+// Sample: __ 31 2c270200 01 ffffffff 00                                                 // tag end (item desc)
+// Sample: __ 31 8008c100 00 00 // TODO: wtf is this?
+// Sample: __ 31 46d75701 00 00 // also this ..
+// Order: [31.$4.01.00000000>31.$4.$1.$4.*>31.$4.01.ffffffff] // TODO: add Order tag support
+// SameAs[ItemDescFamily]
+Packet[Item Detail]:31
+ItemUID:$4
++ SubCate
+pack
+
+SubCate[Clear Cache]
+
+SubCate[Begins]:0100000000
+
+SubCate[Ends]:01ffffffff
+
+// !REVIEW! revision: is baseID or modelID?
+SubCate[Description Line - By ItemBaseID]:02
+ItemBaseID:$4:R[ITEM,dec]
+
+SubCate[Description Line - Direct Format]:01
++ Fragment[FormatString]
+
+</parser>
+
+<parser>
+// Sample: __ 4c 00 43ea2900 5cb40a00 643e560200 00
+// Sample: __ 4c 01 01 e24d0200 63 16 12 09 00 00 01 00 00 00 00
+// Sample: __ 4c 01 02 e34d0200 63 15 11 08 00 01 01 00 00 00 00
+// Sample: __ 4c 01 03 e44d0200 63 13 0b 0c 00 00 00 01 00 00 00
+// Sample: __ 4c 01 04 e54d0200 5f 1a 08 05 01 01 00 00 00 00 00
+// Sample: __ 4c 01 05 e64d0200 62 13 0a 08 00 01 00 00 00 00 00
+// Sample: __ 4c 01 06 e74d0200 63 10 0b 09 01 00 00 00 00 00 00
+// Sample: __ 4c 01 07 e84d0200 63 0c 0f 09 01 00 00 00 00 00 00
+// Sample: __ 4c 01 08 e94d0200 63 10 0e 06 00 01 00 00 00 00 00
+// Sample: __ 4c 01 09 ea4d0200 63 0a 0c 06 00 00 01 00 00 00 00
+// Trigger[UserCMD]: use 29ea43#
+Packet[StoneBag GUI]:4c
++ SubCate
+pack
+
+// [itemDB (^1)] 0x02563e: 乾坤宝石袋
+// 0x0ab45c: ^1`N生命`N能量`N力量`N防御`N智力`N精神`N回避`N精准`N神圣`N
+SubCate[Display GUI]:00
+ItemUID:$4
++ Fragment[FormatString]
+
+SubCate[Stone Amounts]:01
+Page:$1
+Stone Name:$4:R[ITEM,name]
++ REP
+Amount at Stone Level <index>:$1 // repeat 10 times, as 10 stone levels.
+- REP
+</parser>
+
+<parser>
+// Sample: __ 4c 02 01 01 5e 00 // life stone (page1) level 1, amount: 0x5e (94)
+Packet[Update StoneBag Item Amount]:4c02
+Bag Page:$1
+Stone Level:$1
+Amount:$1 // (amount of that stone in bag)
+pack
+</parser>
+
+<parser>
+// Sample: __ 4c 03 05 06 01 00000000 00
+// Sample: __ 4c 03 05 06 01 7f780900 642c780900 64e64d0200 00
+// Sample: __ 4c 03 05 06 01 18790900 00
+// Sample: __ 4c 03 05 06 01 18790900 00
+// Sample: __ 4c 03 05 06 01 38790900 00
+// Sample: __ 4c 03 05 06 01 18790900 00
+// Sample: __ 4c 03 05 06 01 ffffffff 00
+// SameAs[ItemDescFamily]
+Packet[StoneBag Item Desc]:4c03
+Bag Page:$1
+Stone Level:$1
++ SubCate
+
+SubCate[Begins]:0100000000
+
+SubCate[Ends]:01ffffffff
+
+SubCate[Description Line - Direct Format]:01
++ Fragment[FormatString]
+
+</parser>
+
+<parser>
+// Trigger[UserCMD]: move 29f52f# 11
+// Sample: __ 2d 2ff52900 00
+Packet[Remove Item In Bag]:2d
+ItemUID:$4
+pack
+</parser>
+
+<parser>
+// Request: depot info 1 5 4 
+// Sample: __ ab 0c010504 01 00000000 00
+// Sample: __ ab 0c010504 01 7f780900 642c780900 6475550200 00
+// Sample: __ ab 0c010504 01 18790900 00
+// Sample: __ ab 0c010504 01 17780900 00
+// Sample: __ ab 0c010504 02 75550200 00
+// Sample: __ ab 0c010504 01 18790900 00
+// Sample: __ ab 0c010504 01 8c780900 6458020000 00
+// Sample: __ ab 0c010504 01 ffffffff 00
+// Order: [ab.$4.01.00000000>ab.$4.$1.$4.*>ab.$4.01.ffffffff]
+// SameAs[ItemDescFamily]
+Packet[Tribu Valve Item Detail]:ab
+ItemUID:$4
++ SubCate
+pack
+
+SubCate[Clear Cache]
+
+SubCate[Begins]:0100000000
+
+SubCate[Ends]:01ffffffff
+
+// !REVIEW! revision: is baseID or modelID?
+SubCate[Description Line - By ItemBaseID]:02
+ItemBaseID:$4:R[ITEM,dec]
+
+SubCate[Description Line - Direct Format]:01
++ Fragment[FormatString]
+
+</parser>
+
+<parser>
+// Sample: __ 4e dd54e200 ef01 00
+Packet[Update Item Amount]:4e
+ItemUID:$4
+New Amount:$2
+pack
+</parser>
+
+<parser>
+// Sample: __ 3b 02 4bb00a00 64fa1e0200 6401000000 00
+Packet[Self Chat Message]:3b
++ SubCate
+pack
+
+SubCate[Headerless Channel]:02
++ Fragment[FormatString]
+</parser>
+
+<parser>
+// Sample: __ ad 01 01 fa760200 fa760200 3c 00 00 00 00 00
+// Sample: __ ad 01 02 0a760200 0a760200 63 00 00 00 00 00
+// Sample: __ ad 01 03 d2760200 d2760200 63 00 00 00 00 00
+// Sample: __ ad 01 04 1e760200 1e760200 63 00 00 00 00 00
+// Sample: __ ad 01 05 7e750200 7e750200 63 00 00 00 00 00
+// Sample: __ ad 01 06 f0760200 f0760200 41 00 00 00 00 00
+// Sample: __ ad 01 30 78760200 78760200 0e 00 00 00 00 00
+// Remark[CHT]: 生活技能材料包
+Packet[Life Make Material Bag Item]:ad
+Unk:01
+Slot:$1 // index counts from 1, page1: 1 to 24 (0x18), page2: 25 to 48 (0x30)
+ItemID:$4:R[ITEM]
+ItemID:$4:R[ITEM]
+Amount:$1
+pad-4 // !REVIEW! is this really padding?
+pack
+</parser>
+
+<parser> 
+//    case "1" : action = ATTACK_ACT;  break;
+//    case "2" : action = SIT_ACT;  break;
+//    case "3" : action = MAGIC_ACT;  break;
+//    case "4" : action = FALL_ACT;  break;
+//    case "5" : action = STAND_ACT;  break;
+//    case "6" : action = DEFAULT_ACT;  break;
+//    case "7" : action = RUN_ACT;  break;
+//     default : action = WAIT_ACT;  break;
+// lsrc[/cmd/std/go.c]: send_user( user, "%c%d%d%c", 0x40, getoid(me), time2(), MAGIC_ACT_END );    // 结束施法动作
+// Sample: __ 40 395f0101 e6c01012 0b 00 // TODO: usage? order?
+// Order: -Unknown-
+// Command/Trigger: act 11
+Packet[Do Act]:40
+EntityUID:$4
+Time2:$4
+Act:$1:Fn[eAct]
+pack
+</parser>
+
+<parser>
+// Sample: __ 47 fbba4d02 3ad21012c6009200 02 00 01 31 31 00 // TODO: usage? order? meaning?
+// Trigger[CMD]: go2 244,175 2 136876
+// Sample: __ 47 2b555001 71fd8a09f500ae0002fe023232 00 // TODO: ??
+// Sample: __ 47 0a585801 f4409709 9400 7200 01 02 08 3738 00 // update entity location
+// Sample: __ 47 13270000 2e419709 8800 6700 02 01 08 3138 00 // 
+// Event[OnEntityMove]
+// Event[OnMobMove]
+// Command/Trigger: act 11
+// lsrc[cmd/std/go.c]: send_user( user2, "%c%d%d%w%w%c%c%c%s", 0x47, getoid(me), time2(), x0, y0, x - x0, y - y0, d, arg );
+Packet[Update Entity Facing with Steps]:47
+EntityUID:$4
+Time2:$4
+LocX:$2 // unk use
+LocY:$2 // unk use
+Dist. X:$1 // newX(locX) - oriX
+Dist. Y:$1 // newY(locY) - oriY
+Facing (num):$1:Fn[eFacing]
+Facing Steps:$gbk // more steps = more movements
+pack
+</parser>
+
+<parser>
+// Sample(original): __ 48 7d052f00 5a000000 08fbba4d 021d5c01 00 // 7d052f00: target's entityUID, fbba4d02: self entityUID
+// Sample(original): __ 48 83523801 8f2a0000 082b5237 01702302 00
+// Sample(original): __ 48 12270000 8f2a0000 082b5237 12270000 00
+// Event[OnDamageTaken]
+// !REVIEW! confirm packet params
+Packet[Entity Damage Taken]:48
+EntityUID:$4
+Damage:$4
+unk:$4
+DamagerUID:$4
+pack
+</parser>
+
+<parser>
+// Sample: __ 70 cf465801 a91f0000 00
+Packet[Entity Damage Taken]:70
+EntityUID:$4
+Damage:$4
+pack
+</parser>
+
+//<parser>
+// TODO: auto_fight B
+// Command: auto_fight 4f8db4da61d1f4cb9e68037a967afec6 27648 CTRL_FIGHT 
+// Sample:  __ 2101 460f0000 00 // notification
+// Sample:  __ a8 0a01 545950455f42 00 // enable TYPE_B auto_fight; 545950455f42 = (GBK, no qoute) "TYPE_B"
+// Command: go2 127,139 4 27654
+// Sample:  __ 67 40ed2900 7424ee12 7f00 8b00 34 00 // path sync
+// Command: path 27658 122,137 210 4 0
+// Command: go2 126,138 55 27658
+// Sample:  __ 47 40ed2900 7b24ee12 7e00 8a00 fe00053535 00 // perform act
+// Command: auto_fight ae32e89b0f078df19174db0e49cc62c7 27662 CTRL_FIGHT // ask for disable
+// Sample:  __ 43 00 0a5e0600 004b2f0000 00
+// Sample:  __ a8 0a00 545950455f42 00 // disable TYPE_B auto_fight
+//Packet[]:43
+//</parser>
+
+
+<parser>
+// Trigger(Setup silver store): [+] [1623592336.887103] [59233>] Data['pf2 570010'] I[1]
+// Sample(freeze, setup store overhead display): [+] [1623592337.028243] [59233<] Data['057b00010100', '103d5452a531012d450f00647816000000', '0c7bfc2d450f00647816000000'] I[2]
+// Trigger(store close): [+] [1623592340.823404] [59233>] Data['store close'] I[3]
+// Sample(unfreeze, remove store overhead display): [+] [1623592340.969001] [59233<] Data['057b00000100', '083d5152a531010000', '072101d40d000000'] I[4]
+// Sample: __ 7b 00 01 01 00 // freeze
+// Sample: __ 7b 00 00 01 00 // unfreeze
+Packet[Store - Freeze Self]:7b00
+isFreezing:$1:Fn[eBool,Freezing,Unfreeze]
+Unk:$1
+pack
+</parser>
+
+<parser>
+// Trigger: [+] [1623624140.030953] [55024>] Data['desc char 5856'] I[1]
+// Sample: [+] [1623624140.150947] [55024<] Data['2956fc8d1979090064ff110000730a000000bae1d0d0c0cbd7d3b8e77308000000d2bbc5c5b5c4414b00', '03560000', '2f56fe1127000000000500895a1b00089a1b00c84be9039b421500654a0000000006000000070000003e0c00001ff800', '145665000802000000060000080200010000000000', '285665000802000000060000080200010b7809006400080200640a0000006430780900642e78090000', '195665000802000000060000080200010a780900640a00000000', '145665000802000000060000080200011879090000', '145665000802000000060000080200011178090000', '145665000802000000060000080200020008020000', '145665000802000000060000080200011879090000', '1e566500080200000006000008020001487909006427780900647800000000', '1956650008020000000600000802000135780900642d78090000', '1e566500080200000006000008020001417809006410010000647701000000', '2156650008020000000600000802000144780900643078090073030000002b343300', '2156650008020000000600000802000147780900643078090073030000002b373000', '2156650008020000000600000802000148780900643078090073030000002b333500', '2256650008020000000600000802000158780900643078090073040000002b36363900', '235665000802000000060000080200015b780900643078090073050000002b3237323800', '245665000802000000060000080200017b780900643178090073060000002b3130382e3000', '245665000802000000060000080200017c780900643178090073060000002b3130382e3000', '1e5665000802000000060000080200017d780900647de10800640600000000', '225665000802000000060000080200017e780900730200000030377302000000303500', '195665000802000000060000080200018c780900648802000000', '145665000802000000060000080200019778090000', '235665000802000000060000080200019b780900730a000000cad7cfafa4a3c9f3c5d000', '14566500080200000006000008020001ffffffff00', '145666622302000000060062230200010000000000', '285666622302000000060062230200010b7809006462230200640a0000006430780900642e78090000', '195666622302000000060062230200010a780900640a00000000', '145666622302000000060062230200011879090000', '145666622302000000060062230200011378090000', '145666622302000000060062230200026223020000', '145666622302000000060062230200011879090000', '1e566662230200000006006223020001487909006427780900648200000000', '1e56666223020000000600622302000141780900643d01000064b301000000', '2156666223020000000600622302000144780900643078090073030000002b383700', '2156666223020000000600622302000147780900643078090073030000002b343400', '2356666223020000000600622302000152780900643078090073050000002b3237363900', '2456666223020000000600622302000179780900643178090073060000002b3130382e3000', '245666622302000000060062230200017a780900643178090073060000002b3130382e3000', '1e5666622302000000060062230200017d780900649be10800640500000000', '225666622302000000060062230200017e780900730200000030377302000000303400', '195666622302000000060062230200018c78090064c702000000', '145666622302000000060062230200019778090000', '235666622302000000060062230200019b780900730a000000bae1d0d0c0cbd7d3b8e700', '14566662230200000006006223020001ffffffff00', '145667f0e0010000000600f0e00100010000000000', '285667f0e0010000000600f0e00100010b78090064f0e00100640a0000006430780900642e78090000', '145667f0e0010000000600f0e00100010478090000', '195667f0e0010000000600f0e00100010a780900640700000000', '145667f0e0010000000600f0e00100011879090000', '145667f0e0010000000600f0e00100011878090000', '145667f0e0010000000600f0e0010002f0e0010000', '145667f0e0010000000600f0e00100011879090000', '1e5667f0e0010000000600f0e0010001487909006427780900647800000000', '195667f0e0010000000600f0e00100013c780900642778090000', '1e5667f0e0010000000600f0e001000141780900645e000000640401000000', '215667f0e0010000000600f0e001000144780900643078090073030000002b343900', '215667f0e0010000000600f0e001000145780900643078090073030000002b323400', '215667f0e0010000000600f0e001000147780900643078090073030000002b343900', '225667f0e0010000000600f0e00100014d780900643078090073040000002b322e3000', '235667f0e0010000000600f0e001000152780900643078090073050000002b3333323500', '235667f0e0010000000600f0e001000179780900643178090073050000002b35302e3000', '235667f0e0010000000600f0e00100017a780900643178090073050000002b35302e3000', '1e5667f0e0010000000600f0e00100017d7809006471e10800640100000000', '225667f0e0010000000600f0e00100017e780900730200000030377302000000303000', '195667f0e0010000000600f0e00100018c780900644401000000', '145667f0e0010000000600f0e00100019778090000', '235667f0e0010000000600f0e00100019b780900730a0000005977d8bcd0a1cfc9c5ae00', '145667f0e0010000000600f0e0010001ffffffff00', '145668300002000000060030000200010000000000', '285668300002000000060030000200010b7809006430000200640a0000006430780900642e78090000', '195668300002000000060030000200010a780900640a00000000', '145668300002000000060030000200011879090000', '145668300002000000060030000200011478090000', '145668300002000000060030000200023000020000', '145668300002000000060030000200011879090000', '1e566830000200000006003000020001487909006427780900647800000000', '1956683000020000000600300002000135780900642d78090000', '1e566830000200000006003000020001417809006407010000646d01000000', '2256683000020000000600300002000145780900643078090073040000002b31303600', '2156683000020000000600300002000146780900643078090073030000002b313700', '2356683000020000000600300002000158780900643078090073050000002b3539373700', '245668300002000000060030000200017b780900643178090073060000002b3130382e3000', '245668300002000000060030000200017c780900643178090073060000002b3130382e3000', '1e5668300002000000060030000200017d780900648be10800640600000000', '225668300002000000060030000200017e780900730200000030377302000000303500', '195668300002000000060030000200018c780900648802000000', '145668300002000000060030000200019778090000', '235668300002000000060030000200019b780900730a000000c2dec4c9b6fbb6e0d8bc00', '14566830000200000006003000020001ffffffff00', '1456692858020000000100270c0200010000000000', '2856692858020000000100270c0200010b78090064270c02006408000000642c780900642c78090000', '1456692858020000000100270c0200010478090000', '1956692858020000000100270c0200010a780900640600000000', '1456692858020000000100270c0200011879090000', '1456692858020000000100270c0200011578090000', '1456692858020000000100270c020002270c020000', '1456692858020000000100270c0200011879090000', '1e56692858020000000100270c020001487909006427780900644100000000', '1e56692858020000000100270c020001417809006420000000643c00000000', '2256692858020000000100270c02000158780900642c78090073040000002b32303000', '2256692858020000000100270c0200015b780900642c78090073040000002b32303000', '2256692858020000000100270c0200015e780900642c78090073040000002b36303000', '1956692858020000000100270c0200017f370000645152020000', '1456692858020000000100270c020001ffffffff00', '14566a180402000000060018040200010000000000', '28566a180402000000060018040200010b780900641804020064090000006430780900642a78090000', '19566a180402000000060018040200010a780900640a00000000', '14566a180402000000060018040200011879090000', '14566a180402000000060018040200011978090000', '14566a180402000000060018040200021804020000', '14566a180402000000060018040200011879090000', '1e566a18040200000006001804020001487909006427780900647800000000', '1e566a18040200000006001804020001417809006407010000646b01000000', '21566a1804020000000600180402000143780900643078090073030000002b313400', '21566a1804020000000600180402000144780900643078090073030000002b373400', '21566a1804020000000600180402000146780900643078090073030000002b313800', '21566a1804020000000600180402000149780900643078090073030000002b343400', '23566a1804020000000600180402000158780900643078090073050000002b3136303800', '22566a180402000000060018040200015b780900643078090073040000002b38313200', '24566a180402000000060018040200017b780900643178090073060000002b3130382e3000', '24566a180402000000060018040200017c780900643178090073060000002b3130382e3000', '1e566a180402000000060018040200017d780900647de10800640100000000', '22566a180402000000060018040200017e780900730200000030377302000000303000', '19566a180402000000060018040200018c780900648802000000', '14566a180402000000060018040200019778090000', '21566a180402000000060018040200019b7809007308000000a4a5c1f0c1a7d8bc00', '14566a18040200000006001804020001ffffffff00', '14566b362702000000050036270200010000000000', '28566b362702000000050036270200010b78090064362702006409000000642f780900642a78090000', '14566b362702000000050036270200010478090000', '14566b362702000000050036270200011879090000', '14566b362702000000050036270200011678090000', '14566b362702000000050036270200023627020000', '14566b362702000000050036270200011879090000', '1e566b36270200000005003627020001487909006427780900646e00000000', '1e566b362702000000050036270200014178090064e9000000643b01000000', '21566b3627020000000500362702000147780900642f78090073030000002b383400', '23566b362702000000050036270200015e780900642f78090073050000002b3137383200', '22566b3627020000000500362702000162780900642f78090073040000002b34303900'] I[6]
+// details:
+// role: TS, lv 141, BL: 一排的AK
+Packet[Desc Char]:56
+// ..........................................................
+</parser>
+
+
+<parser>
+// Sample: __ 07 a500 6400 02 00
+Packet[KnockBack Location - Error]:07
+Back To LocX:$2
+Back To LocY:$2
+ErrorCode:$1
+pack
+</parser>
+
+<parser>
+// Trigger: OnDodged
+// Sample: __ 44 DEADEBEEF 00
+Packet[Animate Text: Dodged]:44
+EntityUID:$4
+pack
+</parser>
+
+// Trigger: [+] [1623765284.847052] [64664>] Data['desc user 1085'] I[1]
+// [+] [1623765284.995221] [64664<] Data['075d020000000000', '2b5d028f080000730a000000bdb1bebac5c4b1a6ceef643d0400007304000000cee4cabf73020000002d2d00', '075d02ffffffff00'] I[2]
+// Trigger: [+] [1623765319.065102] [64664>] Data['desc user 1427'] I[1]
+// [+] [1623765319.213034] [64664<] Data['075d020000000000', '295d028f0800007304000000bcc0caa664930500007304000000bcc0caa67306000000ccecd3f0b3c700', '175d02702700007306000000ccecd3f0b3c7642827000000', '075d02ffffffff00'] I[2]
+// Trigger: [+] [1623765349.826967] [64664>] Data['desc user 6586'] I[8]
+// [+] [1623765349.938781] [64664<] Data['075d020000000000', '2b5d028f0800007304000000b5dbbefd64ba1900007304000000bda3bfcd7308000000cee4c1a6cac0bcd200', '1f5d029fcb1000730e000000602b433078313462666634602d43641c28000000', '075d02ffffffff00'] I[9]
+
+
+// Trigger(when click on selected target): [+] [1623765401.923331] [64664>] Data['look 6586'] I[36]
+// [+] [1623765402.034761] [64664<] Data['08a206ba1900007800'] I[37]
+
+<parser>
+// Trigger[CMD]: get_info luori
+// Desc: Get Sunset City owner name
+//                  GBK
+// Sample: __ a2 1a ccecb9ac 00
+Packet[Sunset City Owner Name]:a21a
+Name:$gbk
+pack
+</parser>
+
+<parser>
+// "%c%d%d%w%w%d %w %c %c %w %c %c", 0x8a, getoid(me), time2(), get_x(me), get_y(me), getoid(who), 9901, 1, OVER_BODY, 9902, 1, OVER_BODY
+// Sample: __ 8a 12270000 b8ad9609 ac00 7700 13270000 6a3d0800 01 02 00
+// Sample: __ 8a 2b523701 0c4c4a09 9d00 4f00 4b3b3301 57d10c00 01 02 00
+// Sample: __ 8a 2b523701 5c534b09 9800 9b00 ca503801 57d10c00 01 02 00
+// Sample: __ 8a e4d75601 21ae9609 a600 7600 cf465801 6cc80102 00
+//            %c %d       %d       %w   %w   %d       %d
+// Desc: to spawn a skill effect animation.
+Packet[Perform Skill Animation]:8a
+AttackerEID:$4
+Time2:$4
+Attacker LocX:$2
+Attacker LocY:$2
+VictimEID:$4
+AniID/SkillID:$4:R[SKILL]
++ SubCate
+
+SubCate[END]
+pack
+
+SubCate[Animated]
+Ani. Duration (sec):$1
+Ani. Layer:$1:Fn[eAniLayer]
+pack
+</parser>
+
+////<parser>
+////// Trigger[Ask for selling]: [+] [1623936962.453456] [64496>] Data['sell 6971# 1387940# 8<EOL><00><00><00><00><00><00><00><00><00>'] I[101] // selling item, amount: 8 | 40793801
+////// Confirmation of selling (selectedEntityID: 71690000):
+////// [+] [1623936962.557419] [64496<] Data['07 5e ea573701 04 00', '07 5e 71690000 08 00', '29 3a 0a 00000000 c4370c00 64 b48a0100 64 56130000 64 71690000 64 40793801 64 08000000 64 a50f0000 00'] I[102]
+////// Trigger[Sell Confirm]: [+] [1623937402.230522] [64496>] Data['sell ! 6971# 1387948# 1<EOL><00><00><00><00><00><00><00>'] I[2]
+////// [+] [1623937403.056556] [64496<] Data['075eea5737010400', '075e716900000800', '245d01fd0a0000730e000000602b433078666164363765602d4364b68a010064983a000000', '062d4879380100', '073d46cc6f0e0000'] I[3]
+////</parser>
+
+// ----------------- exchange -----------------
+// exchange 8359  <- exchange request
+// exchange 10836 <- confirm exchange request
+// exchange + 8359 0#0 0#0 0#0 0#0 0#0 0#0 $1000000 0# 0# 0#
+// exchange + 10836 0#0 0#0 0#0 0#0 0#0 0#0 $0 0# 0# 0#
+// exchange = 8359
+// exchange = 10836
+<parser>
+// Trigger: exchange 10842
+// Sample: __ 2601 5a2a0000 34313233313233 00
+//                 heroUID  name in GBK
+Packet[Exchange Request/Response]:2601
+HeroUID:$4
+HeroName:$gbk
+pack
+</parser>
+
+<parser>
+// Sample: __ 37 8a400800 00 00
+// Sample: __ 37 26400800 00 00
+Packet[Skill Related Unknown]:37
+SkillID:$4:R[SKILL]
++ SubCate
+pack
+
+SubCate[End]:00
+
+// SubCate[FSDB]
+// FormatStringID:$4:Fn[parseFS]
+// + REP
+// Param <index>:param
+// - REP
+</parser>
+
+<parser>
+// Sample: __ 66 cf465801 800080 00 00
+Packet[Update Entity Name Color]:66
+EntityUID:$4
+Color:$4:Fn[eRGB] // last byte for alignment only
+pack
+</parser>
+
+<parser>
+// lsrc[sys/char/fight.c]: "%c%d%d%c%c%c%d", 0x41, getoid(me), time2(), act, pf, get_d(me), getoid(who)
+// Sample: __ 41 581c2b01 99ad9609 02 00 08 1e175801 00
+// Sample: __ 41 00073b01 aead9609 03 00 07 1e175801 00
+// Sample: __ 41 581c2b01 b2ad9609 02 00 08 1e175801 00
+// Sample: __ 41 cf465801 aaad9609 01 00 03 e4d75601 00
+// Sample: __ 41 12270000 aaad9609 01 00 03 00073b01 00
+// Sample: __ 41 e4d75601 72ad9609 01 3c 04 00000000 00 // no need to send, as this one is useless (victimID == 00000000)
+// Order: [?50>41]
+// Desc: make victim to auto select attacker.
+// Receiver: Victim
+Packet[Entity Attack Entity]:41
+EntityUID (Attacker):$4
+Time2:$4
+Act:$1
+PF?:$1
+Facing:$1:Fn[eFacing]
+EntityUID (Victim):$4
+pack
+</parser>
+
+<parser>
+// lsrc[skill/02/02316.c]: f1 = me->get_armor_code();  f2 = me->get_head_code();  f3 = me->get_weapon_code_2();  f4 = me->get_reincarnation();
+//                         x = get_x(who);  y = get_y(who);  d = get_front_xy(x0, y0, x, y);
+//                         send_user( get_scene_object_2(who, USER_TYPE), "%c%w%w%d%w%w%c%d%w%c%c%c", 0x88, x0, y0, time2(), x, y, d, f1, f3, act, f4, 1 );
+// Sample: __ 88 ec00 6600 {time}   f000 7000 02 11270000 0000 3c 08 0000 0000 01 0001 0100 e780 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 00
+// Sample: __ 88 6600 4c00 f824d309 6400 4c00 05 11270000 0000 3e 01 0000 0000 01 0001 0100 e780 0000 0000 0000 0000 0800 0000 1900 0000 0000 0000 0000 0000 00
+// Sample: __ 88 ec00 6600 {time}   f000 7000 08 4e650600 0000 00 00 0000 0000 00 0000 0000 0000 0000 0000 0000 0000 00 // bigF boss
+//         00 01 0203 0405 06070809 0A0B 0C0D 0E 0F101112 1314 15 16 1718 191A 1B 1C1D 1E1F 2021 2223 2425 2627 2829 2A2B 2C2D 2E2F 3031 3233 3435 3637 3839 3A
+//                                                                   ???? ????                                       hat       body      mask      tail
+Packet[Skill - 520060 - Multi Shadow Clone]:88
+Starting LocX:$2
+Starting LocY:$2
+Time2:$4
+End LocX:$2
+End LocY:$2
+Facing:$1:Fn[eFacing]
++ SubCate
+pack
+
+SubCate[with Hero Model]
+Gender:$4 // 0x2711: body, 0x2af9: girl, others: modelID
+Model Color:$2:Fn[eRGB565]
+Weapon Type:$1 // 0x3c: none, 0x3d: knife, 0x3e: sword, 0x3f: wand
+Weapon Level:$1 // 0x00: newbie, 0x09: highest?
+unk:$2
+unk:$2
+Act?:$1 // byte offset: 1B
+unk:$2
+Hair Cut:$2 // 1E
+Hair Dye:$2 // 20
+unk:$2 // 22
+unk:$2 // 24
+unk:$2 // 26
+unk:$2 // 28
+Style (Hat):$2 // 2A
+Hat Dye:$2
+Style (Body):$2 // 2E
+Body Dye:$2
+Style (Mask):$2 // 32
+Mask Dye:$2
+Style (Tail):$2 // 36
+Tail Dye:$2
+
+SubCate[with NPC Model]
+ModelID:$4
+Model Color:$2:Fn[eRGB565]
+Weapon Type:$1
+Weapon Level:$1
+unk:$2
+unk:$2
+unk:$1 // byte offset: 1B
+unk:$2
+unk:$2 // 1E
+unk:$2 // 20
+unk:$2 // 22
+unk:$2 // 24
+unk:$2 // 26
+unk:$2 // 28
+</parser>
+
+// TODO: analysis
+//            entityUID
+// __ b9 a2 01 547e1600 02 00 // for player
+// __ b9 a9 01 547e1600 01 00 // for player
+//         entityUID
+// __ b9 a3 c47e1600 01 00 // for human like pet
+//                time?
+// __ 40 c47e1600 dad69d12 0f 00 // for human like pet
+//          entityID top title cate, top title
+// __ a8 01 89240e00 05 b3cfcadbb1bebac5 00 // hero head's personal signature
+// __ 3d .. <- player related attributes (self & others)
+// __ 6f b67c1600 70d10c00 02 01 02 00 // TODO: test
+// __ ae 0302e6270000 666f726d6174737472696e672e646174 0a 666f726d6174737472696e67 0a 7469746c65 0a a5c3c551a4d1a455 0a 00 // TODO: test
+// __ ae 0302e5270000 666f726d6174737472696e672e646174 0a 666f726d6174737472696e67 0a 7469746c65 0a adb7b94cb54cb2aa 0a 00 // TODO: test
