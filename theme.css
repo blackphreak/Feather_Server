@@ -1,3 +1,6 @@
+:root {
+    --cli-bg: #482f6f;
+}
 body {
     font-family: "Consolas", "Courier New", Courier, monospace;
     background: #171717;
@@ -126,25 +129,28 @@ body {
 }
 
 .bg-nor {
-    background: #0c421f !important;
+    background: #0e3a1d !important;
 }
 .bg-err {
-    background: #520606 !important;
+    background: #502121 !important;
 }
 .bg-warn {
-    background: #756e0a !important;
+    background: #4a4612 !important;
 }
 .bg-ignored {
-    background: #5d4635 !important;
+    background: #523e1e !important;
 }
 .cli {
-    background: #482f6f !important;
+    background: var(--cli-bg) !important;
 }
 .fg-err {
     background: #cf6868 !important;
 }
+[role="item"][data-original-title] {
+    background-color: #144356 !important;
+}
 [role="item"].active {
-    background: #0d5575 !important;
+    background: #166d88 !important;
 }
 [role="packet-item"] {
     min-height: 35px;
@@ -214,6 +220,10 @@ table tr:hover {
     padding: 8px 15px;
 }
 
+[colspan="100"], .extra {
+    white-space: pre-wrap;
+}
+
 #io > div {
     background: #222222;
     border-top: 1px solid #cfcfcf;
@@ -244,6 +254,7 @@ table tr:hover {
 [role="header"] {
     margin: 10px 0 0 20px;
     color: #fcfcfc;
+    display: inline-block;
 }
 [role="item"] > [role="editable"]:empty::after {
     content: " ----- Here Is An Empty Line -----";
@@ -254,4 +265,26 @@ table tr:hover {
     content: "More packet goes here ...";
     color: #7b7f81;
     margin-left: 2%;
+}
+[role="item"] > .header_extra {
+    color: #ffffff;
+    margin: 10px 20px 0 0;
+    background-color: var(--cli-bg);
+    float: right;
+}
+[role="item"] > .header_extra.srv {
+    background-color: transparent;
+}
+
+[role="item"] > .header_extra.c0 {
+    background-color: #103344;
+}
+[role="item"] > .header_extra.c1 {
+    background-color: #5f2f21;
+}
+[role="item"] > .header_extra.c2 {
+    background-color: #502a92;
+}
+[role="item"] > .header_extra.c3 {
+    background-color: #5c1d67;
 }

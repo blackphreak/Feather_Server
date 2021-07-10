@@ -3,3 +3,4 @@ __pycache__/
 *.ignore.*
 Feather_Server/
 .vs/
+parser.txt
