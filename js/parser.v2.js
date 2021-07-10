@@ -21,7 +21,7 @@ $.getJSON("./js/db/Skill.json").done((json) => {
 const parserVersion = 5;
 const targetFile = "_pkts.v5.ignore.json";
 let url = new URL(window.location);
-let pktSource = `https://raw.githubusercontent.com/blackphreak/Feather_Server/tree/gh-pages/_pkts.v5.json`;
+let pktSource = `https://raw.githubusercontent.com/blackphreak/Feather_Server/gh-pages/_pkts.v5.json`;
 if (window.location.hostname == "127.0.0.1" || window.location.hostname.indexOf("feather") > -1) pktSource = `./`;
 if (url.searchParams.has("file")) pktSource = url.searchParams.get("file");
 
@@ -68,7 +68,7 @@ $.getJSON(pktSource)
     })
     .fail((_) => {
         $(`#pkt_ver`).html(
-            `Failed to load packet list.<br>Please check for the existance of ${targetFile} on the github develop branch.`
+            `Failed to load packet list.<br>Please check for the existance of ${targetFile} on github.`
         );
         if (false) alert("Failed to load packet list.");
         log("Failed to load packet list.", ERR);
