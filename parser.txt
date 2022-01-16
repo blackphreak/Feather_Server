@@ -1016,7 +1016,8 @@ LocY:$2
 + SubCate
 pack
 
-SubCate[Map Name - Direct GBK]:$gbk
+SubCate[Map Name - Direct GBK]
+Map Name:$gbk
 pack
 
 SubCate[Map Name - by MapID]:00
