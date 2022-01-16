@@ -122,6 +122,16 @@ pack
 // Sample: __ 6980 6b690000 ff00 ab00 04 80 01 22150000 00 00 00000000 00 66420f00 6428bf0400 00 // TYC - car
 // Sample: __ 6980 14690000 0801 a000 04 80 01 27150000 00 00 00000000 00 66420f00 64e2be0400 00 // TYC - healer
 // Sample: __ 6980 35690000 f000 9d00 01 80 01 121b0600 00 00 00000000 00 66420f00 646fc00400 00 // TYC - 招魂使者 (evt NPC)
+// Sample: __ 6980 4c6a0000 a200 7800 02 80 01 ee130000 00 00 00000000 00 66420f00 6426340500 00 // TYC - 
+// Sample: __ 6980 a06a0000 a600 5f00 06 80 01 7d150000 00 00 00000000 00 66420f00 6462340500 00 // TYC - 
+// Sample: __ 6980 9d6a0000 9900 6000 04 80 01 e7260000 00 00 00000000 00 66420f00 641c340500 00 // TYC - 
+// Sample: __ 6980 4a6a0000 b500 7200 04 80 01 1d150000 00 00 00000000 00 66420f00 64200d0500 00 // TYC - 
+// Sample: __ 6980 946a0000 a900 9700 02 80 01 51140000 00 00 00000000 00 66420f00 6429c00400 00 // TYC - 
+// Sample: __ 6980 cb6a0000 b000 9a00 01 80 01 ee130000 00 00 00000000 00 66420f00 6432bf0400 00 // TYC - 
+// Sample: __ 6980 7d6a0000 9f00 8200 02 80 01 7d150000 00 00 00000000 00 66420f00 6458340500 00 // TYC - 
+// Sample: __ 6980 726a0000 9e00 9600 02 80 01 81150000 00 00 00000000 00 66420f00 6474e60400 00 // TYC - 
+// Sample: __ 6980 cc6a0000 a600 a100 02 80 01 e7260000 00 00 00000000 00 66420f00 6446bf0400 00 // TYC - 
+
 // Sample: __ 6980 d0a04f01 f000 a200 07 81 0f 752f0700 18 02 00000000 00 b6ae0a00 7308000000cdfab2c6cdfab2c6 730a000000c7e9d2e5d8bcbddcb8e7 00 // Pet - 旺财旺财(情义丶杰哥)
 //         __ b9a3 d0a04f01 01 00        // ?
 //         __ 40   d0a04f01 53fd8a09 0f 00 // do act
@@ -136,6 +146,14 @@ pack
 //                        __ 66   cf465801 800080 00 00 // update entity name color
 // Sample[pet][6980>b9a3]: __ 6980 e4624800 e500 8900 01 81 0f 9c410600 0d 02 00000000 00 b6ae0a00 730700000034bbb7c9eed6aa 7304000000e9aab1a6 00 // pet 波波 -- 4环深知(楠宝)
 // Sample[pet][....>b9a3]: __ b9a3 e4624800 01 00 // [attack mode maybe? 1 = peace]
+// Sample[s.petA-0][6980>b9a3>6f>40]: __ 6980 84a67900 b600 7100 07 81 0f cdbf0400 19 02 00000000 00 b5ae0a00 64f8bf0400 7306000000d1dbd8adedf8 00
+// Sample[s.petA-1][6980>b9a3>6f>40]: __ b9a3 84a67900 01 00
+// Sample[s.petA-2][6980>b9a3>6f>40]: __ 6f 84a67900 cdbf0400 02 01 02 00 // pet effect
+// Sample[s.petA-3][6980>b9a3>6f>40]: __ 40 84a67900 88c21701 0f 00
+// Sample[s.petB-0][6980>7a05>b9a3>40]: __ 6980 31e17c00 a100 5b00 07 81 0f 9b690600 32 02 00000000 00 b6ae0a00 7304000000b2ddbba4 7304000000cfe0d3f6 00
+// Sample[s.petB-1][6980>7a05>b9a3>40]: __ 7a05 31e17c00 6300 0000 c5ca 0000 0000 0000 0000 00
+// Sample[s.petB-2][6980>7a05>b9a3>40]: __ b9a3 31e17c00 01 00
+// Sample[s.petB-3][6980>7a05>b9a3>40]: __ 40 31e17c00 f6f41701 0f 00 // set act (0x0F = passive, wait)
 // Sample: __ b9a3 83634800 01 00
 // [+] [1623893891.247066] [55054<] Data['0678e436d30000', '0678965f370100', '0678479bc90000', '06789b61ed0000', '0678fc7dc70000', '06786b9bc90000', '0c7f0165b80400004800540000', '0c7f0166b80400005c00690000', '0c7f0167b80400002800500000', '0c7f0168b80400008800960000', '0c7f0169b804000030003c0000', '0c7f016ab8040000a500b40000', '0c7f016bb80400007000780000', '0c7f016cb80400005000540000', '0c7f016db804000040004d0000', '0c7f016eb80400002f003c0000', '0c7f016fb80400002d00390000', '0c7f0170b804000030003c0000', '2769803659370175008400068201f64106003206000000000091b00a0064f6410600640d00000000', '2769804659370174008500078201f64106003206000000000091b00a0064f6410600640e00000000', '276980b29ac9006e007b00078201f64106003206000000000091b00a0064f6410600640d00000000', '276980f657ff0070007d00068201f54106003206000000000091b00a0064f5410600640e00000000', '27698051602f0174007c00088201f54106003206000000000091b00a0064f5410600640d00000000', '276980cb2bd40076006e00028201f54106003206000000000091b00a0064f5410600640b00000000', '246980d0de3601700073000080019e070700000000000000b9d6ceefcfc8b7e6b6d3b3a400', '0f672b5237010bf5450982007e003400'] I[594]
 // [+] [1623893891.963969] [55054<] Data['276980a9dbc9006d006f00018201f54106003206000000000091b00a0064f5410600640a00000000', '0f67a9dbc90012f545096d006f003100', '0f675c34370112f54509840080003600', '0f674659370112f54509740085003100'] I[595]
@@ -204,7 +222,7 @@ Packet[Spawn Entity With Animation]:6981
 // Sample: __ 7a05 c43e3801 6300 0000 3200 0000 0000 0000 0000 00 // modifier for elite mob (model color)
 Packet[Entity Model Color Modifier]:7a05
 EntityUID:$4
-unk:$2 // keep it as 0x0063 for elite mob
+unk:$2 // keep it as 0x0063 for elite mob // !REVIEW!: is this modifier for weapon?
 unk:$2
 Color:$2:Fn[eRGB565] // big-end 3200 == 0x3200
 unk:$2
@@ -392,6 +410,7 @@ Ani. Duration (sec):$1
 - REP
 pack
 
+// Sample: __ 6f 738b7f00 b7a60c00 08 02 43 d10c0004 02 02 00 // team leader + reading icon over head
 SubCate[With Layer]
 + REP
 Ani. ID:$4:Fn[eAnimation]
@@ -416,10 +435,12 @@ pack
 
 <parser>
 // Sample: __ 81 743d0800 0807 01 00 // 0x708 (30mins buff)
-// Sample: __ 81 245c0c00 00 00 40d10c00 40 42 01 00 // 0x0c5c24: skill id, 40d10c00: cf buff, unk, pkt: 8124 // TODO: check usage // Src: blToTYC.json
+// Sample: __ 81 245c0c00 0000 40d10c00 4042 01 00 // 0x0c5c24: skill id, 40d10c00: cf buff, unk, pkt: 8124 // Src: blToTYC.json
 Packet[Self (Received Client) Buff]:81
++ REP
 SkillID:$4:R[SKILL,name]
 Buff Duration (sec):$2
+- REP
 Buff Pos:$1:Fn[eTri,Row2,Row1]   // 00: Row2, >=01: Row1
 pack
 </parser>
@@ -428,6 +449,7 @@ pack
 // Sample: __ 83 dedf0d00 d83d0800 05 00 00
 // Sample: __ 83 e4d75601 bcc80700 40d10c00 bf930800 01 01 00
 // Sample: __ 83 93f85001 40d10c00 bf930800 01 01 00
+// Order[Set Long Last Buff]: 83>9568
 Packet[Entity Buff]:83
 EntityUID:$4
 + REP
@@ -981,16 +1003,31 @@ SubCate[Normal Task Avaliable]:04
 // Sample: __ 3c 1127 0000 6800 9000 5a00 00 5f00 00 00 00
 // Sample: __ 3c 1127 6b00 6b00 a600 cb00 00 6b00 00 00 00
 // Sample: __ 3c 1127 bb0b 2300 2000 3000 00 2300 00 00 00
+// Sample: __ 3c 1127 6800 6800 e400 9500 00 6800 00 00 00
+// Sample: __ 3c 1127 d00b 0200 2600 2200 cee4c1d6b4f3bbe1b1c8cee4b3a1 00 // 武林大会比武场
 //          0  1  2 3  4 5  6 7  8 9  A B  c  D E  F 10
+// TODO: review and confirm
 Packet[Hero Map]:3c
 Data1:$2
-pad-1
-Locate Map:$2:Fn[eMap] // also sound? // TODO: test
+Map (On Screen):$2:Fn[eMap]
+Locate Map (Sound & See):$2:Fn[eMap]
 LocX:$2
 LocY:$2
-fmtStrDeterminePoint:$1:Fn[eIf,==0x00,autoDB,>0x0,DirectGBK]
++ SubCate
+pack
+
+SubCate[Map Name - Direct GBK]:$gbk
+pack
+
+SubCate[Map Name - by MapID]:00
 Map Name & Mini Map:$2:Fn[eMap]
 pad-2
+pack
+
+SubCate[Map Name - by MapID]:01
+Map Name & Mini Map:$2:Fn[eMap]
+pad-1
+Map Name:$gbk
 pack
 </parser>
 
@@ -998,6 +1035,7 @@ pack
 // Sample: __ 3e01 2a0e0000 6464000000 00
 // Sample: __ 3e01 63310000 00 // PK mode set to: peaceful
 // Sample: __ 3e01 2cb00a00 64b38a0100 00 // 您捡起 月宫宝箱
+// Sample: __ 3e01 5f3a0c00 00 // 1min before next pvp fight (event: wl)
 Packet[Formatted Message (No Channel Header)]:3e01
 + Fragment[FormatString]
 pack
@@ -1015,7 +1053,10 @@ pack
 // TODO: analysis packets:
 //<parser>
 // Sample: __ b9 a2 01 870a7f01 04 00
+// Sample: __ b9 a2 01 ceb52c00 05 00
 // Sample: __ b9 a2 01 166a4300 01 00
+// Sample: __ b9 a2 01 acce1f00 04 00
+// Order: 690b>a214>b9a201>b9a901>83
 //Packet[-- Unknown b9a2 --]:b9a2
 //Unk:$1
 //EntityUID:$4
@@ -1026,6 +1067,7 @@ pack
 //<parser>
 // Sample: __ b9 a9 01 870a7f01 01 00
 // Sample: __ b9 a9 01 166a4300 01 00
+// Sample: __ b9 a9 01 acce1f00 01 00
 //Packet[-- Unknown b9a9 --]:b9a9
 //Unk:$1
 //EntityUID:$4
@@ -1121,7 +1163,8 @@ pack
 // Sample: __ 95 68 02 870a7f01 00000000 00
 // Sample: __ 95 68 02 166a4300 00000000 00
 // Sample: __ 95 68 02 93f85001 00000000 00 // TODO: ???
-Packet[-- Unknown 9568 --]:9568
+// Sample: __ 95 68 02 ceb52c00 00000000 00 // TODO: ???, "ceb52c00" is self EUID
+Packet[Set Other Entity Buff Long Last (desc only)]:9568
 Unk:$1
 EntityUID:$4
 Unk:$4
@@ -1363,6 +1406,9 @@ pack
 // Sample: __ 43 00 0a 5e060000 4b2f0000 00 // Nameless - FS (5e060000: HeroUID)
 // Sample: __ 43 00 0a 00000000 c4090000 7338000000b9d6ceefbdcbc3f0d5bdbbeeb6afbdabd3dabdf1cded32313a30303a3030bfaab7c5a3accdfbb8f7cebbd3c2cabfd7f6bac3d7bcb1b8a3a100
 // Sample: __ 43 06 5e060000 1b 3a092b31363737373231352cb2eeb2bbb6e0cfc8c9fa3d31363330092d3a2e 00 // ":\t#16777215,差不多先生=1630\t:."
+// Sample[with items]: __ 43 01 51a20000 1b 3a092b36323433372c7656363656763d3431353533092d3a092a31363737363936302c5bbbc6ebf8d3f0d2edc5e4b7bd5d3d34313535332c313737353938312c30092f092a31363737363936302c5bbbc6ebf8d3f0d2edc5e4b7bd5d3d34313535332c323331303432342c30092f092a31363737363936302c5bc7e0c7f1d3f0d2edc5e4b7bd5d3d34313535332c323331313237392c30092f092a31363737363936302c5bc0b6b7e7d3f0d2edc5e4b7bd5d3d34313535332c323331313334312c30092f00
+// Sample: __ 43 00 0a 00000000 3c3a0c00 00 // new round of wl start! (event: wl) [order: 1st]
+// Sample: __ 43 00 0a 00000000 3f3a0c00 6432000000 6405000000 00 // 5 players team with 50lv, fight after 15s, get ready! (event: wl) [order: 2nd]
 Packet[Channel Chat]:43
 + SubCate
 pack
@@ -1452,6 +1498,11 @@ Title:$gbk
 
 <parser>
 // Sample: __ a301 4c320000 6465000000 646a000000 646b000000 6466000000 64cd000000 00
+// Sample: __ a301 a0b10a00 644f650600 6410000000 64fd010000 00 // 16 mins boss
+// Sample: __ a301 a0b10a00 6450650600 6410000000 645b020000 00 // 16 mins boss
+// Sample: __ a301 a0b10a00 6458650600 6410000000 64c2020000 00 // 16 mins boss
+// Sample: __ a301 a0b10a00 645e650600 6410000000 648d030000 00 // 16 mins boss
+// Sample: __ a301 a0b10a00 6461650600 6410000000 648a030000 00 // 16 mins boss
 // Sample: __ a300 414243 00 # TODO: test this PoC (@0x40A2B8)
 Packet[Broadcast (Marquee)]:a301
 + Fragment[FormatString]
@@ -2171,3 +2222,50 @@ unk:$2 // 28
 // __ 6f b67c1600 70d10c00 02 01 02 00 // TODO: test
 // __ ae 0302e6270000 666f726d6174737472696e672e646174 0a 666f726d6174737472696e67 0a 7469746c65 0a a5c3c551a4d1a455 0a 00 // TODO: test
 // __ ae 0302e5270000 666f726d6174737472696e672e646174 0a 666f726d6174737472696e67 0a 7469746c65 0a adb7b94cb54cb2aa 0a 00 // TODO: test
+
+<parser>
+Packet[Pet Farm - Status GUI]:a512
+NPC ID:$4:R[NPC] // pet NPC model ID
+Output Item ID:$4:R[ITEM] // 795d0200 # final output when done
+Current Feed Count:$4 // 00000000 # current ate
+Expected Feed Count:$4 // 02000000 # nEat before done
+Health Level:$4 // 64000000 # health
+Happiness:$4 // 64000000 # happy
+Book:$4 // a6530200 # ? book 宠物图鉴
+Ele.Water - MinEachFeed:$4 // 01000000 # water
+Ele.Water - Current Ate:$4 // 00000000 # current water
+Ele.Water - ExpectedFeed:$4 // 02000000 # expected-water
+Ele.Fire - MinEachFeed:$4 // 01000000 # fire
+Ele.Fire - Current Ate:$4 // 00000000 # current fire
+Ele.Fire - ExpectedFeed:$4 // 02000000 # expected-fire
+Ele.Dirt - MinEachFeed:$4 // 01000000 # dirt
+Ele.Dirt - Current Ate:$4 // 00000000 # current dirt
+Ele.Dirt - ExpectedFeed:$4 // 02000000 # expected-dirt
+Ele.Gold - MinEachFeed:$4 // 01000000 # gold
+Ele.Gold - Current Ate:$4 // 00000000 # current gold
+Ele.Gold - ExpectedFeed:$4 // 02000000 # expected-gold
+Ele.Wind - MinEachFeed:$4 // 01000000 # wind
+Ele.Wind - Current Ate:$4 // 00000000 # current wind
+Ele.Wind - ExpectedFeed:$4 // 02000000 # expected-wind
+pack
+</parser>
+
+// <parser>
+// // __ 6980 bc670000 c400 b800 04 80 01 1a150000 00 00 00000000 00 66420f00 649ce60400 00
+// // Sample: __ 71 bc670000 00 6f00 7200 00
+// // Order[]: 6980>71
+// // __ a8 05bc6700 00 02 82250000 00 // ??? whats this // TODO: TEST: confirm usage & corresponding entity
+// Packet[NPC Special Head?]:71
+// 
+// </parser>
+
+// Sample: 
+// Sample: 
+// Sample: 
+// Sample: 
+// Sample: 
+// Sample: 
+// Sample: 
+// Sample: 
+// Sample: 
+// Sample: 
