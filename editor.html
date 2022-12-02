@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="editor.css" />
+        <script
+            src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
+            integrity="sha384-GH7wmqAxDa43XGS89eXGbziWEki6l/Smy1U+dAI7ZbxlrLsmal+hLlTMqoPIIg1V"
+            crossorigin="anonymous"
+        ></script>
+        <script src="editor.js" defer></script>
+        <title>Feather</title>
+    </head>
+    <body>
+        <div id="overlay" class="hide">
+            <div class="card mt-5">
+                <div class="card-body container">
+                    <div class="row justify-content-center">
+                        <div class="spinner-border text-info" role="status"></div>
+                    </div>
+                    <div class="row justify-content-center mt-2">
+                        <div class="col-auto">
+                            <p>Converting & Packing ... Please DO NOT refresh the page!</p>
+                            <p>If encountered any errors, message will be shown to you!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div style="min-width: 300px; width: 300px">
+                    <!-- control btns -->
+                    <div class="row mt-2">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-primary" id="btn_to_local">Download as PNG(s)</button>
+                            <button class="btn btn-danger" id="btn_reset">Reset</button>
+                            <!-- <button class="btn btn-success" id="btn_test">||</button> -->
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="btn-group-vertical" role="group">
+                            <button class="btn btn-success" id="btn_update_dat">Update .dat</button>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="btn-group-vertical" role="group">
+                            <button class="btn btn-warning" id="btn_ani_play">Play / Stop Animation</button>
+                            <button class="btn btn-outline-warning" id="btn_"></button>
+                            <button class="btn btn-outline-warning" id="btn_"></button>
+                        </div>
+                        
+                        <div class="row mt-5">
+                            <div class="btn-group btn-group-vertical btn-group-sm" role="group">
+                                <button class="btn btn-outline-warning" id="btn_ani_off_up">&uparrow;</button>
+                                <div class="btn-group btn-group-sm ms-0" role="group">
+                                    <button class="btn btn-outline-warning" id="btn_ani_off_left">&leftarrow;</button>
+                                    <button class="btn btn-warning" id="btn_ani_off_base">Base</button>
+                                    <button class="btn btn-outline-warning" id="btn_ani_off_right">&rightarrow;</button>
+                                </div>
+                                <button class="btn btn-outline-warning ms-0" id="btn_ani_off_down">&downarrow;</button>
+                            </div>
+                            <span id="off_current" class="text-wheat"></span>
+                        </div>
+                        <div class="row mt-5">
+                            <span class="text-wheat">Img For Reference:</span>
+                            <div class="px-5">
+                                <div id="img_ref"></div>
+                                <button class="btn btn-outline-warning mt-2" id="btn_show_hide_canvas">Show / Hide Canvas</button>
+                                <button class="btn btn-outline-warning mt-2" id="btn_show_hide_ref">Show / Hide Ref.</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" style="max-width: 806px">
+                    <div class="row">
+                        <!-- image info, offset -->
+                        <div class="card my-2">
+                            <div class="card-body">
+                                <div class="row">
+                                    <span>Editing <span id="file_dat" class="d-inline"></span> - Target Hash[<span id="file_hash"></span>]</span>
+                                </div>
+                                <div class="row">
+                                    <small id="file_px"></small>
+                                    <small id="file_name"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- viewer + drop area -->
+                        <span id="drop_placeholder">Drop image file here to replace~</span>
+                        <div id="viewer_container" class="p-0 m-0">
+                            <canvas id="render_viewer" width="0px" height="0px"> </canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="row">
+                            <!-- thumbnail with frame index, drag & drop for index adjustment -->
+                            <div id="sortable" class="flex justify-content-start"></div>
+                        </div>
+                        <div class="row">
+                            <!-- animation control -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,97 @@
+:root {
+    color-scheme: dark;
+}
+
+body {
+    background-color: #22252a;
+}
+
+#render_viewer {
+    border: 1px solid red;
+}
+
+.highlight {
+    box-shadow: inset 0px 0px 10px 5px #fed700;
+}
+
+#sortable {
+    width: 800px;
+    max-width: 800px;
+    height: 140px;
+    margin: 5px 0;
+    border: 2px dotted #2196f3;
+    padding: 10px 0 0 10px;
+    background: #384a5c;
+    white-space: nowrap;
+    overflow-x: scroll;
+}
+#sortable:empty::after {
+    content: "Drop image file(s) here for multi-frames!";
+    font-size: 24px;
+    color: #fcfcfc;
+}
+
+#sortable > * {
+    border: 1px solid #fcfcfc;
+    background: #414141;
+    height: 100px;
+    width: 100px;
+    display: inline-block;
+    position: relative;
+    margin: 0px 3px;
+}
+
+.ui-state-highlight {
+    border: 2px solid red !important;
+}
+
+#drop_placeholder {
+    position: relative;
+    margin-top: -50px;
+    top: 50px;
+    font-size: 24px;
+    color: #fff;
+    visibility: visible;
+    width: 400px;
+}
+
+#viewer_container {
+    background-color: #434343;
+    border: 2px dashed #bebebe;
+    width: 806px;
+    height: 646px;
+    background-repeat: no-repeat;
+}
+
+.text-wheat {
+    color: wheat;
+}
+
+#img_ref {
+    height: 100px;
+    width: 100px;
+    border: 1px solid wheat;
+    margin-left: calc(var(--bs-gutter-x) * .5);
+    margin-top: 5px;
+    background-repeat: no-repeat;
+    background-size: 100px 100px;
+}
+
+.force_bg {
+    background: #434343 !important;
+}
+
+#overlay {
+    display: block;
+    z-index: 1000;
+    background-color: #4646468c;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+#overlay.hide {
+    display: none !important;
+}
